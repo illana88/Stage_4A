@@ -37,6 +37,22 @@ if arg1==0 or arg1==2 or arg1==5 :
             print("STARTED PROCESSING SAMPLE $sample")
             with open("Summary_stats.txt","a") as fichier :
                 fichier.write("STARTED PROCESSING SAMPLE $sample\n")
-            samp = os.path.splitext(os.path.basename(sample))[0] # Testé jusqu'ici et tout fonctionne
+            samp = os.path.splitext(os.path.basename(sample))[0]
             commande_shell = f"stringtie {sample} -p 8 -G gencode.v38.annotation.gtf -o iPSC_gtfs/{samp}.gtf"
-            subprocess.run(commande_shell, shell=True, check=True)
+            subprocess.run(commande_shell, shell=True, check=True) ##### Testé jusqu'ici et tout fonctionne #####
+        if len(os.listdir("iPSC_gtfs"))!=0 :
+            print("DONE WITH SringTie Calculations - NOW GENERATING LIST of ABUNDANT Txs")
+            with open("Summary_stats.txt","a") as fichier :
+                fichier.write("DONE WITH SringTie Calculations - NOW GENERATING LIST of ABUNDANT Txs\n")
+            # Now get unique transcripts in csv files for each sample
+            # for i in glob.glob("iPSC_gtfs/*.gtf") :
+            #     if (os.path.isfile(i)) :
+            #         samp = i.split('/')[1].split('.')[0]
+            #         print(samp)
+            #         print("PROCESSING SAMPLE $i")
+            #         with open("Summary_stats.txt","a") as fichier :
+            #             fichier.write("PROCESSING SAMPLE $i\n")
+            #         # Step 1. Get all Txs having reference_id (ENST), ref_gene_id (ENSG) and ref_gene_name (HUGO SYMBOL), these are 24 column lines in stringtie's gtf file
+
+            #     else :
+            #         break
