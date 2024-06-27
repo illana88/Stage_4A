@@ -5,12 +5,11 @@ if os.access("Summary_stats.txt",os.F_OK):
     os.remove(("Summary_stats.txt"))
 
 if arg1==0 or arg1==2 or arg1==5 :
-    phrase = "STARTING pgp-a.sh WITH FLAG 0"
-    with open("Summary_stats.txt","w+") as fichier :
-        fichier.write(phrase)
+    with open("Summary_stats.txt","w") as fichier :
+        fichier.write("STARTING pgp-a.sh WITH FLAG 0")
     phrase = "STARTED StringTie Calculation ... of samples"
     print(phrase)
-    with open("Summary_stats.txt","w+") as fichier :
+    with open("Summary_stats.txt","a") as fichier :
         fichier.write(phrase)
 #     if len(os.listdir("iPSC_gtfs"))==0 :
 #         for f in glob.glob("*.*") :
