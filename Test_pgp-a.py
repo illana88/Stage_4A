@@ -6,8 +6,8 @@ if os.access("Summary_stats.txt",os.F_OK):
 
 if arg1==0 or arg1==2 or arg1==5 :
     with open("Summary_stats.txt","w") as fichier :
-        fichier.write("STARTING pgp-a.sh WITH FLAG 0")
-    phrase = "STARTED StringTie Calculation ... of samples"
+        fichier.write("STARTING pgp-a.sh WITH FLAG 0\n")
+    phrase = "STARTED StringTie Calculation ... of samples\n"
     print(phrase)
     with open("Summary_stats.txt","a") as fichier :
         fichier.write(phrase)
