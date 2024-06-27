@@ -1,8 +1,8 @@
 import os
 
 arg1 = int(input("Argument 1 :"))
-# if os.access("Summary_stats",os.F_OK):
-#     os.remove(("Summary_stats"))
+if os.access("Summary_stats",os.F_OK):
+    os.remove(("Summary_stats"))
 
 # if arg1==0 or arg1==2 or arg1==5 :
 #     with open("Summary_stats.txt","w+") as fichier :
