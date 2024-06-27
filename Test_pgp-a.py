@@ -31,6 +31,7 @@ if arg1==0 or arg1==2 or arg1==5 :
     for row in reader :
         if "TDP43" in row[2] :
             samples.append(row[1])
+        print(samples)
     # Check if we got any samples
     # if "samples" in globals and len(samples)!=0 :
     #     for sample in samples :
