@@ -30,14 +30,13 @@ if arg1==0 or arg1==2 or arg1==5 :
     samples = []
     for row in reader :
         if "TDP43" in row[2] :
-            samples.append(row[1]) # Testé jusqu'ici et tout fonctionne
+            samples.append(row[1])
     # Check if we got any samples
     if "samples" in globals() and len(samples)!=0 :
         for sample in samples :
             print("STARTED PROCESSING SAMPLE $sample")
             with open("Summary_stats.txt","a") as fichier :
                 fichier.write("STARTED PROCESSING SAMPLE $sample\n")
-            samp = os.path.splitext(os.path.basename(sample))[0]
-            print(samp)
-    #         commande_shell = f"stringtie {sample} -p 8 -G gencode.v38.annotation.gtf -o iPSC_gtfs/{samp}.gtf"
-    #         subprocess.run(commande_shell, shell=True, check=True)
+            samp = os.path.splitext(os.path.basename(sample))[0] # Testé jusqu'ici et tout fonctionne
+            commande_shell = f"stringtie {sample} -p 8 -G gencode.v38.annotation.gtf -o iPSC_gtfs/{samp}.gtf"
+            subprocess.run(commande_shell, shell=True, check=True)
