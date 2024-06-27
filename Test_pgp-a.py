@@ -12,9 +12,9 @@ if arg1==0 or arg1==2 or arg1==5 :
     print(phrase)
     with open("Summary_stats.txt","a") as fichier :
         fichier.write(phrase)
+    os.makedirs("iPSC_gtfs",exist_ok=True)
     if len(os.listdir("iPSC_gtfs"))!=0 :
         for f in glob.glob("*.*") :
             os.remove(f)
-        os.makedirs("iPSC_gtfs",exist_ok=True)
 #     file = open("all_bams.tsv")
 #     reader = csv.reader(file,delimiter='\t')
