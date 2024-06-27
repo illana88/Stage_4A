@@ -32,7 +32,7 @@ if arg1==0 or arg1==2 or arg1==5 :
         if "TDP43" in row[2] :
             samples.append(row[1]) # Testé jusqu'ici et tout fonctionne
     # Check if we got any samples
-    if "samples" in globals and len(samples)!=0 :
+    if "samples" in globals() and len(samples)!=0 :
         for sample in samples :
             print("STARTED PROCESSING SAMPLE $sample")
             with open("Summary_stats.txt","a") as fichier :
