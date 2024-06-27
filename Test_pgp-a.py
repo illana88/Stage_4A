@@ -14,7 +14,7 @@ if arg1==0 or arg1==2 or arg1==5 :
         fichier.write(phrase)
     os.makedirs("iPSC_gtfs",exist_ok=True)
     if len(os.listdir("iPSC_gtfs"))!=0 :
-        for f in glob.glob("*.*") :
+        for f in glob.glob("iPSC_gtfs/*.*") :
             os.remove(f)
 #     file = open("all_bams.tsv")
 #     reader = csv.reader(file,delimiter='\t')
