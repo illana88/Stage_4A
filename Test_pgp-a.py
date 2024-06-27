@@ -1,5 +1,6 @@
 import os
 import glob
+import csv
 
 arg1 = int(input("Argument 1 :"))
 if os.access("Summary_stats.txt",os.F_OK):
@@ -16,5 +17,5 @@ if arg1==0 or arg1==2 or arg1==5 :
     if len(os.listdir("iPSC_gtfs"))!=0 :
         for f in glob.glob("iPSC_gtfs/*.*") :
             os.remove(f)
-#     file = open("all_bams.tsv")
-#     reader = csv.reader(file,delimiter='\t')
+    file = open("all_bams.tsv")
+    reader = csv.reader(file,delimiter='\t')
