@@ -37,6 +37,7 @@ if arg1==0 or arg1==2 or arg1==5 :
             print("STARTED PROCESSING SAMPLE $sample")
             with open("Summary_stats.txt","a") as fichier :
                 fichier.write("STARTED PROCESSING SAMPLE $sample\n")
-    #         samp = os.path.splitext(os.path.basename(sample))[0]
+            samp = os.path.splitext(os.path.basename(sample))[0]
+            print(samp)
     #         commande_shell = f"stringtie {sample} -p 8 -G gencode.v38.annotation.gtf -o iPSC_gtfs/{samp}.gtf"
     #         subprocess.run(commande_shell, shell=True, check=True)
