@@ -40,7 +40,7 @@ if arg1==0 or arg1==2 or arg1==5 :
                 fichier.write("STARTED PROCESSING SAMPLE $sample\n")
             samp = os.path.splitext(os.path.basename(sample))[0]
             commande_shell = f"stringtie {sample} -p 8 -G gencode.v38.annotation.gtf -o iPSC_gtfs/{samp}.gtf"
-            subprocess.run(commande_shell, shell=True, check=True) ##### Testé jusqu'ici et tout fonctionne #####
+            subprocess.run(commande_shell, shell=True, check=True)
         if len(os.listdir("iPSC_gtfs"))!=0 :
             print("DONE WITH SringTie Calculations - NOW GENERATING LIST of ABUNDANT Txs")
             with open("Summary_stats.txt","a") as fichier :
@@ -49,13 +49,20 @@ if arg1==0 or arg1==2 or arg1==5 :
             for i in glob.glob("iPSC_gtfs/*.gtf") :
                 if (os.path.isfile(i)) :
                     samp = i.split('/')[1].split('.')[0]
-                    print(samp)
                     print("PROCESSING SAMPLE $i")
                     with open("Summary_stats.txt","a") as fichier :
-                        fichier.write("PROCESSING SAMPLE $i\n")
-                #     # Step 1. Get all Txs having reference_id (ENST), ref_gene_id (ENSG) and ref_gene_name (HUGO SYMBOL), these are 24 column lines in stringtie's gtf file
-                #     if len(i)==24 :
-                #         col = [i[13], i[15], i[17], i[19], i[21], i[23]]
-                #         for c in col :
-                # else :
-                #     break
+                        fichier.write("PROCESSING SAMPLE $i\n")  ##### Testé jusqu'ici et tout fonctionne #####
+                    # Step 1. Get all Txs having reference_id (ENST), ref_gene_id (ENSG) and ref_gene_name (HUGO SYMBOL), these are 24 column lines in stringtie's gtf file
+                    tab = i.strip().split()
+                    if len(tab)==24 :
+                        col = [tab[13], tab[15], tab[17], tab[19], tab[21], tab[23]]
+                        new_col = re.sub(r';', '\t', "\t".join(col))
+                        with open(f"iPSC_gtfs/{samp}.csv","w") as fichier :
+                            fichier.write(new_col)
+                else :
+                    break
+            # Now select most abundant transcripts from all samples
+            print("Now calling abundant_tx.R")
+            with open("Summary_stats.txt","a") as fichier :
+                fichier.write("Now calling abundant_tx.R\n")
+                    
