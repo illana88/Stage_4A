@@ -8,6 +8,7 @@ import os
 import glob
 import csv
 import subprocess
+import re
 
 arg1 = int(input("Argument 1 :"))
 if os.access("Summary_stats.txt",os.F_OK):
@@ -45,14 +46,16 @@ if arg1==0 or arg1==2 or arg1==5 :
             with open("Summary_stats.txt","a") as fichier :
                 fichier.write("DONE WITH SringTie Calculations - NOW GENERATING LIST of ABUNDANT Txs\n")
             # Now get unique transcripts in csv files for each sample
-            # for i in glob.glob("iPSC_gtfs/*.gtf") :
-            #     if (os.path.isfile(i)) :
-            #         samp = i.split('/')[1].split('.')[0]
-            #         print(samp)
-            #         print("PROCESSING SAMPLE $i")
-            #         with open("Summary_stats.txt","a") as fichier :
-            #             fichier.write("PROCESSING SAMPLE $i\n")
-            #         # Step 1. Get all Txs having reference_id (ENST), ref_gene_id (ENSG) and ref_gene_name (HUGO SYMBOL), these are 24 column lines in stringtie's gtf file
-
-            #     else :
-            #         break
+            for i in glob.glob("iPSC_gtfs/*.gtf") :
+                if (os.path.isfile(i)) :
+                    samp = i.split('/')[1].split('.')[0]
+                    print(samp)
+                    print("PROCESSING SAMPLE $i")
+                    with open("Summary_stats.txt","a") as fichier :
+                        fichier.write("PROCESSING SAMPLE $i\n")
+                #     # Step 1. Get all Txs having reference_id (ENST), ref_gene_id (ENSG) and ref_gene_name (HUGO SYMBOL), these are 24 column lines in stringtie's gtf file
+                #     if len(i)==24 :
+                #         col = [i[13], i[15], i[17], i[19], i[21], i[23]]
+                #         for c in col :
+                # else :
+                #     break
