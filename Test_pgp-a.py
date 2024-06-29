@@ -9,7 +9,7 @@ import glob
 import csv
 import subprocess
 import re
-import panda as pd
+import pandas as pd
 
 arg1 = int(input("Argument 1 :"))
 if os.access("Summary_stats.txt",os.F_OK):
