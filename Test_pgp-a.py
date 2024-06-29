@@ -51,12 +51,17 @@ if arg1==0 or arg1==2 or arg1==5 :
                     samp = i.split('/')[1].split('.')[0]
                     print("PROCESSING SAMPLE $i")
                     with open("Summary_stats.txt","a") as fichier :
-                        fichier.write("PROCESSING SAMPLE $i\n")  ##### Testé jusqu'ici et tout fonctionne #####
+                        fichier.write("PROCESSING SAMPLE $i\n") ##### Testé jusqu'ici et tout fonctionne #####
                     # Step 1. Get all Txs having reference_id (ENST), ref_gene_id (ENSG) and ref_gene_name (HUGO SYMBOL), these are 24 column lines in stringtie's gtf file
                     tab = i.strip().split()
+                    print(f"tab : {tab}")
+                    print(f"len tab : {len(tab)}")
                     if len(tab)==24 :
                         col = [tab[13], tab[15], tab[17], tab[19], tab[21], tab[23]]
+                        print(f"col : {col}")
                         new_col = re.sub(r';', '\t', "\t".join(col))
+                        print(f"new_col : {new_col}")
+                        print(f"samp : {samp}")
                         with open(f"iPSC_gtfs/{samp}.csv","w") as fichier :
                             fichier.write(new_col)
                 else :
@@ -64,5 +69,6 @@ if arg1==0 or arg1==2 or arg1==5 :
             # Now select most abundant transcripts from all samples
             print("Now calling abundant_tx.R")
             with open("Summary_stats.txt","a") as fichier :
-                fichier.write("Now calling abundant_tx.R\n")
+                fichier.write("Now calling abundant_tx.R\n") ##### Testé jusqu'ici (et tout fonctionne) -> à vérifier #####
+            ##### abundant_tx.R à coder en Pyhton #####
                     
