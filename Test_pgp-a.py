@@ -62,8 +62,8 @@ if arg1==0 or arg1==2 or arg1==5 :
                             tab = tab.strip().split('\t')
                             print(f"tab : {tab}")
                             print(f"len tab : {len(tab)}")
-                            c = c + 1
                             if len(tab)==24 :
+                                c = c + 1
                                 col = [tab[13], tab[15], tab[17], tab[19], tab[21], tab[23]]
                                 print(f"col : {col}")
                                 new_col = re.sub(r';', '\t', "\t".join(col))
@@ -73,6 +73,7 @@ if arg1==0 or arg1==2 or arg1==5 :
                                     fichier.write(new_col)
                 else :
                     break
+                print("compteur : ", c)
             # Now select most abundant transcripts from all samples
             print("Now calling abundant_tx.R")
             with open("Summary_stats.txt","a") as fichier :
