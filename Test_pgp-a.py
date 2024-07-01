@@ -40,8 +40,7 @@ if arg1==0 or arg1==2 or arg1==5 :
             with open("Summary_stats.txt","a") as fichier :
                 fichier.write("STARTED PROCESSING SAMPLE $sample\n")
             samp = os.path.basename(sample)
-            samp = samp.split('.')[0] # os.path.splitext(samp)[0] ## pb : pas la bon samp -> test
-            print(samp)
+            samp = samp.split('.')[0]
             commande_shell = f"stringtie {sample} -p 8 -G gencode.v38.annotation.gtf -o iPSC_gtfs/{samp}.gtf"
             subprocess.run(commande_shell, shell=True, check=True)
         if len(os.listdir("iPSC_gtfs"))!=0 :
@@ -58,7 +57,8 @@ if arg1==0 or arg1==2 or arg1==5 :
                     # Step 1. Get all Txs having reference_id (ENST), ref_gene_id (ENSG) and ref_gene_name (HUGO SYMBOL), these are 24 column lines in stringtie's gtf file
                     with open(i, 'r') as file:
                         for line in file:
-                            tab = line.strip().split('\t')
+                            tab = line.replace(' ', '\t')
+                            tab = tab.strip().split('\t')
                             print(f"tab : {tab}")
                             print(f"len tab : {len(tab)}")
                             if len(tab)==24 :
