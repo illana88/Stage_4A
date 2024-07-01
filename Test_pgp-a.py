@@ -55,12 +55,14 @@ if arg1==0 or arg1==2 or arg1==5 :
                     with open("Summary_stats.txt","a") as fichier :
                         fichier.write("PROCESSING SAMPLE $i\n") ##### Testé jusqu'ici et tout fonctionne #####
                     # Step 1. Get all Txs having reference_id (ENST), ref_gene_id (ENSG) and ref_gene_name (HUGO SYMBOL), these are 24 column lines in stringtie's gtf file
+                    c = 0
                     with open(i, 'r') as file:
                         for line in file:
                             tab = line.replace(' ', '\t')
                             tab = tab.strip().split('\t')
                             print(f"tab : {tab}")
                             print(f"len tab : {len(tab)}")
+                            c = c + 1
                             if len(tab)==24 :
                                 col = [tab[13], tab[15], tab[17], tab[19], tab[21], tab[23]]
                                 print(f"col : {col}")
