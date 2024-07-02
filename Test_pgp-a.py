@@ -53,7 +53,7 @@ if arg1==0 or arg1==2 or arg1==5 :
                     samp = i.split('/')[1].split('.')[0]
                     print("PROCESSING SAMPLE $i")
                     with open("Summary_stats.txt","a") as fichier :
-                        fichier.write("PROCESSING SAMPLE $i\n") ##### Testé jusqu'ici et tout fonctionne #####
+                        fichier.write("PROCESSING SAMPLE $i\n")
                     # Step 1. Get all Txs having reference_id (ENST), ref_gene_id (ENSG) and ref_gene_name (HUGO SYMBOL), these are 24 column lines in stringtie's gtf file
                     with open(i, 'r') as file:
                         for line in file:
@@ -74,27 +74,30 @@ if arg1==0 or arg1==2 or arg1==5 :
             # Now select most abundant transcripts from all samples
             print("Now calling abundant_tx.R")
             with open("Summary_stats.txt","a") as fichier :
-                fichier.write("Now calling abundant_tx.R\n")
-            ##### abundant_tx.R à coder en Pyhton #####
-            # if os.access("principal_tx.csv",os.F_OK):
-            #     os.remove(("principal_tx.csv"))
-            # file_list = [f for f in os.listdir("iPSC_gtfs/") if f.endswith('.csv')]
-            # ddf = pd.DataFrame({
-            #     'TxID': pd.Series(dtype='str'),
-            #     'GeneID': pd.Series(dtype='str'),
-            #     'Gene_Name': pd.Series(dtype='str'),
-            #     'cov': pd.Series(dtype='float'),
-            #     'FPKM': pd.Series(dtype='float'),
-            #     'TPM': pd.Series(dtype='float')
-            # })
-            # all_ddf = pd.DataFrame({
-            #     'TxID': pd.Series(dtype='str'),
-            #     'GeneID': pd.Series(dtype='str'),
-            #     'Gene_Name': pd.Series(dtype='str'),
-            #     'cov': pd.Series(dtype='float'),
-            #     'FPKM': pd.Series(dtype='float'),
-            #     'TPM': pd.Series(dtype='float')
-            # })
+                fichier.write("Now calling abundant_tx.R\n") ##### Testé jusqu'ici et tout fonctionne #####
+            ##### abundant_tx.R codé en Pyhton #####
+            if os.access("principal_tx.csv",os.F_OK):
+                os.remove(("principal_tx.csv"))
+            file_list = [f for f in os.listdir("iPSC_gtfs/") if f.endswith('.csv')]
+            print(file_list)
+            ddf = pd.DataFrame({
+                'TxID': pd.Series(dtype='str'),
+                'GeneID': pd.Series(dtype='str'),
+                'Gene_Name': pd.Series(dtype='str'),
+                'cov': pd.Series(dtype='float'),
+                'FPKM': pd.Series(dtype='float'),
+                'TPM': pd.Series(dtype='float')
+            })
+            all_ddf = pd.DataFrame({
+                'TxID': pd.Series(dtype='str'),
+                'GeneID': pd.Series(dtype='str'),
+                'Gene_Name': pd.Series(dtype='str'),
+                'cov': pd.Series(dtype='float'),
+                'FPKM': pd.Series(dtype='float'),
+                'TPM': pd.Series(dtype='float')
+            })
+            print(ddf)
+            print(all_ddf)
             # for i in range(1,len(file_list)):
             #     print(f"reading file : {file_list[i]}")
             #     rec = pd.read_csv(f"iPSC_gtfs/{file_list[i]}", sep="\t", header=None)
