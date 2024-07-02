@@ -74,12 +74,11 @@ if arg1==0 or arg1==2 or arg1==5 :
             # Now select most abundant transcripts from all samples
             print("Now calling abundant_tx.R")
             with open("Summary_stats.txt","a") as fichier :
-                fichier.write("Now calling abundant_tx.R\n") ##### Testé jusqu'ici et tout fonctionne #####
+                fichier.write("Now calling abundant_tx.R\n")
             ##### abundant_tx.R codé en Pyhton #####
             if os.access("principal_tx.csv",os.F_OK):
                 os.remove(("principal_tx.csv"))
             file_list = [f for f in os.listdir("iPSC_gtfs/") if f.endswith('.csv')]
-            print(file_list)
             ddf = pd.DataFrame({
                 'TxID': pd.Series(dtype='str'),
                 'GeneID': pd.Series(dtype='str'),
@@ -95,12 +94,10 @@ if arg1==0 or arg1==2 or arg1==5 :
                 'cov': pd.Series(dtype='float'),
                 'FPKM': pd.Series(dtype='float'),
                 'TPM': pd.Series(dtype='float')
-            })
-            print(ddf)
-            print(all_ddf)
-            # for i in range(1,len(file_list)):
-            #     print(f"reading file : {file_list[i]}")
-            #     rec = pd.read_csv(f"iPSC_gtfs/{file_list[i]}", sep="\t", header=None)
-            #     rec = rec.drop(columns=['V7'])
-            #     rec.columns = ["TxID","GeneID","Gene_Name", "cov","FPKM","TPM"]
-            #     all_ddf = pd.concat([all_ddf, rec], ignore_index=True)
+            }) ##### Testé jusqu'ici et tout fonctionne #####
+            for i in range(1,len(file_list)):
+                print(f"reading file : {file_list[i]}")
+                rec = pd.read_csv(f"iPSC_gtfs/{file_list[i]}", sep="\t", header=None)
+                rec = rec.drop(columns=['V7'])
+                rec.columns = ["TxID","GeneID","Gene_Name", "cov","FPKM","TPM"]
+                all_ddf = pd.concat([all_ddf, rec], ignore_index=True)
