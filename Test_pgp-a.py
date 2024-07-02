@@ -98,6 +98,7 @@ if arg1==0 or arg1==2 or arg1==5 :
             for i in range(1,len(file_list)):
                 print(f"reading file : {file_list[i]}")
                 rec = pd.read_csv(f"iPSC_gtfs/{file_list[i]}", sep="\t", header=None)
+                print(rec)
                 rec = rec.drop(columns=['V7'])
                 rec.columns = ["TxID","GeneID","Gene_Name", "cov","FPKM","TPM"]
                 all_ddf = pd.concat([all_ddf, rec], ignore_index=True)
