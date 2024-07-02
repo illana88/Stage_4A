@@ -55,7 +55,6 @@ if arg1==0 or arg1==2 or arg1==5 :
                     with open("Summary_stats.txt","a") as fichier :
                         fichier.write("PROCESSING SAMPLE $i\n") ##### Testé jusqu'ici et tout fonctionne #####
                     # Step 1. Get all Txs having reference_id (ENST), ref_gene_id (ENSG) and ref_gene_name (HUGO SYMBOL), these are 24 column lines in stringtie's gtf file
-                    c = 0
                     with open(i, 'r') as file:
                         for line in file:
                             tab = line.replace(' ', '\t')
@@ -63,17 +62,15 @@ if arg1==0 or arg1==2 or arg1==5 :
                             print(f"tab : {tab}")
                             print(f"len tab : {len(tab)}")
                             if len(tab)==24 :
-                                c = c + 1
                                 col = [tab[13], tab[15], tab[17], tab[19], tab[21], tab[23]]
                                 print(f"col : {col}")
                                 new_col = re.sub(r';', '\t', "\t".join(col))
                                 print(f"new_col : {new_col}")
                                 print(f"samp : {samp}")
                                 with open(f"iPSC_gtfs/{samp}.csv","a") as fichier :
-                                    fichier.write(new_col)
+                                    fichier.write(new_col + "\n")
                 else :
                     break
-                print("compteur : ", c)
             # Now select most abundant transcripts from all samples
             print("Now calling abundant_tx.R")
             with open("Summary_stats.txt","a") as fichier :
@@ -100,3 +97,7 @@ if arg1==0 or arg1==2 or arg1==5 :
             # })
             # for i in range(1,len(file_list)):
             #     print(f"reading file : {file_list[i]}")
+            #     rec = pd.read_csv(f"iPSC_gtfs/{file_list[i]}", sep="\t", header=None)
+            #     rec = rec.drop(columns=['V7'])
+            #     rec.columns = ["TxID","GeneID","Gene_Name", "cov","FPKM","TPM"]
+            #     all_ddf = pd.concat([all_ddf, rec], ignore_index=True)
