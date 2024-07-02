@@ -69,7 +69,7 @@ if arg1==0 or arg1==2 or arg1==5 :
                                 new_col = re.sub(r';', '\t', "\t".join(col))
                                 print(f"new_col : {new_col}")
                                 print(f"samp : {samp}")
-                                with open(f"iPSC_gtfs/{samp}.csv","w") as fichier :
+                                with open(f"iPSC_gtfs/{samp}.csv","a") as fichier :
                                     fichier.write(new_col)
                 else :
                     break
