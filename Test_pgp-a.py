@@ -98,73 +98,73 @@ if arg1==0 or arg1==2 or arg1==5 :
             for i in range(len(file_list)):
                 print(f"reading file : {file_list[i]}")
                 rec = pd.read_csv(f"iPSC_gtfs/{file_list[i]}", sep="\t", header=None)
+                print("rec : ", rec)
                 rec = rec.drop(columns=[7])
-                rec.columns = ["TxID","GeneID","Gene_Name", "cov","FPKM","TPM"] + list(rec.columns[6:]) # il y a 11 éléments et on renomme que 6 colonnes
+                rec.columns = ["TxID","GeneID","Gene_Name", "cov","FPKM","TPM"] + list(rec.columns[6:])
                 all_ddf = pd.concat([all_ddf, rec], ignore_index=True) ##### Testé jusqu'ici et tout fonctionne #####
-            # Remove spaces
-            print("rec : ",rec)
-            print("all_ddf before : ", all_ddf)
-            def remove_spaces(s):
-                if isinstance(s, str):
-                    return re.sub(r' ', '', s)
-            all_ddf = all_ddf.apply(lambda col: col.map(remove_spaces)) # all_ddf.applymap(remove_spaces)
-            print("all_ddf after revoming space : ", all_ddf)
-            # And sort for fast retrieval
-            all_ddf = all_ddf.sort_values(by='Gene_Name')
-            print("all_ddf after sorted : ", all_ddf)
-            # Get unique gene names
-            unique_genes = pd.unique(all_ddf['Gene_Name'])
-            print("unique_genes : ", unique_genes)
-            Tx_ddf = pd.DataFrame({
-                'TxID': pd.Series(dtype='str'),
-                'GeneID': pd.Series(dtype='str'),
-                'Gene_Name': pd.Series(dtype='str') ##### Testé jusqu'ici et à vérifier si ça fonctionne #####
-            })
-            # Select row with max cov for each gene
-            print('Now Generating Txs Table, Will take a while !!!!!!!')
-            for i in range (len(unique_genes)):
-                TxSubset = all_ddf[all_ddf['Gene_Name'] == unique_genes[i]]
-                tx_gene = TxSubset[TxSubset['cov'] == TxSubset['cov'].max()][0:3]
-                Tx_ddf = pd.concat([Tx_ddf, tx_gene], ignore_index=True)
-            # Write in file
-            # Also remove trailing version numbers
-            Tx_ddf['GeneID'] = Tx_ddf['GeneID'].str.split('.', n=1, expand=True)[0]
-            Tx_ddf['TxID'] = Tx_ddf['TxID'].str.split('.', n=1, expand=True)[0]
-            Tx_ddf.to_csv("principal_txs.csv", index=False, quoting=pd.QUOTE_NONE, sep=',', header=False)
-            print('Done With Txs Table: principal_txs.csv')
-            ########## FIN abundant_tx.R codé en Pyhton ##########
+#             # Remove spaces
+#             print("all_ddf before : ", all_ddf)
+#             def remove_spaces(s):
+#                 if isinstance(s, str):
+#                     return re.sub(r' ', '', s)
+#             all_ddf = all_ddf.apply(lambda col: col.map(remove_spaces)) # all_ddf.applymap(remove_spaces)
+#             print("all_ddf after revoming space : ", all_ddf)
+#             # And sort for fast retrieval
+#             all_ddf = all_ddf.sort_values(by='Gene_Name')
+#             print("all_ddf after sorted : ", all_ddf)
+#             # Get unique gene names
+#             unique_genes = pd.unique(all_ddf['Gene_Name'])
+#             print("unique_genes : ", unique_genes)
+#             Tx_ddf = pd.DataFrame({
+#                 'TxID': pd.Series(dtype='str'),
+#                 'GeneID': pd.Series(dtype='str'),
+#                 'Gene_Name': pd.Series(dtype='str') ##### Testé jusqu'ici et à vérifier si ça fonctionne #####
+#             })
+#             # Select row with max cov for each gene
+#             print('Now Generating Txs Table, Will take a while !!!!!!!')
+#             for i in range (len(unique_genes)):
+#                 TxSubset = all_ddf[all_ddf['Gene_Name'] == unique_genes[i]]
+#                 tx_gene = TxSubset[TxSubset['cov'] == TxSubset['cov'].max()][0:3]
+#                 Tx_ddf = pd.concat([Tx_ddf, tx_gene], ignore_index=True)
+#             # Write in file
+#             # Also remove trailing version numbers
+#             Tx_ddf['GeneID'] = Tx_ddf['GeneID'].str.split('.', n=1, expand=True)[0]
+#             Tx_ddf['TxID'] = Tx_ddf['TxID'].str.split('.', n=1, expand=True)[0]
+#             Tx_ddf.to_csv("principal_txs.csv", index=False, quoting=pd.QUOTE_NONE, sep=',', header=False)
+#             print('Done With Txs Table: principal_txs.csv')
+#             ########## FIN abundant_tx.R codé en Pyhton ##########
             
             
-            print("DONE WITH ABUNDANT Txs file Generation (principal_txs.csv) for input BAM SAMPLES")
-            with open("Summary_stats.txt","a") as fichier :
-                fichier.write("DONE WITH ABUNDANT Txs file Generation (principal_txs.csv) for input BAM SAMPLES\n")
-                fichier.write("FINISHED pgp-a.sh WITH FLAG 0\n")
-            if arg1 == 0 :
-                print("++++++NOW Exiting+++++, PLEASE CHECK Summary_stats.txt file for details")
-                with open("Summary_stats.txt","a") as fichier :
-                    fichier.write("++++++NOW Exiting+++++, PLEASE CHECK Summary_stats.txt file for details\n")
-                sys.exit(1)
-            else : # ABORT if we got no samples
-                print("No .gtf FILE GENERATED BY StringTie2 (found empty iPSC_gtfs folder) ABORTING!!!! Please check BAM samples path and Rerun again")
-                with open("Summary_stats.txt","a") as fichier :
-                    fichier.write("No .gtf FILE GENERATED BY StringTie2 (found empty iPSC_gtfs folder) ABORTING!!!! Please check BAM samples path and Rerun again\n")
-        else :
-            print("!!!!!!!!!!!Something went wrong with SringTie Calculations (Please check all_bams.tsv for BAM FILE PATHS) - Please correct the error and re-run again !!!!!!!!!!!")
-            with open("Summary_stats.txt","a") as fichier :
-                fichier.write("!!!!!!!!!!!Something went wrong with SringTie Calculations (Please check all_bams.tsv for BAM FILE PATHS) - Please correct the error and re-run again !!!!!!!!!!!\n")
-            print("++++++NOW Exiting+++++")
-            with open("Summary_stats.txt","a") as fichier :
-                fichier.write("++++++NOW Exiting+++++\n")
-            sys.exit(1)
+#             print("DONE WITH ABUNDANT Txs file Generation (principal_txs.csv) for input BAM SAMPLES")
+#             with open("Summary_stats.txt","a") as fichier :
+#                 fichier.write("DONE WITH ABUNDANT Txs file Generation (principal_txs.csv) for input BAM SAMPLES\n")
+#                 fichier.write("FINISHED pgp-a.sh WITH FLAG 0\n")
+#             if arg1 == 0 :
+#                 print("++++++NOW Exiting+++++, PLEASE CHECK Summary_stats.txt file for details")
+#                 with open("Summary_stats.txt","a") as fichier :
+#                     fichier.write("++++++NOW Exiting+++++, PLEASE CHECK Summary_stats.txt file for details\n")
+#                 sys.exit(1)
+#             else : # ABORT if we got no samples
+#                 print("No .gtf FILE GENERATED BY StringTie2 (found empty iPSC_gtfs folder) ABORTING!!!! Please check BAM samples path and Rerun again")
+#                 with open("Summary_stats.txt","a") as fichier :
+#                     fichier.write("No .gtf FILE GENERATED BY StringTie2 (found empty iPSC_gtfs folder) ABORTING!!!! Please check BAM samples path and Rerun again\n")
+#         else :
+#             print("!!!!!!!!!!!Something went wrong with SringTie Calculations (Please check all_bams.tsv for BAM FILE PATHS) - Please correct the error and re-run again !!!!!!!!!!!")
+#             with open("Summary_stats.txt","a") as fichier :
+#                 fichier.write("!!!!!!!!!!!Something went wrong with SringTie Calculations (Please check all_bams.tsv for BAM FILE PATHS) - Please correct the error and re-run again !!!!!!!!!!!\n")
+#             print("++++++NOW Exiting+++++")
+#             with open("Summary_stats.txt","a") as fichier :
+#                 fichier.write("++++++NOW Exiting+++++\n")
+#             sys.exit(1)
             
             
             
             
-# NEXT SORT FILE ON COLUMN 5 - THIS IS IMPORTANT AS PIPELINE DEPENDS ON IT
-if arg1==1 or arg1==2 or arg1==5 :
-    with open("Summary_stats.txt","a") as fichier :
-        fichier.write("STARTING pgp-a.sh WITH FLAG 1 for all events sashimi plots\n")
-    arg2 = input("Argument 2 :") # arg2 = "sorted_selected_events.csv
-    if os.access(arg2 ,os.F_OK):
-        splicing_events_file = arg2.split('.')[0]
+# # NEXT SORT FILE ON COLUMN 5 - THIS IS IMPORTANT AS PIPELINE DEPENDS ON IT
+# if arg1==1 or arg1==2 or arg1==5 :
+#     with open("Summary_stats.txt","a") as fichier :
+#         fichier.write("STARTING pgp-a.sh WITH FLAG 1 for all events sashimi plots\n")
+#     arg2 = input("Argument 2 :") # arg2 = "sorted_selected_events.csv
+#     if os.access(arg2 ,os.F_OK):
+#         splicing_events_file = arg2.split('.')[0]
         
