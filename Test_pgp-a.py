@@ -97,7 +97,8 @@ if arg1==0 or arg1==2 or arg1==5 :
             })
             for i in range(len(file_list)):
                 print(f"reading file : {file_list[i]}")
-                rec = pd.read_csv(f"iPSC_gtfs/{file_list[i]}", sep="\t", header=None, dtype=str, encoding='utf-8')
+                rec = pd.read_csv(f"iPSC_gtfs/{file_list[i]}", sep="\s+", header=None, dtype=str)
+                # rec = pd.read_csv(f"iPSC_gtfs/{file_list[i]}", sep="\t", header=None, dtype=str, encoding='utf-8')
                 print("rec : ", rec)
                 rec = rec.drop(columns=[7])
                 rec.columns = ["TxID","GeneID","Gene_Name", "cov","FPKM","TPM"] + list(rec.columns[6:])
