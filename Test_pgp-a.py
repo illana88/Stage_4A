@@ -111,7 +111,7 @@ if arg1==0 or arg1==2 or arg1==5 :
             print("all_ddf after revoming space : ", all_ddf)
             # And sort for fast retrieval
             all_ddf = all_ddf.sort_values(by='Gene_Name')
-            print("all_ddf after sorted : ", all_ddf)
+            print("all_ddf after sorted : ", all_ddf[5,:])
 #             # Get unique gene names
 #             unique_genes = pd.unique(all_ddf['Gene_Name'])
 #             print("unique_genes : ", unique_genes)
