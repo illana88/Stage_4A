@@ -102,24 +102,24 @@ if arg1==0 or arg1==2 or arg1==5 :
                 # rec = rec.drop(columns=[7]) -> seulement 6 colonnes
                 rec.columns = ["TxID","GeneID","Gene_Name", "cov","FPKM","TPM"]
                 all_ddf = pd.concat([all_ddf, rec], ignore_index=True)
-            # # Remove spaces
-            # print("all_ddf before : ", all_ddf)
-            # def remove_spaces(s):
-            #     if isinstance(s, str):
-            #         return re.sub(r' ', '', s)
-            # all_ddf = all_ddf.apply(lambda col: col.map(remove_spaces)) # all_ddf.applymap(remove_spaces)
-            # print("all_ddf after revoming space : ", all_ddf)
-            # # And sort for fast retrieval
-            # all_ddf = all_ddf.sort_values(by='Gene_Name')
-            # print("all_ddf after sorted : ", all_ddf)
-            # # Get unique gene names
-            # unique_genes = pd.unique(all_ddf['Gene_Name'])
-            # print("unique_genes : ", unique_genes)
-            # Tx_ddf = pd.DataFrame({
-            #     'TxID': pd.Series(dtype='str'),
-            #     'GeneID': pd.Series(dtype='str'),
-            #     'Gene_Name': pd.Series(dtype='str')
-            # })
+            # Remove spaces
+            print("all_ddf before : ", all_ddf)
+            def remove_spaces(s):
+                if isinstance(s, str):
+                    return re.sub(r' ', '', s)
+            all_ddf = all_ddf.apply(lambda col: col.map(remove_spaces)) # all_ddf.applymap(remove_spaces)
+            print("all_ddf after revoming space : ", all_ddf)
+            # And sort for fast retrieval
+            all_ddf = all_ddf.sort_values(by='Gene_Name')
+            print("all_ddf after sorted : ", all_ddf)
+#             # Get unique gene names
+#             unique_genes = pd.unique(all_ddf['Gene_Name'])
+#             print("unique_genes : ", unique_genes)
+#             Tx_ddf = pd.DataFrame({
+#                 'TxID': pd.Series(dtype='str'),
+#                 'GeneID': pd.Series(dtype='str'),
+#                 'Gene_Name': pd.Series(dtype='str')
+#             })
 #             # Select row with max cov for each gene
 #             print('Now Generating Txs Table, Will take a while !!!!!!!')
 #             for i in range (len(unique_genes)):
@@ -164,7 +164,7 @@ if arg1==0 or arg1==2 or arg1==5 :
 # if arg1==1 or arg1==2 or arg1==5 :
 #     with open("Summary_stats.txt","a") as fichier :
 #         fichier.write("STARTING pgp-a.sh WITH FLAG 1 for all events sashimi plots\n")
-#     arg2 = input("Argument 2 :") # arg2 = "sorted_selected_events.csv
+#     arg2 = input("Argument 2 :") # arg2 = "sorted_selected_events.csv"
 #     if os.access(arg2 ,os.F_OK):
 #         splicing_events_file = arg2.split('.')[0]
         
