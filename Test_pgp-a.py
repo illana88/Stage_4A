@@ -94,32 +94,32 @@ if arg1==0 or arg1==2 or arg1==5 :
                 'cov': pd.Series(dtype='float'),
                 'FPKM': pd.Series(dtype='float'),
                 'TPM': pd.Series(dtype='float')
-            })
+            })                              ##### Testé jusqu'ici et tout fonctionne #####
             for i in range(len(file_list)):
                 print(f"reading file : {file_list[i]}")
                 rec = pd.read_csv(f"iPSC_gtfs/{file_list[i]}", sep="\s+", header=None, dtype=str)
                 print("rec : ", rec)
-                rec = rec.drop(columns=[7])
-                rec.columns = ["TxID","GeneID","Gene_Name", "cov","FPKM","TPM"] + list(rec.columns[6:])
-                all_ddf = pd.concat([all_ddf, rec], ignore_index=True) ##### Testé jusqu'ici et tout fonctionne #####
-            # Remove spaces
-            print("all_ddf before : ", all_ddf)
-            def remove_spaces(s):
-                if isinstance(s, str):
-                    return re.sub(r' ', '', s)
-            all_ddf = all_ddf.apply(lambda col: col.map(remove_spaces)) # all_ddf.applymap(remove_spaces)
-            print("all_ddf after revoming space : ", all_ddf)
-            # And sort for fast retrieval
-            all_ddf = all_ddf.sort_values(by='Gene_Name')
-            print("all_ddf after sorted : ", all_ddf)
-            # Get unique gene names
-            unique_genes = pd.unique(all_ddf['Gene_Name'])
-            print("unique_genes : ", unique_genes)
-            Tx_ddf = pd.DataFrame({
-                'TxID': pd.Series(dtype='str'),
-                'GeneID': pd.Series(dtype='str'),
-                'Gene_Name': pd.Series(dtype='str') ##### Testé jusqu'ici et à vérifier si ça fonctionne #####
-            })
+                # rec = rec.drop(columns=[7]) -> seulement 6 colonnes
+                rec.columns = ["TxID","GeneID","Gene_Name", "cov","FPKM","TPM"]
+                all_ddf = pd.concat([all_ddf, rec], ignore_index=True)
+            # # Remove spaces
+            # print("all_ddf before : ", all_ddf)
+            # def remove_spaces(s):
+            #     if isinstance(s, str):
+            #         return re.sub(r' ', '', s)
+            # all_ddf = all_ddf.apply(lambda col: col.map(remove_spaces)) # all_ddf.applymap(remove_spaces)
+            # print("all_ddf after revoming space : ", all_ddf)
+            # # And sort for fast retrieval
+            # all_ddf = all_ddf.sort_values(by='Gene_Name')
+            # print("all_ddf after sorted : ", all_ddf)
+            # # Get unique gene names
+            # unique_genes = pd.unique(all_ddf['Gene_Name'])
+            # print("unique_genes : ", unique_genes)
+            # Tx_ddf = pd.DataFrame({
+            #     'TxID': pd.Series(dtype='str'),
+            #     'GeneID': pd.Series(dtype='str'),
+            #     'Gene_Name': pd.Series(dtype='str')
+            # })
 #             # Select row with max cov for each gene
 #             print('Now Generating Txs Table, Will take a while !!!!!!!')
 #             for i in range (len(unique_genes)):
