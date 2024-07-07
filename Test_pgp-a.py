@@ -94,7 +94,7 @@ if arg1==0 or arg1==2 or arg1==5 :
                 'cov': pd.Series(dtype='float'),
                 'FPKM': pd.Series(dtype='float'),
                 'TPM': pd.Series(dtype='float')
-            })                              ##### Testé jusqu'ici et tout fonctionne #####
+            })
             for i in range(len(file_list)):
                 print(f"reading file : {file_list[i]}")
                 rec = pd.read_csv(f"iPSC_gtfs/{file_list[i]}", sep="\s+", header=None, dtype=str)
@@ -107,11 +107,11 @@ if arg1==0 or arg1==2 or arg1==5 :
             def remove_spaces(s):
                 if isinstance(s, str):
                     return re.sub(r' ', '', s)
-            all_ddf = all_ddf.apply(lambda col: col.map(remove_spaces)) # all_ddf.applymap(remove_spaces)
-            print("all_ddf after revoming space : ", all_ddf)
+            all_ddf = all_ddf.apply(lambda col: col.map(remove_spaces))
+            print("all_ddf after revoming space : ", all_ddf) ##### Testé jusqu'ici et tout fonctionne #####
             # And sort for fast retrieval
             all_ddf = all_ddf.sort_values(by='Gene_Name')
-            print("all_ddf after sorted : ", all_ddf[5,:])
+            print("all_ddf after sorted : ", all_ddf.head())
 #             # Get unique gene names
 #             unique_genes = pd.unique(all_ddf['Gene_Name'])
 #             print("unique_genes : ", unique_genes)
