@@ -289,7 +289,8 @@ if arg1==1 or arg1==2 or arg1==5 :
             edb = dataset.query(attributes=['ensembl_transcript_id', 'chromosome_name', 
                                          'transcript_start', 'transcript_end', 
                                          '5_utr_start', '5_utr_end', 
-                                         '3_utr_start', '3_utr_end'])
+                                         '3_utr_start', '3_utr_end',
+                                         '5_utr_length', '3_utr_length'])
             
             edb['5_utr_length'] = edb.apply(lambda row: row['5_utr_end'] - row['5_utr_start'] + 1 
                                                   if pd.notnull(row['5_utr_start']) else 0, axis=1)
