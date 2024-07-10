@@ -283,21 +283,28 @@ if arg1==1 or arg1==2 or arg1==5 :
             # 04/20/2022 - removing 5'utr
             
             server = Server(host='http://www.ensembl.org')
-            dataset = (server.marts['ENSEMBL_MART_ENSEMBL']
-                       .datasets['hsapiens_gene_ensembl'])
-            print('********************************coucou******************************************')
-            edb = dataset.query(attributes=['ensembl_transcript_id', 'chromosome_name', 
-                                         'transcript_start', 'transcript_end', 
-                                         '5_utr_start', '5_utr_end', 
-                                         '3_utr_start', '3_utr_end'])
-            print('********************************hello world******************************************')
-            print("Colonnes du DataFrame:", edb.columns)
+            dataset = (server.marts['ENSEMBL_MART_ENSEMBL'].datasets['hsapiens_gene_ensembl'])
 
-            required_columns = ['5_utr_start', '5_utr_end', '3_utr_start', '3_utr_end']
-            missing_columns = [col for col in required_columns if col not in edb.columns]
+            attributes = dataset.attributes
+            print(attributes)
+
+            # Affichage des premiers attributs pour voir ce qui est disponible
+            print(attributes.head(20))
+
+            # print('********************************coucou******************************************')
+            # edb = dataset.query(attributes=['ensembl_transcript_id', 'chromosome_name', 
+            #                              'transcript_start', 'transcript_end', 
+            #                              '5_utr_start', '5_utr_end', 
+            #                              '3_utr_start', '3_utr_end'])
+            # print('********************************hello world******************************************')
+            # print("Colonnes du DataFrame:", edb.columns)
+
+            # required_columns = ['5_utr_start', '5_utr_end', '3_utr_start', '3_utr_end']
+            # missing_columns = [col for col in required_columns if col not in edb.columns]
             
-            print('missing columns : ',missing_columns)
-            print(edb.head())
+            # print('missing columns : ',missing_columns)
+            # pd.set_option('display.max_columns', None)
+            # print(edb.head())
 
             # edb['5_utr_length'] = edb.apply(lambda row: row['5_utr_end'] - row['5_utr_start'] + 1 
             #                                       if pd.notnull(row['5_utr_start']) else 0, axis=1)
