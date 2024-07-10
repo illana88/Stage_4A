@@ -291,12 +291,15 @@ if arg1==1 or arg1==2 or arg1==5 :
                                          '5_utr_start', '5_utr_end', 
                                          '3_utr_start', '3_utr_end'])
             
-            print("Colonnes du DataFrame:", edb.columns)
+            if '5_utr_length' not in edb.columns:
+                edb['5_utr_length'] = None
+            if '3_utr_length' not in edb.columns:
+                edb['3_utr_length'] = None
             
-            # edb['5_utr_length'] = edb.apply(lambda row: row['5_utr_end'] - row['5_utr_start'] + 1 
-            #                                       if pd.notnull(row['5_utr_start']) else 0, axis=1)
-            # edb['3_utr_length'] = edb.apply(lambda row: row['3_utr_end'] - row['3_utr_start'] + 1 
-            #                                                   if pd.notnull(row['3_utr_start']) else 0, axis=1)
+            edb['5_utr_length'] = edb.apply(lambda row: row['5_utr_end'] - row['5_utr_start'] + 1 
+                                                  if pd.notnull(row['5_utr_start']) else 0, axis=1)
+            edb['3_utr_length'] = edb.apply(lambda row: row['3_utr_end'] - row['3_utr_start'] + 1 
+                                                              if pd.notnull(row['3_utr_start']) else 0, axis=1)
  
             # GeneIDField = 6
             
