@@ -13,8 +13,11 @@ import subprocess
 import re
 import pandas as pd
 import sys
-from pyensembl import EnsemblRelease
-from pybedtools import BedTool, Interval
+import pyranges as pr
+from pybiomart import Server
+
+# from pyensembl import EnsemblRelease
+# from pybedtools import BedTool, Interval
 
 if os.access("Summary_stats.txt",os.F_OK):
     os.remove(("Summary_stats.txt"))
@@ -277,26 +280,29 @@ if arg1==1 or arg1==2 or arg1==5 :
             # So coordinate based search is back on to see if it makes difference
             # THIS SCRIPT HAS BEEN MODIFIED - SO REPLACE IT IN ALL VERSIONS
             # 04/20/2022 - removing 5'utr
-            edb = EnsemblRelease(103)
-            genes = edb.genes() # ERREUR ICI
-            # gene_list = []
             
-            # for gene in genes:
-            #     gene_list.append({
-            #         'gene_id': gene.gene_id,
-            #         'gene_name': gene.gene_name,
-            #         'chrom': gene.contig,
-            #         'start': gene.start,
-            #         'end': gene.end,
-            #         'strand': gene.strand
-            #     })
-
-            # gene_df = pd.DataFrame(gene_list)
+            server = Server(host='http://www.ensembl.org')
+            dataset = (server.marts['ENSEMBL_MART_ENSEMBL']
+                       .datasets['hsapiens_gene_ensembl'])
+            
+            # edb = dataset.query(attributes=['ensembl_transcript_id', 'chromosome_name', 
+            #                              'transcript_start', 'transcript_end', 
+            #                              '5_utr_start', '5_utr_end', 
+            #                              '3_utr_start', '3_utr_end'])
+            
+            # edb['5_utr_length'] = edb.apply(lambda row: row['5_utr_end'] - row['5_utr_start'] + 1 
+            #                                       if pd.notnull(row['5_utr_start']) else 0, axis=1)
+            # edb['3_utr_length'] = edb.apply(lambda row: row['3_utr_end'] - row['3_utr_start'] + 1 
+            #                                                   if pd.notnull(row['3_utr_start']) else 0, axis=1)
+ 
             # GeneIDField = 6
-            # Read Peaks File
+            
+            # # Read Peaks File
             # SpliceData = pd.read_csv('sorted_sorted_selected_events.csv', header=None)
-            # # Also read Tx list
+            
+            # # # Also read Tx list
             # Tx_list = pd.read_csv('principal_txs.csv', header=None)
+            
             # # Also read appris annoation data to get principal 1 isoform
             # appr_anno1 = pd.read_csv("GRCh38_appris_data.principal.txt", sep="\t", header=None)
             # # V1 - hugo_symbol, V2 - ENSG_ID, V3 - TX_ID, V4 - , V2 - PRINCIPAL/ALTERNATE
