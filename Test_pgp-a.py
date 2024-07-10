@@ -289,7 +289,7 @@ if arg1==1 or arg1==2 or arg1==5 :
             print(attributes)
 
             # Affichage des premiers attributs pour voir ce qui est disponible
-            print(attributes.head(20))
+            print(attributes[20])
 
             # print('********************************coucou******************************************')
             # edb = dataset.query(attributes=['ensembl_transcript_id', 'chromosome_name', 
