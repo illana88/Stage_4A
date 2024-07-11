@@ -13,7 +13,7 @@ import subprocess
 import re
 import pandas as pd
 import sys
-from bioservices import Biomart
+from bioservices import BioMart
 import pyranges as pr
 from pybiomart import Server
 from io import StringIO
