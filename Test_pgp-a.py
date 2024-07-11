@@ -288,11 +288,22 @@ if arg1==1 or arg1==2 or arg1==5 :
             print('**************************************************************************')
             edb = dataset.query(attributes=['ensembl_transcript_id', 'chromosome_name', 
                                          'transcript_start', 'transcript_end', 
-                                         '5_utr_start', '5_utr_end', 
-                                         '3_utr_start', '3_utr_end'])
+                                         "5' UTR start", "5' UTR end",
+                                         "3' UTR start", "3' UTR end"])
+                                        #  '5_utr_start', '5_utr_end', 
+                                        #  '3_utr_start', '3_utr_end'])
             print('**************************************************************************')
             
+            print("Colonnes du DataFrame:", edb.columns)
             pd.set_option('display.max_columns', None)
+            print(edb.head())
+
+            edb['5_utr_start'] = edb['5_utr_start'].astype(float)
+            edb['5_utr_end'] = edb['5_utr_end'].astype(float)
+            edb['3_utr_start'] = edb['3_utr_start'].astype(float)
+            edb['3_utr_end'] = edb['3_utr_end'].astype(float)
+
+            print(edb.dtypes)
             print(edb.head())
 
             # edb['5_utr_length'] = edb.apply(lambda row: row['5_utr_end'] - row['5_utr_start'] + 1 
