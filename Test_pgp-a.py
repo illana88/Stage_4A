@@ -289,6 +289,9 @@ if arg1==1 or arg1==2 or arg1==5 :
             gtf_file = "gencode.v38.annotation.gtf"
             annotations = BedTool(gtf_file)
 
+            utr5_regions = annotations.filter(lambda feature: feature[2] == 'UTR' and feature[6] == '+')
+
+
             # edb['5_utr_length'] = edb.apply(lambda row: row['5_utr_end'] - row['5_utr_start'] + 1 
             #                                       if pd.notnull(row['5_utr_start']) else 0, axis=1)
             # edb['3_utr_length'] = edb.apply(lambda row: row['3_utr_end'] - row['3_utr_start'] + 1 
