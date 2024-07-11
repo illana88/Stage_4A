@@ -293,6 +293,11 @@ if arg1==1 or arg1==2 or arg1==5 :
             print("UTR 5' regions:")
             for region in utr5_regions[:5]:
                 print(region)
+            
+            utr3_regions = annotations.filter(lambda feature: feature[2] == 'UTR' and feature[6] == '-')
+            print("\nUTR 3' regions:")
+            for region in utr3_regions[:5]:
+                print(region)
 
             # edb['5_utr_length'] = edb.apply(lambda row: row['5_utr_end'] - row['5_utr_start'] + 1 
             #                                       if pd.notnull(row['5_utr_start']) else 0, axis=1)
