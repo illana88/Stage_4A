@@ -296,7 +296,7 @@ if arg1==1 or arg1==2 or arg1==5 :
             # pd.set_option('display.max_columns', None)
             # print(edb.head())
 
-            server = BioMart(host='http://www.ensembl.org')
+            server = BioMart(host='https://www.ensembl.org')
             server.new_query()
             server.add_dataset_to_xml("hsapiens_gene_ensembl")
 
