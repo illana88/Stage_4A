@@ -290,19 +290,24 @@ if arg1==1 or arg1==2 or arg1==5 :
             annotations = BedTool(gtf_file)
 
             utr5_regions = annotations.filter(lambda feature: feature[2] == 'UTR' and feature[6] == '+')
-            print("UTR 5' regions:")
-            for region in utr5_regions[:5]:
-                print(region)
+            # print("UTR 5' regions:")
+            # for region in utr5_regions[:5]:
+            #     print(region)
             
             utr3_regions = annotations.filter(lambda feature: feature[2] == 'UTR' and feature[6] == '-')
-            print("\nUTR 3' regions:")
-            for region in utr3_regions[:5]:
-                print(region)
+            # print("\nUTR 3' regions:")
+            # for region in utr3_regions[:5]:
+            #     print(region)
 
-            # edb['5_utr_length'] = edb.apply(lambda row: row['5_utr_end'] - row['5_utr_start'] + 1 
-            #                                       if pd.notnull(row['5_utr_start']) else 0, axis=1)
-            # edb['3_utr_length'] = edb.apply(lambda row: row['3_utr_end'] - row['3_utr_start'] + 1 
-            #                                                   if pd.notnull(row['3_utr_start']) else 0, axis=1)
+            transcripts = genome.transcripts()
+
+            tx_lens = {}
+            for transcript in transcripts:
+                utr5_len = transcript.utr_length_5p
+                utr3_len = transcript.utr_length_3p
+                tx_length = transcript.coding_sequence_length + utr5_len + utr3_len
+                tx_lens[transcript.transcript_id] = {'length': tx_length, 'utr5_len': utr5_len, 'utr3_len': utr3_len}
+
 
             # GeneIDField = 6
             
