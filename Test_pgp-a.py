@@ -13,9 +13,8 @@ import subprocess
 import re
 import pandas as pd
 import sys
-from pyensembl import EnsemblRelease
-from pyensembl import Genome
-from pybedtools import BedTool
+import requests
+import pyensembl
 from io import StringIO
 
 # from pyensembl import EnsemblRelease
@@ -282,31 +281,20 @@ if arg1==1 or arg1==2 or arg1==5 :
             # So coordinate based search is back on to see if it makes difference
             # THIS SCRIPT HAS BEEN MODIFIED - SO REPLACE IT IN ALL VERSIONS
             # 04/20/2022 - removing 5'utr
+
+            urls = {
+                "gtf": "ftp://ftp.ensembl.org/pub/release-103/gtf/homo_sapiens/Homo_sapiens.GRCh38.103.gtf.gz",
+                "transcript_fasta": "ftp://ftp.ensembl.org/pub/release-103/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz",
+                "protein_fasta": "ftp://ftp.ensembl.org/pub/release-103/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz"
+            }
+
+            paths = {
+                "gtf": "Homo_sapiens.GRCh38.103.gtf.gz",
+                "transcript_fasta": "Homo_sapiens.GRCh38.cdna.all.fa.gz",
+                "protein_fasta": "Homo_sapiens.GRCh38.pep.all.fa.gz"
+            }
+
             
-            release = 103
-            genome = Genome(reference_name="GRCh38", annotation_name=f"Ensembl {release}", gtf_path_or_url='GRCh38_appris_data.principal.txt')
-
-            gtf_file = "gencode.v38.annotation.gtf"
-            annotations = BedTool(gtf_file)
-
-            utr5_regions = annotations.filter(lambda feature: feature[2] == 'UTR' and feature[6] == '+')
-            # print("UTR 5' regions:")
-            # for region in utr5_regions[:5]:
-            #     print(region)
-            
-            utr3_regions = annotations.filter(lambda feature: feature[2] == 'UTR' and feature[6] == '-')
-            # print("\nUTR 3' regions:")
-            # for region in utr3_regions[:5]:
-            #     print(region)
-
-            transcripts = genome.transcripts()
-
-            tx_lens = {}
-            for transcript in transcripts:
-                utr5_len = transcript.utr_length_5p
-                utr3_len = transcript.utr_length_3p
-                tx_length = transcript.coding_sequence_length + utr5_len + utr3_len
-                tx_lens[transcript.transcript_id] = {'length': tx_length, 'utr5_len': utr5_len, 'utr3_len': utr3_len}
 
 
             # GeneIDField = 6
