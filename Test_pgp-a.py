@@ -294,7 +294,16 @@ if arg1==1 or arg1==2 or arg1==5 :
                 "protein_fasta": "Homo_sapiens.GRCh38.pep.all.fa.gz"
             }
 
-            
+            for file_type, url in urls.items():
+                local_path = paths[file_type]
+                if not os.path.exists(local_path):
+                    print(f"Téléchargement de {url}...")
+                    response = requests.get(url)
+                    with open(local_path, "wb") as f:
+                        f.write(response.content)
+                    print(f"{local_path} téléchargé avec succès.")
+                else:
+                    print(f"{local_path} existe déjà. Téléchargement ignoré.")
 
 
             # GeneIDField = 6
