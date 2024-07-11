@@ -15,6 +15,7 @@ import pandas as pd
 import sys
 from pyensembl import EnsemblRelease
 from pyensembl import Genome
+from pybedtools import BedTool
 from io import StringIO
 
 # from pyensembl import EnsemblRelease
@@ -284,6 +285,9 @@ if arg1==1 or arg1==2 or arg1==5 :
             
             release = 103
             genome = Genome(reference_name="GRCh38", annotation_name=f"Ensembl {release}")
+
+            gtf_file = "chemin/vers/votre/gencode.v38.annotation.gtf"
+            annotations = BedTool(gtf_file)
 
             # edb['5_utr_length'] = edb.apply(lambda row: row['5_utr_end'] - row['5_utr_start'] + 1 
             #                                       if pd.notnull(row['5_utr_start']) else 0, axis=1)
