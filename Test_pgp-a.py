@@ -13,7 +13,9 @@ import subprocess
 import re
 import pandas as pd
 import sys
-import requests
+import ftplib
+import gzip
+import shutil
 import pyensembl
 from io import StringIO
 
@@ -282,7 +284,15 @@ if arg1==1 or arg1==2 or arg1==5 :
             # THIS SCRIPT HAS BEEN MODIFIED - SO REPLACE IT IN ALL VERSIONS
             # 04/20/2022 - removing 5'utr
 
-            urls = {
+            def download_ftp_file(ftp_url, local_file):
+                ftp = ftplib.FTP("ftp.ensembl.org")
+                ftp.login()
+                ftp.cwd(ftp_url)
+                with open(local_file, "wb") as f:
+                    ftp.retrbinary("RETR " + local_file, f.write)
+                ftp.quit()
+
+            files = {
                 "gtf": "ftp://ftp.ensembl.org/pub/release-103/gtf/homo_sapiens/Homo_sapiens.GRCh38.103.gtf.gz",
                 "transcript_fasta": "ftp://ftp.ensembl.org/pub/release-103/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz",
                 "protein_fasta": "ftp://ftp.ensembl.org/pub/release-103/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz"
@@ -294,17 +304,14 @@ if arg1==1 or arg1==2 or arg1==5 :
                 "protein_fasta": "Homo_sapiens.GRCh38.pep.all.fa.gz"
             }
 
-            for file_type, url in urls.items():
+            for file_type, ftp_path in files.items():
                 local_path = paths[file_type]
                 if not os.path.exists(local_path):
-                    print(f"Téléchargement de {url}...")
-                    response = requests.get(url)
-                    with open(local_path, "wb") as f:
-                        f.write(response.content)
+                    print(f"Téléchargement de {ftp_path}...")
+                    download_ftp_file(os.path.dirname(ftp_path), os.path.basename(local_path))
                     print(f"{local_path} téléchargé avec succès.")
                 else:
                     print(f"{local_path} existe déjà. Téléchargement ignoré.")
-
 
             # GeneIDField = 6
             
