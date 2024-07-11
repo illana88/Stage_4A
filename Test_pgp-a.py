@@ -285,32 +285,21 @@ if arg1==1 or arg1==2 or arg1==5 :
             server = Server(host='http://www.ensembl.org')
             dataset = (server.marts['ENSEMBL_MART_ENSEMBL'].datasets['hsapiens_gene_ensembl'])
 
-            attributes = dataset.attributes
-            print(attributes)
-
-            # Affichage des premiers attributs pour voir ce qui est disponible
-            print(attributes[20])
-
-            # print('********************************coucou******************************************')
-            # edb = dataset.query(attributes=['ensembl_transcript_id', 'chromosome_name', 
-            #                              'transcript_start', 'transcript_end', 
-            #                              '5_utr_start', '5_utr_end', 
-            #                              '3_utr_start', '3_utr_end'])
-            # print('********************************hello world******************************************')
-            # print("Colonnes du DataFrame:", edb.columns)
-
-            # required_columns = ['5_utr_start', '5_utr_end', '3_utr_start', '3_utr_end']
-            # missing_columns = [col for col in required_columns if col not in edb.columns]
+            print('**************************************************************************')
+            edb = dataset.query(attributes=['ensembl_transcript_id', 'chromosome_name', 
+                                         'transcript_start', 'transcript_end', 
+                                         '5_utr_start', '5_utr_end', 
+                                         '3_utr_start', '3_utr_end'])
+            print('**************************************************************************')
             
-            # print('missing columns : ',missing_columns)
-            # pd.set_option('display.max_columns', None)
-            # print(edb.head())
+            pd.set_option('display.max_columns', None)
+            print(edb.head())
 
             # edb['5_utr_length'] = edb.apply(lambda row: row['5_utr_end'] - row['5_utr_start'] + 1 
             #                                       if pd.notnull(row['5_utr_start']) else 0, axis=1)
             # edb['3_utr_length'] = edb.apply(lambda row: row['3_utr_end'] - row['3_utr_start'] + 1 
             #                                                   if pd.notnull(row['3_utr_start']) else 0, axis=1)
- 
+
             # GeneIDField = 6
             
             # # Read Peaks File
@@ -469,6 +458,11 @@ if arg1==1 or arg1==2 or arg1==5 :
                                     
             #                 dat = pd.DataFrame(exon_data)
                             
-                            
+            #                 if (SpliceData[i,2]>=min(dat.iloc[:, 1]) and SpliceData[i,3]<=max(dat.iloc[:, 2])) : # Make sure that event lies within the transcript
+            #                     iPSC_events = iPSC_events+1
+            #                     Tx_str = 'iPSC'
+            #                     Tx_flg = 1
+                    
+            #         if (Tx_flg==0 and len(pd.merge(appr_anno, genes_data, left_on='V2', right_on='gene_id')['V3']))
             
             # ########## FIN TxEnsDB103_layeredV6.R codé en Pyhton ##########
