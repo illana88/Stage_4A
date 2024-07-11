@@ -13,7 +13,7 @@ import subprocess
 import re
 import pandas as pd
 import sys
-from bioservices import BioMart
+import requests
 import pyranges as pr
 from pybiomart import Server
 from io import StringIO
@@ -296,21 +296,7 @@ if arg1==1 or arg1==2 or arg1==5 :
             # pd.set_option('display.max_columns', None)
             # print(edb.head())
 
-            server = BioMart(host='http://www.ensembl.org/biomart')
-            server.new_query()
-            server.add_dataset_to_xml("hsapiens_gene_ensembl")
-
-            attributes = ['ensembl_transcript_id', 'chromosome_name', 
-              'transcript_start', 'transcript_end', 
-              '5_utr_start', '5_utr_end', 
-              '3_utr_start', '3_utr_end']
-            
-            for attr in attributes:
-                server.add_attribute_to_xml(attr)
-
-            edb = server.query()
-            print(edb)
-
+            edb = "https://rest.ensembl.org"
 
             # edb['5_utr_length'] = edb.apply(lambda row: row['5_utr_end'] - row['5_utr_start'] + 1 
             #                                       if pd.notnull(row['5_utr_start']) else 0, axis=1)
