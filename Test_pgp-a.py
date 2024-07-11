@@ -284,7 +284,7 @@ if arg1==1 or arg1==2 or arg1==5 :
             # 04/20/2022 - removing 5'utr
             
             release = 103
-            genome = Genome(reference_name="GRCh38", annotation_name=f"Ensembl {release}")
+            genome = Genome(reference_name="GRCh38", annotation_name=f"Ensembl {release}", gtf_path_or_url='GRCh38_appris_data.principal.txt')
 
             gtf_file = "gencode.v38.annotation.gtf"
             annotations = BedTool(gtf_file)
