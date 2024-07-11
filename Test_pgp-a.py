@@ -13,9 +13,8 @@ import subprocess
 import re
 import pandas as pd
 import sys
-import requests
-import pyranges as pr
-from pybiomart import Server
+from pyensembl import EnsemblRelease
+from pyensembl import Genome
 from io import StringIO
 
 # from pyensembl import EnsemblRelease
@@ -283,20 +282,8 @@ if arg1==1 or arg1==2 or arg1==5 :
             # THIS SCRIPT HAS BEEN MODIFIED - SO REPLACE IT IN ALL VERSIONS
             # 04/20/2022 - removing 5'utr
             
-            # server = Server(host='http://www.ensembl.org')
-            # dataset = (server.marts['ENSEMBL_MART_ENSEMBL'].datasets['hsapiens_gene_ensembl'])
-
-            # print('**************************************************************************')
-            # edb = dataset.query(attributes=['ensembl_transcript_id', 'chromosome_name', 
-            #                              'transcript_start', 'transcript_end',
-            #                              '5_utr_start', '5_utr_end', 
-            #                              '3_utr_start', '3_utr_end'])
-            # print('**************************************************************************')
-            
-            # pd.set_option('display.max_columns', None)
-            # print(edb.head())
-
-            edb = "https://rest.ensembl.org"
+            release = 103
+            genome = Genome(reference_name="GRCh38", annotation_name=f"Ensembl {release}")
 
             # edb['5_utr_length'] = edb.apply(lambda row: row['5_utr_end'] - row['5_utr_start'] + 1 
             #                                       if pd.notnull(row['5_utr_start']) else 0, axis=1)
