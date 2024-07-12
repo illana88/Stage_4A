@@ -271,7 +271,7 @@ if arg1==1 or arg1==2 or arg1==5 :
 
             command = [
                 "Rscript",
-                "txens",
+                "txens.R",
                 "sorted_selected_events.csv",
                 "principal_txs.csv",
                 "temp_all_events_sashimi/FINAL_STATS_ALL_SASHIMIS.txt"
