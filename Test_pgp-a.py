@@ -485,18 +485,24 @@ if arg1==1 or arg1==2 or arg1==5 :
             
             # ########## FIN TxEnsDB103_layeredV6.R codé en Pyhton ##########
 
-        #     with open("Summary_stats.txt","a") as fichier :
-        #         fichier.write("************************ BACK FROM TxEnsDB103_layeredV6.R, CONTINUING pgp-a.sh \n")
+
+
+
+            with open("Summary_stats.txt","a") as fichier :
+                fichier.write("************************ BACK FROM TxEnsDB103_layeredV6.R, CONTINUING pgp-a.sh \n")
             
-        # csv_data = pd.read_csv('all_tx_events.csv')
-        # csvi = 0
-        # samples = glob.glob('event_bedfiles/temp_*.bed')
+        csv_data = pd.read_csv('all_tx_events.csv')
+        csvi = 0
+        samples = glob.glob('event_bedfiles/temp_*.bed')
 
-        # with open("Summary_stats.txt","a") as fichier :
-        #     fichier.write("GENERATING BED FILES FOR EACH EVENT\n")
+        with open("Summary_stats.txt","a") as fichier :
+            fichier.write("GENERATING BED FILES FOR EACH EVENT\n")
 
-        # for sample in samples :
-        #     # Read csv entry
-        #     csv_ln = csv_data[csvi]
-        #     csvi = csvi + 1
+        for sample in samples :
+            # Read csv entry
+            csv_ln = csv_data[csvi]
+            csvi = csvi + 1
+        
+            allexons = sample.split('/')[1].split('_')[1]
+            
 
