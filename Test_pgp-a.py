@@ -13,14 +13,6 @@ import subprocess
 import re
 import pandas as pd
 import sys
-import ftplib
-import gzip
-import shutil
-import pyensembl
-from io import StringIO
-
-# from pyensembl import EnsemblRelease
-# from pybedtools import BedTool, Interval
 
 if os.access("Summary_stats.txt",os.F_OK):
     os.remove(("Summary_stats.txt"))
@@ -277,6 +269,16 @@ if arg1==1 or arg1==2 or arg1==5 :
             
             ########## TxEnsDB103_layeredV6.R codé en Pyhton ##########
 
+            command = [
+                "Rscript",
+                "TxEnsDB103_layeredV6.R",
+                "sorted_selected_events.csv",
+                "principal_txs.csv",
+                "temp_all_events_sashimi/FINAL_STATS_ALL_SASHIMIS.txt"
+            ]
+
+            result = subprocess.run(command, capture_output=True, text=True)
+
             # Using ENSG (commented out this - junction start and end range) to get transcripts
             # Starting from previous version (TxEnsDB103_layeredV1.R), it has 41 events for which Tx selected does not encapsulate the event
             # An example is event: chr12	22515151	22517985	AC053513.1
@@ -284,34 +286,34 @@ if arg1==1 or arg1==2 or arg1==5 :
             # THIS SCRIPT HAS BEEN MODIFIED - SO REPLACE IT IN ALL VERSIONS
             # 04/20/2022 - removing 5'utr
 
-            def download_ftp_file(ftp_url, local_file):
-                ftp = ftplib.FTP("ftp.ensembl.org")
-                ftp.login()
-                ftp.cwd(ftp_url)
-                with open(local_file, "wb") as f:
-                    ftp.retrbinary("RETR " + local_file, f.write)
-                ftp.quit()
+            # def download_ftp_file(ftp_url, local_file):
+            #     ftp = ftplib.FTP("ftp.ensembl.org")
+            #     ftp.login()
+            #     ftp.cwd(ftp_url)
+            #     with open(local_file, "wb") as f:
+            #         ftp.retrbinary("RETR " + local_file, f.write)
+            #     ftp.quit()
 
-            files = {
-                "gtf": "ftp://ftp.ensembl.org/pub/release-103/gtf/homo_sapiens/Homo_sapiens.GRCh38.103.gtf.gz",
-                "transcript_fasta": "ftp://ftp.ensembl.org/pub/release-103/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz",
-                "protein_fasta": "ftp://ftp.ensembl.org/pub/release-103/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz"
-            }
+            # files = {
+            #     "gtf": "ftp://ftp.ensembl.org/pub/release-103/gtf/homo_sapiens/Homo_sapiens.GRCh38.103.gtf.gz",
+            #     "transcript_fasta": "ftp://ftp.ensembl.org/pub/release-103/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz",
+            #     "protein_fasta": "ftp://ftp.ensembl.org/pub/release-103/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz"
+            # }
 
-            paths = {
-                "gtf": "Homo_sapiens.GRCh38.103.gtf.gz",
-                "transcript_fasta": "Homo_sapiens.GRCh38.cdna.all.fa.gz",
-                "protein_fasta": "Homo_sapiens.GRCh38.pep.all.fa.gz"
-            }
+            # paths = {
+            #     "gtf": "Homo_sapiens.GRCh38.103.gtf.gz",
+            #     "transcript_fasta": "Homo_sapiens.GRCh38.cdna.all.fa.gz",
+            #     "protein_fasta": "Homo_sapiens.GRCh38.pep.all.fa.gz"
+            # }
 
-            for file_type, ftp_path in files.items():
-                local_path = paths[file_type]
-                if not os.path.exists(local_path):
-                    print(f"Téléchargement de {ftp_path}...")
-                    download_ftp_file(os.path.dirname(ftp_path), os.path.basename(local_path))
-                    print(f"{local_path} téléchargé avec succès.")
-                else:
-                    print(f"{local_path} existe déjà. Téléchargement ignoré.")
+            # for file_type, ftp_path in files.items():
+            #     local_path = paths[file_type]
+            #     if not os.path.exists(local_path):
+            #         print(f"Téléchargement de {ftp_path}...")
+            #         download_ftp_file(os.path.dirname(ftp_path), os.path.basename(local_path))
+            #         print(f"{local_path} téléchargé avec succès.")
+            #     else:
+            #         print(f"{local_path} existe déjà. Téléchargement ignoré.")
 
             # GeneIDField = 6
             
@@ -479,3 +481,17 @@ if arg1==1 or arg1==2 or arg1==5 :
             #         if (Tx_flg==0 and len(pd.merge(appr_anno, genes_data, left_on='V2', right_on='gene_id')['V3']))
             
             # ########## FIN TxEnsDB103_layeredV6.R codé en Pyhton ##########
+
+            with open("Summary_stats.txt","a") as fichier :
+                fichier.write("************************ BACK FROM TxEnsDB103_layeredV6.R, CONTINUING pgp-a.sh \n")
+            
+        csv_data = pd.read_csv('all_tx_events.csv')
+        csvi = 0
+        samples = glob.glob('event_bedfiles/temp_*.bed')
+
+        with open("Summary_stats.txt","a") as fichier :
+            fichier.write("GENERATING BED FILES FOR EACH EVENT\n")
+
+        for sample in samples :
+            # Read csv entry
+            csv_ln = csv_data[csvi]
