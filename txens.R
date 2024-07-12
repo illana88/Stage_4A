@@ -28,7 +28,7 @@ tx_lens=transcriptLengths(edb,with.utr5_len = TRUE,with.utr3_len = TRUE)
 
 
 
-args = commandArgs(trailingOnly=TRUE)
+#args = commandArgs(trailingOnly=TRUE)
 
 
 
@@ -40,9 +40,11 @@ GeneIDField=6
 
 #Read Peaks File
 
-SpliceData <- read.csv(args[1], header=FALSE) #this gave poblem and I do not know why
+#SpliceData <- read.csv(args[1], header=FALSE) #this gave poblem and I do not know why
+SpliceData <- read.csv("sorted_selected_events.csv", header=FALSE)
 #Also read Tx list
-Tx_list <- read.csv(args[2], header=FALSE)
+#Tx_list <- read.csv(args[2], header=FALSE)
+Tx_list <- read.csv("principal_txs.csv", header=FALSE)
 
 
 #SpliceData <- read.csv("sorted_remaining_events.csv", header=FALSE)
@@ -78,10 +80,10 @@ if (file.exists("events_to_tx_mapping_invalid.csv")) {
 #}
 
 
-write(paste0('                                 '),file=args[3],append=TRUE)
-write(paste0('Starting From TxEnsDB103_layeredV6.R: --------------- Processing file: ',args[1],' with: ',dim(SpliceData)[1],' events to generate each event .bed files in event_bedfiles/ folder: '),file=args[3],append=TRUE)
+write(paste0('                                 '),file="temp_all_events_sashimi/FINAL_STATS_ALL_SASHIMIS.txt",append=TRUE)
+write(paste0('Starting From TxEnsDB103_layeredV6.R: --------------- Processing file: ',"sorted_selected_events.csv",' with: ',dim(SpliceData)[1],' events to generate each event .bed files in event_bedfiles/ folder: '),file="temp_all_events_sashimi/FINAL_STATS_ALL_SASHIMIS.txt",append=TRUE)
 
-print(paste0('Started Generating BED files for Splicing Events in folder event_bedfiles/ from File: ',args[1]))
+print(paste0('Started Generating BED files for Splicing Events in folder event_bedfiles/ from File: ',"sorted_selected_events.csv"))
 
 trackj = 1;
 temp_gene="";
@@ -368,7 +370,7 @@ for (i in 1:dim(SpliceData)[1])
           {
             probable_noncoding_events=probable_noncoding_events+1
             print(paste0('*** gene: ', SpliceData[i,]$V5, ' @ line: ',i,' lies outside of 5 UTR'))
-            write(paste0('Probable non-cds events#: ',probable_noncoding_events,' ** gene: ', SpliceData[i,]$V5, ' @ line: ',i,' lies outside of 5 UTR'),file=args[3],append=TRUE)
+            write(paste0('Probable non-cds events#: ',probable_noncoding_events,' ** gene: ', SpliceData[i,]$V5, ' @ line: ',i,' lies outside of 5 UTR'),file="temp_all_events_sashimi/FINAL_STATS_ALL_SASHIMIS.txt",append=TRUE)
           }
         }
         else
@@ -397,7 +399,7 @@ for (i in 1:dim(SpliceData)[1])
           {
             probable_noncoding_events=probable_noncoding_events+1
             print(paste0('** gene: ', SpliceData[i,]$V5, ' @ line: ',i,' lies outside of 5 UTR'))
-            write(paste0('Probable non-cds events#: ',probable_noncoding_events,' ** gene: ', SpliceData[i,]$V5, ' @ line: ',i,' lies outside of 5 UTR'),file=args[3],append=TRUE)
+            write(paste0('Probable non-cds events#: ',probable_noncoding_events,' ** gene: ', SpliceData[i,]$V5, ' @ line: ',i,' lies outside of 5 UTR'),file="temp_all_events_sashimi/FINAL_STATS_ALL_SASHIMIS.txt",append=TRUE)
           }
           
         }
@@ -406,7 +408,7 @@ for (i in 1:dim(SpliceData)[1])
       {
         probable_noise_events=probable_noise_events+1
         print(paste0('Noise Event#: ',probable_noise_events,'--- Transcript: ',Tx_name,' gene: ', SpliceData[i,]$V5, ' @ line: ',i,' is: ',g_dat1$tx_biotype[1]))
-        write(paste0('Noise Event#: ',probable_noise_events,'--- Transcript: ',Tx_name,' gene: ', SpliceData[i,]$V5, ' @ line: ',i,' is: ',g_dat1$tx_biotype[1]),file=args[3],append=TRUE)
+        write(paste0('Noise Event#: ',probable_noise_events,'--- Transcript: ',Tx_name,' gene: ', SpliceData[i,]$V5, ' @ line: ',i,' is: ',g_dat1$tx_biotype[1]),file="temp_all_events_sashimi/FINAL_STATS_ALL_SASHIMIS.txt",append=TRUE)
       }
       #df=data.frame(EnsGenes1@unlistData)
       df=g_dat
@@ -523,7 +525,7 @@ print(paste('Total : ',principalTx_events, ' EnsDB Princiapl Tx (maximum number 
 print(paste('Out of Total : ',Total_Events,' A total of: ',Tx_valid,' Events have Valid Transcripts (event lies between Transcript ends) and ',(Total_Events-Tx_valid),' Events have Transcripts that does not Encapsulate events'))
 
 
-write(paste0('Finally total Noise Events detected are: ',probable_noise_events),file=args[3],append=TRUE)
-write(paste0('Finally total Probable non-cds events#: ',probable_noncoding_events),file=args[3],append=TRUE)
+write(paste0('Finally total Noise Events detected are: ',probable_noise_events),file="temp_all_events_sashimi/FINAL_STATS_ALL_SASHIMIS.txt",append=TRUE)
+write(paste0('Finally total Probable non-cds events#: ',probable_noncoding_events),file="temp_all_events_sashimi/FINAL_STATS_ALL_SASHIMIS.txt",append=TRUE)
 #print(paste('genes with zero UTR are: ',dim(df_zeroutr)[1]))
 #}
