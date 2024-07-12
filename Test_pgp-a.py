@@ -279,6 +279,9 @@ if arg1==1 or arg1==2 or arg1==5 :
 
             result = subprocess.run(command, capture_output=True, text=True)
 
+            print("stdout:", result.stdout)
+            print("stderr:", result.stderr)
+
             # Using ENSG (commented out this - junction start and end range) to get transcripts
             # Starting from previous version (TxEnsDB103_layeredV1.R), it has 41 events for which Tx selected does not encapsulate the event
             # An example is event: chr12	22515151	22517985	AC053513.1
@@ -482,16 +485,18 @@ if arg1==1 or arg1==2 or arg1==5 :
             
             # ########## FIN TxEnsDB103_layeredV6.R codé en Pyhton ##########
 
-            with open("Summary_stats.txt","a") as fichier :
-                fichier.write("************************ BACK FROM TxEnsDB103_layeredV6.R, CONTINUING pgp-a.sh \n")
+        #     with open("Summary_stats.txt","a") as fichier :
+        #         fichier.write("************************ BACK FROM TxEnsDB103_layeredV6.R, CONTINUING pgp-a.sh \n")
             
-        csv_data = pd.read_csv('all_tx_events.csv')
-        csvi = 0
-        samples = glob.glob('event_bedfiles/temp_*.bed')
+        # csv_data = pd.read_csv('all_tx_events.csv')
+        # csvi = 0
+        # samples = glob.glob('event_bedfiles/temp_*.bed')
 
-        with open("Summary_stats.txt","a") as fichier :
-            fichier.write("GENERATING BED FILES FOR EACH EVENT\n")
+        # with open("Summary_stats.txt","a") as fichier :
+        #     fichier.write("GENERATING BED FILES FOR EACH EVENT\n")
 
-        for sample in samples :
-            # Read csv entry
-            csv_ln = csv_data[csvi]
+        # for sample in samples :
+        #     # Read csv entry
+        #     csv_ln = csv_data[csvi]
+        #     csvi = csvi + 1
+
