@@ -13,6 +13,8 @@ import subprocess
 import re
 import pandas as pd
 import sys
+import pybedtools
+from io import StringIO
 
 if os.access("Summary_stats.txt",os.F_OK):
     os.remove(("Summary_stats.txt"))
@@ -488,21 +490,69 @@ if arg1==1 or arg1==2 or arg1==5 :
 
 
 
-        #     with open("Summary_stats.txt","a") as fichier :
-        #         fichier.write("************************ BACK FROM TxEnsDB103_layeredV6.R, CONTINUING pgp-a.sh \n")
+            with open("Summary_stats.txt","a") as fichier :
+                fichier.write("************************ BACK FROM TxEnsDB103_layeredV6.R, CONTINUING pgp-a.sh \n")
             
-        # csv_data = pd.read_csv('all_tx_events.csv')
-        # csvi = 0
-        # samples = glob.glob('event_bedfiles/temp_*.bed')
+        csv_data = pd.read_csv('all_tx_events.csv')
+        csvi = 0
+        samples = glob.glob('event_bedfiles/temp_*.bed')
 
-        # with open("Summary_stats.txt","a") as fichier :
-        #     fichier.write("GENERATING BED FILES FOR EACH EVENT\n")
+        with open("Summary_stats.txt","a") as fichier :
+            fichier.write("GENERATING BED FILES FOR EACH EVENT\n")
 
-        # for sample in samples :
-        #     # Read csv entry
-        #     csv_ln = csv_data[csvi]
-        #     csvi = csvi + 1
+        for sample in samples :
+            # Read csv entry
+            csv_ln = csv_data[csvi]
+            csvi = csvi + 1
         
-        #     allexons = sample.split('/')[1].split('_')[1]
+            allexons = sample.split('/')[1].split('_')[1]
+            gene_name1 = allexons.split('.')[0]
+            gene_name = gene_name1.split('.')[0]
 
+            # First sort the bed
+            sorted_bed = f'event_bedfiles/{allexons}'.sort()
+            sorted_bed.saveas(f'event_bedfiles/t{allexons}')
 
+            # Also read Tx Files to retrieve selected Tx - should find better ways
+            df = pd.read_csv(f'event_bedfiles/TxID{allexons}', delim_whitespace=True, header=None)
+            TxID = df.iloc[0, 6]
+
+            df = pd.read_csv(sample, delim_whitespace=True, header=None)
+            strnd = df.iloc[0, 5]
+
+            # Get distance to downstream exon (for ties, report first) from current reference and pick start, end and d
+            a = pybedtools.BedTool(sample)
+            b = pybedtools.BedTool(allexons)
+            closest = a.closest(b, s=True, D="a", iu=True, d=True, t="first")
+            ds = closest.to_dataframe()
+
+            # Also get distance to upstream exon from current reference and pick start, end and d
+            closest = a.closest(b, s=True, D="a", id=True, d=True, t="last")
+            us = closest.to_dataframe()
+
+            # Get up and down stream exon numbers
+            upexon = us.iloc[:, 10]
+            dnexon = ds.iloc[:, 10]
+
+            # Events star and end
+            event_st = us.iloc[:, 1]
+            event_end = us.iloc[:, 2]
+
+            diff_exon = upexon - dnexon
+
+            # Take absolute value
+            diff_exon_abs = abs(diff_exon)
+
+            if diff_exon_abs>=1 : #ALL EVENTS THAT SPANS 2 OR MORE EXONS
+                if strnd == '+' :
+                    start = us.iloc[:, 7]
+                    end = ds.iloc[:, 8]
+                else :
+                    start = ds.iloc[:, 7]
+                    end = us.iloc[:, 8]
+                
+                # Also save
+                # FORMAT IS: chr, start of up_ex,end of ds_ex, 1, 0, strand, gene_name, TxID
+				# First check if event lies between selected exons
+                if (start<=event_st and end>=event_end) :
+                    
