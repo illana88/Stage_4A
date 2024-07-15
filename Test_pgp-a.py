@@ -555,4 +555,34 @@ if arg1==1 or arg1==2 or arg1==5 :
                 # FORMAT IS: chr, start of up_ex,end of ds_ex, 1, 0, strand, gene_name, TxID
 				# First check if event lies between selected exons
                 if (start<=event_st and end>=event_end) :
+                    input_data = us + [start, end, strnd] + gene_name + TxID
+
+                    output_data = [input_data[0], input_data[13], input_data[14], "1", "0", input_data[15], input_data[16], input_data[17]]
+                    with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi2.bed", "a") as f:
+                        f.write("\t".join(output_data) + "\n")
+
+                    with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi.bed", "a") as f:
+                        f.write("\t".join(output_data) + "\n")
                     
+                    with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi2.csv", "a") as f:
+                        f.write(csv_ln)
+
+                    with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi.csv", "a") as f:
+                        f.write(csv_ln)
+                    
+                else :
+                    if strnd == '+' :
+                        start = us.iloc[:, 7]
+                        end = ds.iloc[:, 8] # Both are same
+                        # First check if star > event_start, then select upstream exon
+
+                        if start>=event_st :
+                            # Get exon (line number in bed file) to read
+                            exon = ds.iloc[:, 10]
+                            exon = exon - 2
+
+                            with open(f"event_bedfiles/{allexons}", 'r') as file:
+                                bed_data = [line.strip() for line in file]
+                            
+                            bed_ln = bed_data[exon]
+                            
