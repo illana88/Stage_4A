@@ -708,4 +708,168 @@ if arg1==1 or arg1==2 or arg1==5 :
                         start = bed_ln.iloc[:, 1]
 
                         # Now go on the other side
+                        if start>=event_st : # Get the other exon
+                            # Get exon (line number in bed file) to read
+                            exon = us.iloc[:, 10]
+
+                            with open(f"event_bedfiles/{allexons}", 'r') as file:
+                                bed_data = [line.strip() for line in file]
+
+                            bed_ln = bed_data[exon]
+
+                            # Update start
+                            start = bed_ln.iloc[:, 1]
+
+                    # Now check if end <event_end
+                    if end<=event_end :
+                        # Get exon (line number in bed file) to read
+                        exon = us.iloc[:, 10]
+
+                        with open(f"event_bedfiles/{allexons}", 'r') as file:
+                            bed_data = [line.strip() for line in file]
+
+                        print(f"bed_data {bed_data}")
+                        bed_ln = bed_data[exon]
+                        print(f"exon {exon} bed_ln {bed_ln}")
+
+                        # Update end
+                        end = bed_ln.iloc[:, 2]
+
+                        if end<=event_end :
+                            # Get exon (line number in bed file) to read
+                            exon = us.iloc[:, 10]
+                            exon = exon - 2 # Reading line for readarray starts from 0
+
+                            with open(f"event_bedfiles/{allexons}", 'r') as file:
+                                bed_data = [line.strip() for line in file]
+
+                            bed_ln = bed_data[exon]
+
+                            # Update end
+                            end = bed_ln.iloc[:, 2]
+
+                    # Now one more time check if event lies between selected exons
+                    if (start<=event_st and end>=event_end) :
+                        input_data = us + [start, end, strnd] + gene_name + TxID
+
+                        output_data = [input_data[0], input_data[13], input_data[14], "1", "0", input_data[15], input_data[16], input_data[17]]
+                        with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi01.bed", "a") as f:
+                            f.write("\t".join(output_data) + "\n")
+
+                        with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi.bed", "a") as f:
+                            f.write("\t".join(output_data) + "\n")
+
+                        with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi01.csv", "a") as f:
+                            f.write(csv_ln)
+
+                        with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi.csv", "a") as f:
+                            f.write(csv_ln)
                         
+                    else :
+                        with open(f"temp_all_events_sashimi/{splicing_events_file}_progress01.txt", "a") as f:
+                            f.write(f"ds {ds}\n")
+
+                        with open(f"temp_all_events_sashimi/{splicing_events_file}_progress01.txt", "a") as f:
+                            f.write(f"us {us}\n")
+
+                        print(f"diff_exon_abs is {diff_exon_abs} selected event {sample} has event_st {event_st} selected start {start} event end {event_end} selected end {end} - please check")
+
+                else : # THIS IS FOR NEGATIVE STRAND
+                    start = ds.iloc[:, 7]
+                    end = us.iloc[:, 8]
+
+                    # First check if star > event_start, then select upstream exon
+                    if start>=event_st :
+                        # Get exon (line number in bed file) to read
+                        exon = us.iloc[:, 10]
+
+                        with open(f"event_bedfiles/{allexons}", 'r') as file:
+                            bed_data = [line.strip() for line in file]
+
+                        bed_ln = bed_data[exon]
+
+                        # Update start
+                        start = bed_ln.iloc[:, 1]
+                    
+                    # Now check if end <event_end
+                    if end<=event_end :
+                        # Get exon (line number in bed file) to read
+                        exon =us.iloc[:, 10]
+                        exon = exon - 2 #Tx on -ve strand has exons listed from bottom to top in increasing order
+                        
+                        with open(f"event_bedfiles/{allexons}", 'r') as file:
+                            bed_data = [line.strip() for line in file]
+
+                        bed_ln = bed_data[exon]
+
+                        # Update end
+                        end = bed_ln.iloc[:, 2]
+
+                    # Now one more time check if event lies between selected exons
+                    if (start<=event_st and end>=event_end) :
+                        input_data = us + [start, end, strnd] + gene_name + TxID
+
+                        output_data = [input_data[0], input_data[13], input_data[14], "1", "0", input_data[15], input_data[16], input_data[17]]
+                        with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi02.bed", "a") as f:
+                            f.write("\t".join(output_data) + "\n")
+
+                        with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi.bed", "a") as f:
+                            f.write("\t".join(output_data) + "\n")
+
+                        with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi02.csv", "a") as f:
+                            f.write(csv_ln)
+
+                        with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi.csv", "a") as f:
+                            f.write(csv_ln)
+                        
+                    else :
+                        with open(f"temp_all_events_sashimi/{splicing_events_file}_progress02.txt", "a") as f:
+                            f.write(f"ds {ds}\n")
+
+                        with open(f"temp_all_events_sashimi/{splicing_events_file}_progress02.txt", "a") as f:
+                            f.write(f"us {us}\n")
+                        
+                        print(f"diff_exon_abs is {diff_exon_abs} selected event {sample} has event_st {event_st} selected start {start} event end {event_end} selected end {end} - please check")
+                
+                # First check if star > event_start, then select upstream exon
+
+            else :
+                with open(f"temp_all_events_sashimi/{splicing_events_file}_progress_all.txt", "a") as f:
+                    f.write(f"ds {ds}\n")
+
+                with open(f"temp_all_events_sashimi/{splicing_events_file}_progress_all.txt", "a") as f:
+                    f.write(f"us {us}\n")
+
+        print("################################ DONE GENERATING BED AND OTHER RELATED FILES FOR ALL EVENTS TO CONTINUE FOR SASHIMI PLOTD")
+
+        with open("Summary_stats.txt", "a") as f:
+            f.write("################################ DONE GENERATING BED AND OTHER RELATED FILES FOR ALL EVENTS TO CONTINUE FOR SASHIMI PLOTD\n")
+        
+        if arg1==1 or arg1==2 or arg1==5 :
+            print("################################ STARTED CREATING SASHIMI PLOTS FOR ALL EVENTS - MAY TAKE MANY HOURS ")
+
+            with open("Summary_stats.txt", "a") as f:
+                f.write("################################ STARTED CREATING SASHIMI PLOTS FOR ALL EVENTS - MAY TAKE MANY HOURS \n")
+
+            # CALL run_sashimiV1.sh for SASHIMI PLOTS
+
+
+
+
+            ########## run_sashimiV1.sh codé en Pyhton ##########
+
+            #THIS SI FINAL SCRIPT FOR SASHIMI PLOTS FOR ALL PARTS OF PGP
+
+            #THIS SCRIPT CONTAINS SASHIMI PLOT CODE FOR
+            #0. PLEASE NOTE THAT FOLLOWING 2 FILES (OR SOFT LINKS) SHOULD BE IN CURRENT FOLDER
+                #01: ggsashimi_txV4.py
+                #02: Homo_sapiens.GRCh38.103.chr.sorted_new.gtf
+            #1. Skiptic Events
+            #2. ALL MAJIQ EVENTS
+            #3. CE (INCLUDING INCLUSION, EXTENSION AND IR) events
+
+
+            #First CHECK IF Called from pgp-a/b or pgp-c
+            #CHECK IF 3 ARGUMENTS ARE PROVIDED
+
+            
