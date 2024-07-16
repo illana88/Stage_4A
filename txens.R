@@ -109,7 +109,9 @@ for (i in 1:dim(SpliceData)[1])
   #print(paste('processing gene: ',SpliceData[i,6]))
   #Step 0 - get transcripts for each gene (MAJIQ only reports for some)
   #Deal with multiple events for the same gene
-  rm(Tx_name) #clear Tx_name
+  if (exists(Tx_name)){
+    rm(Tx_name) #clear Tx_name
+  }
   if (i==1)
   {
     temp_gene=SpliceData[i,5]
