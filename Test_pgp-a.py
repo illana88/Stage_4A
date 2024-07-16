@@ -497,6 +497,9 @@ if arg1==1 or arg1==2 or arg1==5 :
         csvi = 0
         samples = glob.glob('event_bedfiles/temp_*.bed')
 
+        print("csv_data : ", csv_data.head())
+        print("samples : ", samples[5])
+
         with open("Summary_stats.txt","a") as fichier :
             fichier.write("GENERATING BED FILES FOR EACH EVENT\n")
 
@@ -504,352 +507,357 @@ if arg1==1 or arg1==2 or arg1==5 :
             # Read csv entry
             csv_ln = csv_data[csvi]
             csvi = csvi + 1
+
+            print("csv_ln : ", csv_ln)
+            print("csvi : ", csvi)
         
             allexons = sample.split('/')[1].split('_')[1]
             gene_name1 = allexons.split('.')[0]
             gene_name = gene_name1.split('.')[0]
 
+            print("gene_name : ", gene_name)
+
             # First sort the bed
             sorted_bed = f'event_bedfiles/{allexons}'.sort()
             sorted_bed.saveas(f'event_bedfiles/t{allexons}')
 
-            # Also read Tx Files to retrieve selected Tx - should find better ways
-            df = pd.read_csv(f'event_bedfiles/TxID{allexons}', delim_whitespace=True, header=None)
-            TxID = df.iloc[0, 6]
+        #     # Also read Tx Files to retrieve selected Tx - should find better ways
+        #     df = pd.read_csv(f'event_bedfiles/TxID{allexons}', delim_whitespace=True, header=None)
+        #     TxID = df.iloc[0, 6]
 
-            df = pd.read_csv(sample, delim_whitespace=True, header=None)
-            strnd = df.iloc[0, 5]
+        #     df = pd.read_csv(sample, delim_whitespace=True, header=None)
+        #     strnd = df.iloc[0, 5]
 
-            # Get distance to downstream exon (for ties, report first) from current reference and pick start, end and d
-            a = pybedtools.BedTool(sample)
-            b = pybedtools.BedTool(allexons)
-            closest = a.closest(b, s=True, D="a", iu=True, d=True, t="first")
-            ds = closest.to_dataframe()
+        #     # Get distance to downstream exon (for ties, report first) from current reference and pick start, end and d
+        #     a = pybedtools.BedTool(sample)
+        #     b = pybedtools.BedTool(allexons)
+        #     closest = a.closest(b, s=True, D="a", iu=True, d=True, t="first")
+        #     ds = closest.to_dataframe()
 
-            # Also get distance to upstream exon from current reference and pick start, end and d
-            closest = a.closest(b, s=True, D="a", id=True, d=True, t="last")
-            us = closest.to_dataframe()
+        #     # Also get distance to upstream exon from current reference and pick start, end and d
+        #     closest = a.closest(b, s=True, D="a", id=True, d=True, t="last")
+        #     us = closest.to_dataframe()
 
-            # Get up and down stream exon numbers
-            upexon = us.iloc[:, 10]
-            dnexon = ds.iloc[:, 10]
+        #     # Get up and down stream exon numbers
+        #     upexon = us.iloc[:, 10]
+        #     dnexon = ds.iloc[:, 10]
 
-            # Events star and end
-            event_st = us.iloc[:, 1]
-            event_end = us.iloc[:, 2]
+        #     # Events star and end
+        #     event_st = us.iloc[:, 1]
+        #     event_end = us.iloc[:, 2]
 
-            diff_exon = upexon - dnexon
+        #     diff_exon = upexon - dnexon
 
-            # Take absolute value
-            diff_exon_abs = abs(diff_exon)
+        #     # Take absolute value
+        #     diff_exon_abs = abs(diff_exon)
 
-            if diff_exon_abs>=1 : #ALL EVENTS THAT SPANS 2 OR MORE EXONS
-                if strnd == '+' :
-                    start = us.iloc[:, 7]
-                    end = ds.iloc[:, 8]
-                else :
-                    start = ds.iloc[:, 7]
-                    end = us.iloc[:, 8]
+        #     if diff_exon_abs>=1 : #ALL EVENTS THAT SPANS 2 OR MORE EXONS
+        #         if strnd == '+' :
+        #             start = us.iloc[:, 7]
+        #             end = ds.iloc[:, 8]
+        #         else :
+        #             start = ds.iloc[:, 7]
+        #             end = us.iloc[:, 8]
                 
-                # Also save
-                # FORMAT IS: chr, start of up_ex,end of ds_ex, 1, 0, strand, gene_name, TxID
-				# First check if event lies between selected exons
-                if (start<=event_st and end>=event_end) :
-                    input_data = us + [start, end, strnd] + gene_name + TxID
+        #         # Also save
+        #         # FORMAT IS: chr, start of up_ex,end of ds_ex, 1, 0, strand, gene_name, TxID
+		# 		# First check if event lies between selected exons
+        #         if (start<=event_st and end>=event_end) :
+        #             input_data = us + [start, end, strnd] + gene_name + TxID
 
-                    output_data = [input_data[0], input_data[13], input_data[14], "1", "0", input_data[15], input_data[16], input_data[17]]
-                    with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi2.bed", "a") as f:
-                        f.write("\t".join(output_data) + "\n")
+        #             output_data = [input_data[0], input_data[13], input_data[14], "1", "0", input_data[15], input_data[16], input_data[17]]
+        #             with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi2.bed", "a") as f:
+        #                 f.write("\t".join(output_data) + "\n")
 
-                    with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi.bed", "a") as f:
-                        f.write("\t".join(output_data) + "\n")
+        #             with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi.bed", "a") as f:
+        #                 f.write("\t".join(output_data) + "\n")
                     
-                    with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi2.csv", "a") as f:
-                        f.write(csv_ln)
+        #             with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi2.csv", "a") as f:
+        #                 f.write(csv_ln)
 
-                    with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi.csv", "a") as f:
-                        f.write(csv_ln)
+        #             with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi.csv", "a") as f:
+        #                 f.write(csv_ln)
                     
-                else :
-                    if strnd == '+' :
-                        start = us.iloc[:, 7]
-                        end = ds.iloc[:, 8] # Both are same
-                        # First check if star > event_start, then select upstream exon
+        #         else :
+        #             if strnd == '+' :
+        #                 start = us.iloc[:, 7]
+        #                 end = ds.iloc[:, 8] # Both are same
+        #                 # First check if star > event_start, then select upstream exon
 
-                        if start>=event_st :
-                            # Get exon (line number in bed file) to read
-                            exon = ds.iloc[:, 10]
-                            exon = exon - 2
+        #                 if start>=event_st :
+        #                     # Get exon (line number in bed file) to read
+        #                     exon = ds.iloc[:, 10]
+        #                     exon = exon - 2
 
-                            with open(f"event_bedfiles/{allexons}", 'r') as file:
-                                bed_data = [line.strip() for line in file]
+        #                     with open(f"event_bedfiles/{allexons}", 'r') as file:
+        #                         bed_data = [line.strip() for line in file]
                             
-                            bed_ln = bed_data[exon]
+        #                     bed_ln = bed_data[exon]
 
-                            # Update start
-                            start = bed_ln.iloc[:, 1]
+        #                     # Update start
+        #                     start = bed_ln.iloc[:, 1]
                         
-                        # Now check if end <event_end
-                        if end<=event_end :
-                            # Get exon (line number in bed file) to read
-                            exon = us.iloc[:, 10]
+        #                 # Now check if end <event_end
+        #                 if end<=event_end :
+        #                     # Get exon (line number in bed file) to read
+        #                     exon = us.iloc[:, 10]
 
-                            with open(f"event_bedfiles/{allexons}", 'r') as file:
-                                bed_data = [line.strip() for line in file]
+        #                     with open(f"event_bedfiles/{allexons}", 'r') as file:
+        #                         bed_data = [line.strip() for line in file]
                             
-                            print('bed_data ',bed_data)
-                            bed_ln = bed_data[exon]
-                            print('exon ', exon, ' bed_ln ', bed_ln)
+        #                     print('bed_data ',bed_data)
+        #                     bed_ln = bed_data[exon]
+        #                     print('exon ', exon, ' bed_ln ', bed_ln)
 
-                            # Update end
-                            end = bed_ln.iloc[:, 2]
+        #                     # Update end
+        #                     end = bed_ln.iloc[:, 2]
                         
-                        # Now one more time check if event lies between selected exons
-                        if (start<=event_st and end>=event_end):
-                            input_data = us + [start, end, strnd] + gene_name + TxID
+        #                 # Now one more time check if event lies between selected exons
+        #                 if (start<=event_st and end>=event_end):
+        #                     input_data = us + [start, end, strnd] + gene_name + TxID
 
-                            output_data = [input_data[0], input_data[13], input_data[14], "1", "0", input_data[15], input_data[16], input_data[17]]
-                            with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi2.bed", "a") as f:
-                                f.write("\t".join(output_data) + "\n")
+        #                     output_data = [input_data[0], input_data[13], input_data[14], "1", "0", input_data[15], input_data[16], input_data[17]]
+        #                     with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi2.bed", "a") as f:
+        #                         f.write("\t".join(output_data) + "\n")
 
-                            with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi.bed", "a") as f:
-                                f.write("\t".join(output_data) + "\n")
+        #                     with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi.bed", "a") as f:
+        #                         f.write("\t".join(output_data) + "\n")
 
-                            with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi2.csv", "a") as f:
-                                f.write(csv_ln)
+        #                     with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi2.csv", "a") as f:
+        #                         f.write(csv_ln)
 
-                            with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi.csv", "a") as f:
-                                f.write(csv_ln)
+        #                     with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi.csv", "a") as f:
+        #                         f.write(csv_ln)
                             
-                        else :
-                            with open(f"temp_all_events_sashimi/{splicing_events_file}_progress2.txt", "a") as f:
-                                f.write(f"ds 1 {ds}\n")
+        #                 else :
+        #                     with open(f"temp_all_events_sashimi/{splicing_events_file}_progress2.txt", "a") as f:
+        #                         f.write(f"ds 1 {ds}\n")
 
-                            with open(f"temp_all_events_sashimi/{splicing_events_file}_progress2.txt", "a") as f:
-                                f.write(f"us 1 {us}\n")
+        #                     with open(f"temp_all_events_sashimi/{splicing_events_file}_progress2.txt", "a") as f:
+        #                         f.write(f"us 1 {us}\n")
                             
-                            print(f"diff_exon_abs is {diff_exon_abs} selected event {sample} has event_st {event_st} selected start {start} event end {event_end} selected end {end} - please check")
+        #                     print(f"diff_exon_abs is {diff_exon_abs} selected event {sample} has event_st {event_st} selected start {start} event end {event_end} selected end {end} - please check")
                         
-                    else : # THIS IS FOR NEGATIVE STRAND
-                        start = ds.iloc[:, 7]
-                        end = us.iloc[:, 8]
+        #             else : # THIS IS FOR NEGATIVE STRAND
+        #                 start = ds.iloc[:, 7]
+        #                 end = us.iloc[:, 8]
 
-                        # First check if star > event_start, then select upstream exon
-                        if start>=event_st :
-                            # Get exon (line number in bed file) to read
-                            exon = ds.iloc[:, 10]
-                            exon = int(exon) # Tx on -ve strand has exons listed from bottom to top in increasing order
+        #                 # First check if star > event_start, then select upstream exon
+        #                 if start>=event_st :
+        #                     # Get exon (line number in bed file) to read
+        #                     exon = ds.iloc[:, 10]
+        #                     exon = int(exon) # Tx on -ve strand has exons listed from bottom to top in increasing order
 
-                            with open(f"event_bedfiles/{allexons}", 'r') as file:
-                                bed_data = [line.strip() for line in file]
+        #                     with open(f"event_bedfiles/{allexons}", 'r') as file:
+        #                         bed_data = [line.strip() for line in file]
                             
-                            bed_ln = bed_data[exon]
+        #                     bed_ln = bed_data[exon]
 
-                            # Update start
-                            start = bed_ln.iloc[:, 1]
+        #                     # Update start
+        #                     start = bed_ln.iloc[:, 1]
                         
-                        # Now check if end <event_end
-                        if end<=event_end :
-                            # Get exon (line number in bed file) to read
-                            exon = us.iloc[:, 10]
-                            exon = exon - 2 # Tx on -ve strand has exons listed from bottom to top in increasing order
+        #                 # Now check if end <event_end
+        #                 if end<=event_end :
+        #                     # Get exon (line number in bed file) to read
+        #                     exon = us.iloc[:, 10]
+        #                     exon = exon - 2 # Tx on -ve strand has exons listed from bottom to top in increasing order
 
-                            with open(f"event_bedfiles/{allexons}", 'r') as file:
-                                bed_data = [line.strip() for line in file]
+        #                     with open(f"event_bedfiles/{allexons}", 'r') as file:
+        #                         bed_data = [line.strip() for line in file]
 
-                            bed_ln = bed_data[exon]
+        #                     bed_ln = bed_data[exon]
 
-                            # Update end
-                            end = bed_ln.iloc[:, 2]
+        #                     # Update end
+        #                     end = bed_ln.iloc[:, 2]
 
-                        # Now one more time check if event lies between selected exons
-                        if (start<=event_st and end>=event_end):
-                            input_data = us + [start, end, strnd] + gene_name + TxID
+        #                 # Now one more time check if event lies between selected exons
+        #                 if (start<=event_st and end>=event_end):
+        #                     input_data = us + [start, end, strnd] + gene_name + TxID
 
-                            output_data = [input_data[0], input_data[13], input_data[14], "1", "0", input_data[15], input_data[16], input_data[17]]
-                            with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi2.bed", "a") as f:
-                                f.write("\t".join(output_data) + "\n")
+        #                     output_data = [input_data[0], input_data[13], input_data[14], "1", "0", input_data[15], input_data[16], input_data[17]]
+        #                     with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi2.bed", "a") as f:
+        #                         f.write("\t".join(output_data) + "\n")
 
-                            with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi.bed", "a") as f:
-                                f.write("\t".join(output_data) + "\n")
+        #                     with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi.bed", "a") as f:
+        #                         f.write("\t".join(output_data) + "\n")
 
-                            with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi2.csv", "a") as f:
-                                f.write(csv_ln)
+        #                     with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi2.csv", "a") as f:
+        #                         f.write(csv_ln)
 
-                            with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi.csv", "a") as f:
-                                f.write(csv_ln)
+        #                     with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi.csv", "a") as f:
+        #                         f.write(csv_ln)
                             
-                        else :
-                            with open(f"temp_all_events_sashimi/{splicing_events_file}_progress2.txt", "a") as f:
-                                f.write(f"ds 2 {ds}\n")
+        #                 else :
+        #                     with open(f"temp_all_events_sashimi/{splicing_events_file}_progress2.txt", "a") as f:
+        #                         f.write(f"ds 2 {ds}\n")
 
-                            with open(f"temp_all_events_sashimi/{splicing_events_file}_progress2.txt", "a") as f:
-                                f.write(f"us 2 {us}\n")
+        #                     with open(f"temp_all_events_sashimi/{splicing_events_file}_progress2.txt", "a") as f:
+        #                         f.write(f"us 2 {us}\n")
                             
-                            print(f"diff_exon_abs is {diff_exon_abs} selected event {sample} has event_st {event_st} selected start {start} event end {event_end} selected end {end} - please check")
+        #                     print(f"diff_exon_abs is {diff_exon_abs} selected event {sample} has event_st {event_st} selected start {start} event end {event_end} selected end {end} - please check")
                         
-            elif diff_exon_abs==0 :
-                if strnd == '+' :
-                    start = us.iloc[:, 7]
-                    end = ds.iloc[:, 8] # Both are same
+        #     elif diff_exon_abs==0 :
+        #         if strnd == '+' :
+        #             start = us.iloc[:, 7]
+        #             end = ds.iloc[:, 8] # Both are same
 
-					# First check if star > event_start, then select upstream exon
-                    if start>=event_st :
-                        # Get exon (line number in bed file) to read
-                        exon = us.iloc[:, 10]
-                        exon = exon - 2
+		# 			# First check if star > event_start, then select upstream exon
+        #             if start>=event_st :
+        #                 # Get exon (line number in bed file) to read
+        #                 exon = us.iloc[:, 10]
+        #                 exon = exon - 2
 
-                        with open(f"event_bedfiles/{allexons}", 'r') as file:
-                            bed_data = [line.strip() for line in file]
+        #                 with open(f"event_bedfiles/{allexons}", 'r') as file:
+        #                     bed_data = [line.strip() for line in file]
 
-                        bed_ln = bed_data[exon]
+        #                 bed_ln = bed_data[exon]
 
-                        # Update start
-                        start = bed_ln.iloc[:, 1]
+        #                 # Update start
+        #                 start = bed_ln.iloc[:, 1]
 
-                        # Now go on the other side
-                        if start>=event_st : # Get the other exon
-                            # Get exon (line number in bed file) to read
-                            exon = us.iloc[:, 10]
+        #                 # Now go on the other side
+        #                 if start>=event_st : # Get the other exon
+        #                     # Get exon (line number in bed file) to read
+        #                     exon = us.iloc[:, 10]
 
-                            with open(f"event_bedfiles/{allexons}", 'r') as file:
-                                bed_data = [line.strip() for line in file]
+        #                     with open(f"event_bedfiles/{allexons}", 'r') as file:
+        #                         bed_data = [line.strip() for line in file]
 
-                            bed_ln = bed_data[exon]
+        #                     bed_ln = bed_data[exon]
 
-                            # Update start
-                            start = bed_ln.iloc[:, 1]
+        #                     # Update start
+        #                     start = bed_ln.iloc[:, 1]
 
-                    # Now check if end <event_end
-                    if end<=event_end :
-                        # Get exon (line number in bed file) to read
-                        exon = us.iloc[:, 10]
+        #             # Now check if end <event_end
+        #             if end<=event_end :
+        #                 # Get exon (line number in bed file) to read
+        #                 exon = us.iloc[:, 10]
 
-                        with open(f"event_bedfiles/{allexons}", 'r') as file:
-                            bed_data = [line.strip() for line in file]
+        #                 with open(f"event_bedfiles/{allexons}", 'r') as file:
+        #                     bed_data = [line.strip() for line in file]
 
-                        print(f"bed_data {bed_data}")
-                        bed_ln = bed_data[exon]
-                        print(f"exon {exon} bed_ln {bed_ln}")
+        #                 print(f"bed_data {bed_data}")
+        #                 bed_ln = bed_data[exon]
+        #                 print(f"exon {exon} bed_ln {bed_ln}")
 
-                        # Update end
-                        end = bed_ln.iloc[:, 2]
+        #                 # Update end
+        #                 end = bed_ln.iloc[:, 2]
 
-                        if end<=event_end :
-                            # Get exon (line number in bed file) to read
-                            exon = us.iloc[:, 10]
-                            exon = exon - 2 # Reading line for readarray starts from 0
+        #                 if end<=event_end :
+        #                     # Get exon (line number in bed file) to read
+        #                     exon = us.iloc[:, 10]
+        #                     exon = exon - 2 # Reading line for readarray starts from 0
 
-                            with open(f"event_bedfiles/{allexons}", 'r') as file:
-                                bed_data = [line.strip() for line in file]
+        #                     with open(f"event_bedfiles/{allexons}", 'r') as file:
+        #                         bed_data = [line.strip() for line in file]
 
-                            bed_ln = bed_data[exon]
+        #                     bed_ln = bed_data[exon]
 
-                            # Update end
-                            end = bed_ln.iloc[:, 2]
+        #                     # Update end
+        #                     end = bed_ln.iloc[:, 2]
 
-                    # Now one more time check if event lies between selected exons
-                    if (start<=event_st and end>=event_end) :
-                        input_data = us + [start, end, strnd] + gene_name + TxID
+        #             # Now one more time check if event lies between selected exons
+        #             if (start<=event_st and end>=event_end) :
+        #                 input_data = us + [start, end, strnd] + gene_name + TxID
 
-                        output_data = [input_data[0], input_data[13], input_data[14], "1", "0", input_data[15], input_data[16], input_data[17]]
-                        with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi01.bed", "a") as f:
-                            f.write("\t".join(output_data) + "\n")
+        #                 output_data = [input_data[0], input_data[13], input_data[14], "1", "0", input_data[15], input_data[16], input_data[17]]
+        #                 with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi01.bed", "a") as f:
+        #                     f.write("\t".join(output_data) + "\n")
 
-                        with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi.bed", "a") as f:
-                            f.write("\t".join(output_data) + "\n")
+        #                 with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi.bed", "a") as f:
+        #                     f.write("\t".join(output_data) + "\n")
 
-                        with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi01.csv", "a") as f:
-                            f.write(csv_ln)
+        #                 with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi01.csv", "a") as f:
+        #                     f.write(csv_ln)
 
-                        with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi.csv", "a") as f:
-                            f.write(csv_ln)
+        #                 with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi.csv", "a") as f:
+        #                     f.write(csv_ln)
                         
-                    else :
-                        with open(f"temp_all_events_sashimi/{splicing_events_file}_progress01.txt", "a") as f:
-                            f.write(f"ds {ds}\n")
+        #             else :
+        #                 with open(f"temp_all_events_sashimi/{splicing_events_file}_progress01.txt", "a") as f:
+        #                     f.write(f"ds {ds}\n")
 
-                        with open(f"temp_all_events_sashimi/{splicing_events_file}_progress01.txt", "a") as f:
-                            f.write(f"us {us}\n")
+        #                 with open(f"temp_all_events_sashimi/{splicing_events_file}_progress01.txt", "a") as f:
+        #                     f.write(f"us {us}\n")
 
-                        print(f"diff_exon_abs is {diff_exon_abs} selected event {sample} has event_st {event_st} selected start {start} event end {event_end} selected end {end} - please check")
+        #                 print(f"diff_exon_abs is {diff_exon_abs} selected event {sample} has event_st {event_st} selected start {start} event end {event_end} selected end {end} - please check")
 
-                else : # THIS IS FOR NEGATIVE STRAND
-                    start = ds.iloc[:, 7]
-                    end = us.iloc[:, 8]
+        #         else : # THIS IS FOR NEGATIVE STRAND
+        #             start = ds.iloc[:, 7]
+        #             end = us.iloc[:, 8]
 
-                    # First check if star > event_start, then select upstream exon
-                    if start>=event_st :
-                        # Get exon (line number in bed file) to read
-                        exon = us.iloc[:, 10]
+        #             # First check if star > event_start, then select upstream exon
+        #             if start>=event_st :
+        #                 # Get exon (line number in bed file) to read
+        #                 exon = us.iloc[:, 10]
 
-                        with open(f"event_bedfiles/{allexons}", 'r') as file:
-                            bed_data = [line.strip() for line in file]
+        #                 with open(f"event_bedfiles/{allexons}", 'r') as file:
+        #                     bed_data = [line.strip() for line in file]
 
-                        bed_ln = bed_data[exon]
+        #                 bed_ln = bed_data[exon]
 
-                        # Update start
-                        start = bed_ln.iloc[:, 1]
+        #                 # Update start
+        #                 start = bed_ln.iloc[:, 1]
                     
-                    # Now check if end <event_end
-                    if end<=event_end :
-                        # Get exon (line number in bed file) to read
-                        exon =us.iloc[:, 10]
-                        exon = exon - 2 #Tx on -ve strand has exons listed from bottom to top in increasing order
+        #             # Now check if end <event_end
+        #             if end<=event_end :
+        #                 # Get exon (line number in bed file) to read
+        #                 exon =us.iloc[:, 10]
+        #                 exon = exon - 2 #Tx on -ve strand has exons listed from bottom to top in increasing order
                         
-                        with open(f"event_bedfiles/{allexons}", 'r') as file:
-                            bed_data = [line.strip() for line in file]
+        #                 with open(f"event_bedfiles/{allexons}", 'r') as file:
+        #                     bed_data = [line.strip() for line in file]
 
-                        bed_ln = bed_data[exon]
+        #                 bed_ln = bed_data[exon]
 
-                        # Update end
-                        end = bed_ln.iloc[:, 2]
+        #                 # Update end
+        #                 end = bed_ln.iloc[:, 2]
 
-                    # Now one more time check if event lies between selected exons
-                    if (start<=event_st and end>=event_end) :
-                        input_data = us + [start, end, strnd] + gene_name + TxID
+        #             # Now one more time check if event lies between selected exons
+        #             if (start<=event_st and end>=event_end) :
+        #                 input_data = us + [start, end, strnd] + gene_name + TxID
 
-                        output_data = [input_data[0], input_data[13], input_data[14], "1", "0", input_data[15], input_data[16], input_data[17]]
-                        with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi02.bed", "a") as f:
-                            f.write("\t".join(output_data) + "\n")
+        #                 output_data = [input_data[0], input_data[13], input_data[14], "1", "0", input_data[15], input_data[16], input_data[17]]
+        #                 with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi02.bed", "a") as f:
+        #                     f.write("\t".join(output_data) + "\n")
 
-                        with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi.bed", "a") as f:
-                            f.write("\t".join(output_data) + "\n")
+        #                 with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi.bed", "a") as f:
+        #                     f.write("\t".join(output_data) + "\n")
 
-                        with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi02.csv", "a") as f:
-                            f.write(csv_ln)
+        #                 with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi02.csv", "a") as f:
+        #                     f.write(csv_ln)
 
-                        with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi.csv", "a") as f:
-                            f.write(csv_ln)
+        #                 with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi.csv", "a") as f:
+        #                     f.write(csv_ln)
                         
-                    else :
-                        with open(f"temp_all_events_sashimi/{splicing_events_file}_progress02.txt", "a") as f:
-                            f.write(f"ds {ds}\n")
+        #             else :
+        #                 with open(f"temp_all_events_sashimi/{splicing_events_file}_progress02.txt", "a") as f:
+        #                     f.write(f"ds {ds}\n")
 
-                        with open(f"temp_all_events_sashimi/{splicing_events_file}_progress02.txt", "a") as f:
-                            f.write(f"us {us}\n")
+        #                 with open(f"temp_all_events_sashimi/{splicing_events_file}_progress02.txt", "a") as f:
+        #                     f.write(f"us {us}\n")
                         
-                        print(f"diff_exon_abs is {diff_exon_abs} selected event {sample} has event_st {event_st} selected start {start} event end {event_end} selected end {end} - please check")
+        #                 print(f"diff_exon_abs is {diff_exon_abs} selected event {sample} has event_st {event_st} selected start {start} event end {event_end} selected end {end} - please check")
                 
-                # First check if star > event_start, then select upstream exon
+        #         # First check if star > event_start, then select upstream exon
 
-            else :
-                with open(f"temp_all_events_sashimi/{splicing_events_file}_progress_all.txt", "a") as f:
-                    f.write(f"ds {ds}\n")
+        #     else :
+        #         with open(f"temp_all_events_sashimi/{splicing_events_file}_progress_all.txt", "a") as f:
+        #             f.write(f"ds {ds}\n")
 
-                with open(f"temp_all_events_sashimi/{splicing_events_file}_progress_all.txt", "a") as f:
-                    f.write(f"us {us}\n")
+        #         with open(f"temp_all_events_sashimi/{splicing_events_file}_progress_all.txt", "a") as f:
+        #             f.write(f"us {us}\n")
 
-        print("################################ DONE GENERATING BED AND OTHER RELATED FILES FOR ALL EVENTS TO CONTINUE FOR SASHIMI PLOTD")
+        # print("################################ DONE GENERATING BED AND OTHER RELATED FILES FOR ALL EVENTS TO CONTINUE FOR SASHIMI PLOTD")
 
-        with open("Summary_stats.txt", "a") as f:
-            f.write("################################ DONE GENERATING BED AND OTHER RELATED FILES FOR ALL EVENTS TO CONTINUE FOR SASHIMI PLOTD\n")
+        # with open("Summary_stats.txt", "a") as f:
+        #     f.write("################################ DONE GENERATING BED AND OTHER RELATED FILES FOR ALL EVENTS TO CONTINUE FOR SASHIMI PLOTD\n")
         
-        if arg1==1 or arg1==2 or arg1==5 :
-            print("################################ STARTED CREATING SASHIMI PLOTS FOR ALL EVENTS - MAY TAKE MANY HOURS ")
+        # if arg1==1 or arg1==2 or arg1==5 :
+        #     print("################################ STARTED CREATING SASHIMI PLOTS FOR ALL EVENTS - MAY TAKE MANY HOURS ")
 
-            with open("Summary_stats.txt", "a") as f:
-                f.write("################################ STARTED CREATING SASHIMI PLOTS FOR ALL EVENTS - MAY TAKE MANY HOURS \n")
+        #     with open("Summary_stats.txt", "a") as f:
+        #         f.write("################################ STARTED CREATING SASHIMI PLOTS FOR ALL EVENTS - MAY TAKE MANY HOURS \n")
 
             # CALL run_sashimiV1.sh for SASHIMI PLOTS
 
