@@ -926,6 +926,134 @@ if arg1==1 or arg1==2 or arg1==5 :
                         TxID = line1.iloc[:, 7]
 
                         # us exon length
-                        exon1=0
+                        exon1 = 0
                         # ds exon length
                         exon2 = 0
+
+                        combined_line = f"{line1} {line2}".split()
+                        field1 = combined_line[0]
+                        field2 = int(combined_line[1]) - 50
+                        field11 = int(combined_line[10]) + 50
+                        print(f"{field1}:{field2}-{field11}")
+
+                        event = all_csv_data[eventn]
+                        gene_name = event.split(',')[7]
+
+                        fields = event.split(',')
+                        field8 = fields[7]
+                        field2 = fields[1]
+                        field3 = fields[2]
+                        field4 = fields[3]
+                        fn = f"{field8}-{field2}_{field3}-{field4}"
+
+                        # String for majiq event
+                        chr_name = event.split(',')[1]
+                        start = event.split(',')[2]
+                        end = event.split(',')[3]
+
+                        # For now using strand from ggsashimi
+                        comb_line = f"{chr_name} {start} {end}".split()
+                        majiq_event = f"{comb_line[0]}-{comb_line[1]}-{comb_line[2]}"
+
+                        # Also get actual event identified
+                        event_identified = f"PGPEvent-{combined_line[2]}-{combined_line[9]}"
+                        eventn = eventn + 1
+
+                        print("processing event num {eventn} and event {fn}") # And majiq event is $majiq_event and event identified is $event_identified
+
+                        # Here removed -PGPTx flag
+                        command = [
+                            "./ggsashimi_txV3.py",
+                            "-A", "median_j",
+                            "-b", "all_bams.tsv",
+                            "-c", line,
+                            "-g", "Homo_sapiens.GRCh38.103.chr.sorted_new.gtf",
+                            "-GeneName", gene_name,
+                            "-MajiqStrnd", strnd,
+                            "-ORIG", "1",
+                            "-UEX", exon1,
+                            "-DEX", exon2,
+                            "-MajiqTx", majiq_event,
+                            "-Majiq", fn,
+                            "-Tx", TxID,
+                            "-M", "1",
+                            "-C", "3",
+                            "-o", f"{inp_prefix}/sashimi_plots/{fn}",
+                            "-O", "3",
+                            "--alpha", "0.25",
+                            "--base-size=20",
+                            "--ann-height=2.5",
+                            "--height=2.5",
+                            "--width=18",
+                            "-P", "palette.txt"
+                        ]
+
+                        subprocess.run(command)
+
+                    # Now merge all pdf's
+                    command = [
+                        "python", "merge_sashimis.py", f"{inp_prefix}/sashimi_plots/"
+                    ]
+
+                    subprocess.run(command)
+
+                ###### THIS IS FOR ALL MAJIQ EVENTS
+                if args[2]==2 :
+                    os.makedirs("all_events_sashimi/",exist_ok=True)
+                    if len(os.listdir("all_events_sashimi/"))!=0 :
+                        for f in glob.glob("all_events_sashimi/*.*") :
+                            os.remove(f)
+                
+                    bed = f"{args[1]}_all_sashimi.bed"
+
+                    with open(bed, 'r') as file:
+                        all_bed_data = [line.strip() for line in file]
+                    
+                    with open(bed, 'r') as file:
+                        nrecrds = sum(1 for line in file)
+
+                    print(f"read {nrecrds} records")
+                    csv = f"{args[1]}_all_sashimi.csv"
+
+                    with open(csv, 'r') as file:
+                        all_csv_data = [line.strip() for line in file]
+                    
+                    i = 0
+                    eventn = 0
+
+                    while i<nrecrds :
+                        # Construct string for ggsashimi
+                        line1 = all_bed_data[i]
+                        i = i + 1
+
+                        # Read strand
+                        strnd = '+'
+
+                        # Also read TxID
+                        TxID = line1.iloc[7]
+                        line = f"{line1.iloc[0]}:{line1.iloc[1]-50}-{line1.iloc[2]+50}" # This is the actual event
+
+                        # Get majiq event
+                        event = all_csv_data[eventn]
+                        eventn = eventn + 1
+
+                        # THIS IS TO KEEP DIFFERENT FILE NAMES FOR EVENTS WITH IDENTICAL COORDINATES AND GENE_NAMES
+                        gene_name = event.split(',')[4]
+
+                        if i==1 :
+                            temp_gene = event.split(',')[4]
+                            trackj=1
+
+                        elif temp_gene==gene_name :
+                            trackj = trackj + 1
+
+                        else :
+                            temp_gene = event.split(',')[4]
+                            trackj=1
+                        
+                        # SHOULD NOT HAVE THIS BUT NEED TO KEEP AS PER REQUEST
+                        fields = event.split(',')
+                        fn = f"{fields[4]}-{fields[0]}-{fields[1]}-{fields[2]}-{trackj}"
+
+                        # String for majiq event
+                        
