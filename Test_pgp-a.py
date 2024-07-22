@@ -279,7 +279,7 @@ if arg1==1 or arg1==2 or arg1==5 :
                 "temp_all_events_sashimi/FINAL_STATS_ALL_SASHIMIS.txt"
             ]
 
-            result = subprocess.run(command, capture_output=True, text=True) ##### Testé jusqu'ici et tout fonctionne #####
+            subprocess.run(command, capture_output=True, text=True) ##### Testé jusqu'ici et tout fonctionne #####
 
             # Using ENSG (commented out this - junction start and end range) to get transcripts
             # Starting from previous version (TxEnsDB103_layeredV1.R), it has 41 events for which Tx selected does not encapsulate the event
@@ -487,32 +487,32 @@ if arg1==1 or arg1==2 or arg1==5 :
 
 
 
-        #     with open("Summary_stats.txt","a") as fichier :
-        #         fichier.write("************************ BACK FROM TxEnsDB103_layeredV6.R, CONTINUING pgp-a.sh \n")
+            with open("Summary_stats.txt","a") as fichier :
+                fichier.write("************************ BACK FROM TxEnsDB103_layeredV6.R, CONTINUING pgp-a.sh \n")
             
-        # csv_data = pd.read_csv('all_tx_events.csv')
-        # csvi = 0
-        # samples = glob.glob('event_bedfiles/temp_*.bed')
-
-        # print("csv_data : ", csv_data.head())
-        # print("samples : ", samples[5])
-
-        # with open("Summary_stats.txt","a") as fichier :
-        #     fichier.write("GENERATING BED FILES FOR EACH EVENT\n")
-
-        # for sample in samples :
-        #     # Read csv entry
-        #     csv_ln = csv_data[csvi]
-        #     csvi = csvi + 1
-
-        #     print("csv_ln : ", csv_ln)
-        #     print("csvi : ", csvi)
-        
-        #     allexons = sample.split('/')[1].split('_')[1]
-        #     gene_name1 = allexons.split('.')[0]
-        #     gene_name = gene_name1.split('.')[0]
-
-        #     print("gene_name : ", gene_name)
+            csv_data = pd.read_csv('all_tx_events.csv')
+            csvi = 0
+            samples = glob.glob('event_bedfiles/temp_*.bed')
+    
+            print("csv_data : ", csv_data.head())
+            print("samples : ", samples[5])
+    
+            with open("Summary_stats.txt","a") as fichier :
+                fichier.write("GENERATING BED FILES FOR EACH EVENT\n")
+    
+            for sample in samples :
+                # Read csv entry
+                csv_ln = csv_data[csvi]
+                csvi = csvi + 1
+    
+                print("csv_ln : ", csv_ln)
+                print("csvi : ", csvi)
+            
+                allexons = sample.split('/')[1].split('_')[1]
+                gene_name1 = allexons.split('.')[0]
+                gene_name = gene_name1.split('.')[0]
+    
+                print("gene_name : ", gene_name)
 
         #     # First sort the bed
         #     sorted_bed = f'event_bedfiles/{allexons}'.sort()
@@ -1153,7 +1153,7 @@ if arg1==1 or arg1==2 or arg1==5 :
                             # Now modify to reflect whole up/dn exons
                             up = line1.iloc[:, 1]
                             upn = up - exon1
-				            
+				             
                             # ds exon
                             dn = line3.iloc[:, 2]
                             dnn = dn + exon2
@@ -1176,7 +1176,7 @@ if arg1==1 or arg1==2 or arg1==5 :
                             # Now modify to reflect whole up/dn exons
                             dn = line3.iloc[:, 1]
                             dnn = dn - exon1
-				            
+				             
                             # ds exon
                             up = line1.iloc[:, 2]
                             upn = up + exon2
@@ -1294,7 +1294,7 @@ if arg1==1 or arg1==2 or arg1==5 :
                             # Now modify to reflect whole up/dn exons
                             up = line1.iloc[:, 1]
                             upn = up - exon1
-				            
+				             
                             # ds exon
                             dn = line3.iloc[:, 2]
                             dnn = dn + exon2
@@ -1315,7 +1315,7 @@ if arg1==1 or arg1==2 or arg1==5 :
                             # Now modify to reflect whole up/dn exons
                             dn = line3.iloc[:, 1]
                             dnn = dn - exon1
-				            
+				             
                             # ds exon
                             up = line1.iloc[:, 2]
                             upn = up + exon2
@@ -1487,5 +1487,228 @@ if arg1==1 or arg1==2 or arg1==5 :
                     # Now merge all pdf's
                     command = ["python", "merge_sashimis.py", f"{inp_prefix}/ir_sashimi_plots/"]
                     subprocess.run(command)
+                    
+            else :
+                print("came in for peaksbackmapping")
+                
+                ###### THIS PART IS FOR BACKMAPPING
+                flg_sashimi_files_only = 1
+                
+                if flg_sashimi_files_only==1 :
+                    step01_flg = 1
+                    
+                    if step01_flg==1 :
+                        ################################ GENERATING BED FILE FOR SASHIMI PLOTS FOR ALL EVENTS
+                        # IMPORTANT - THIS CODE RELIES ON THE OUTPUT OF BEDTOOLS CLOSEST FUNCTION
+                        # GIVEN A MAJIQ EVENT (as a bed file) and BED FILE FOR THE TRANSCRIPT IT BELIEVES TO BE PART OF
+                        # BEDTOOLS CLOSEST FUNCTION USES INPUT RANGE (AMJIQ JUNTION) and finds closest exons (and their ranges) from the TRANSCRIPT BED FILE
+                        # BEDTOOLS CLOSEST RETURNS A BED FILE WITH FOLLOWING OUTPUT
+                        # INPUT: chr,start,end,1,0,+ (majiq event with strand)
+                        # OUTPUT: chr,start,end,1,0,+,chr,start,end,size,exon_num,+,distance
+                        # Here first 6 entries are the original majiq input and next 7 entries are the resulting closest exon coordinates, its size (in bp),exon_num,strand and distance from reference
+                        # SOULD ADD CHECKS ON EXON_NUM READING FROM FILE
+                        
+                        inp = args[0].split('.')[0]
+                        print(f"run_sashimiV1.sh, got inp as {inp}")
+                        
+                        # Also get folder
+                        folder = inp.split('/')[0]
+                        print(f"run_sashimiV1.sh, got folder as {folder}")
+                        
+                        # Also get event TYPE
+                        eventyp = args[1].split('/')[1].split('.')[0]
+                        print(f"run_sashimiV1.sh, got eventype as {eventyp}")
+                        
+                        if os.path.exists(f"{inp}_majiq.bed"):
+                            os.remove(f"{inp}_majiq.bed")
+                        
+                        if os.path.exists(f"{inp}_majiq.csv"):
+                            os.remove(f"{inp}_majiq.csv")
+                            
+                        if os.path.exists("all_tx_events.csv"):
+                            os.remove("all_tx_events.csv")
+                            
+                        if os.path.exists("majiq_events_sashimi2.bed"):
+                            os.remove("majiq_events_sashimi2.bed")
+                            
+                        if os.path.exists("majiq_events_sashimi2.csv"):
+                            os.remove("majiq_events_sashimi2.csv")
+                            
+                        if os.path.exists("majiq_events_sashimi01.bed"):
+                            os.remove("majiq_events_sashimi01.bed")
+                            
+                        if os.path.exists("majiq_events_sashimi01.csv"):
+                            os.remove("majiq_events_sashimi01.csv")
+                            
+                        if os.path.exists("majiq_events_sashimi02.bed"):
+                            os.remove("majiq_events_sashimi02.bed")
+                            
+                        if os.path.exists("majiq_events_sashimi02.csv"):
+                            os.remove("majiq_events_sashimi02.csv")
+                            
+                        if os.path.exists("majiq_events_progress2.txt"):
+                            os.remove("majiq_events_progress2.txt")
+                            
+                        if os.path.exists("majiq_events_progress01.txt"):
+                            os.remove("majiq_events_progress01.txt")
+                            
+                        if os.path.exists("majiq_events_progress02.txt"):
+                            os.remove("majiq_events_progress02.txt")
+                            
+                        if os.path.exists("majiq_events_progress_all.txt"):
+                            os.remove("majiq_events_progress_all.txt")
+                            
+                        if os.path.exists("majiq_events_progress1.txt"):
+                            os.remove("majiq_events_progress1.txt")
+                            
+                        flg = 1
+                        
+                        if flg==1 :
+                            os.makedirs("event_bedfiles",exist_ok=True)
+                            if len(os.listdir("event_bedfiles/"))!=0 :
+                                for f in glob.glob("event_bedfiles/*.*") :
+                                    os.remove(f)
+                            
+                            command = [
+                                "Rscript",
+                                "txens.R",
+                                args[0],
+                                "principal_txs.csv"
+                            ]
 
-            
+                            subprocess.run(command, capture_output=True, text=True)
+                            
+                        with open("all_tx_events.csv", 'r') as file:
+                            csv_data = [line.strip() for line in file]
+                        
+                        csvi = 0
+                        samples = glob.glob('event_bedfiles/temp_*.bed')
+                        
+                        for sample in samples :
+                            # Read csv entry
+                            csv_ln = csv_data[csvi]
+                            csvi = csvi + 1
+                            
+                            print(f"processing {sample}")
+                            allexons = sample.split('/')[1].split('_')[1]
+                            gene_name1 = allexons.split('.')[0]
+                            gene_name = gene_name1.split('-')[0]
+                            
+                            # First sort the bed
+                            bed = pybedtools.BedTool(f"event_bedfiles/{allexons}")
+                            sorted_bed = bed.sort()
+                            sorted_bed.saveas(f"event_bedfiles/t{allexons}")
+                            
+                            # Also read Tx Files to retrieve selected Tx - should find better ways
+                            with open(f"event_bedfiles/TxID{allexons}", 'r') as file:
+                                first_line = file.readline().strip()
+                                TxID = first_line.split()[6]
+                                
+                            samp = pd.read_csv(sample, sep='\t', header=None)
+                            strnd = samp.iloc[:, 5]
+                            
+                            # Get distance to downstream exon (for ties, report first) from current reference and pick start, end and d
+                            a = pybedtools.BedTool(sample)
+                            b = pybedtools.BedTool(f'event_bedfiles/t{allexons}')
+                            closest = a.closest(b, d=True, s=True, t='first')
+                            ds = [line.strip() for line in closest]
+                            ds = closest.to_dataframe()
+                            
+                            # Also get distance to upstream exon from current reference and pick start, end and d
+                            closest = a.closest(b, d=True, s=True, t='last')
+                            us = [line.strip() for line in closest]
+                            us = closest.to_dataframe()
+                            
+                            # Get up and down stream exon numbers
+                            upexon = us.iloc[:,10]
+                            dnexon = ds.iloc[:,10]
+                            
+                            # Events star and end
+                            event_st = us.iloc[:,1]
+                            event_end = us.iloc[:,2]
+                            diff_exon = upexon - dnexon
+                            
+                            # Take absolute value
+                            diff_exon_abs = abs(diff_exon)
+                            
+                            if diff_exon_abs>=1 : # ALL EVENTS THAT SPANS 2 OR MORE EXONS
+                                if strnd=="+" :
+                                    start = us.iloc[:,7]
+                                    end = ds.iloc[:,8]
+                                    
+                                else :
+                                    start = ds.iloc[:,7]
+                                    end = us.iloc[:,8]
+                                
+                                # Also save
+                                # FORMAT IS: chr, start of up_ex,end of ds_ex, 1, 0, strand, gene_name, TxID
+                                # First check if event lies between selected exons
+                                if (start<=event_st and end>=event_end) :
+                                    input_data = us + [start, end, strnd] + gene_name + TxID
+                                    output_data = [input_data[0], input_data[13], input_data[14], "1", "0", input_data[15], input_data[16], input_data[17]]
+                                    with open(f"{inp}_majiq.bed", "a") as f:
+                                        f.write("\t".join(output_data) + "\n")
+                                        
+                                    with open(f"{inp}_majiq.csv", "a") as f:
+                                        f.write(csv_ln)
+                                    
+                                else :
+                                    if strnd=="+" :
+                                        start = us.iloc[:,7]
+                                        end = ds.iloc[:,8] # Both are same
+                                        
+                                        # First check if star > event_start, then select upstream exon
+                                        if start>=event_st :
+                                            # Get exon (line number in bed file) to read
+                                            exon = ds.iloc[:,10]
+                                            exon = exon - 2
+                                            
+                                            with open(f"event_bedfiles/{allexons}", 'r') as file:
+                                                bed_data = [line.strip() for line in file]
+                                            
+                                            bed_ln = bed_data[exon]
+                                            
+                                            # Update start
+                                            start = bed_ln.iloc[:,1]
+                                            
+                                        # Now check if end <event_end
+                                        if end<=event_end :
+                                            # Get exon (line number in bed file) to read
+                                            exon = us.iloc[:,10]
+                                            
+                                            with open(f"event_bedfiles/{allexons}", 'r') as file:
+                                                bed_data = [line.strip() for line in file]
+                                            
+                                            print(f"bed_data {bad_data}")
+                                            bed_ln = bed_data[exon]
+                                            print(f"exon {exon} bed_ln {bed_ln}")
+                                            
+                                            # Update end
+                                            end = bed_ln.iloc[:,2]
+                                            
+                                        # Now one more time check if event lies between selected exons
+                                        if (start<=event_st and end>=event_end):
+                                            input_data = us + [start, end, strnd] + gene_name + TxID
+                                            output_data = [input_data[0], input_data[13], input_data[14], "1", "0", input_data[15], input_data[16], input_data[17]]
+                                            with open(f"{inp}_majiq.bed", "a") as f:
+                                                f.write("\t".join(output_data) + "\n")
+                                                
+                                            with open(f"{inp}_majiq.csv", "a") as f:
+                                                f.write(csv_ln)
+                                            
+                                        else :
+                                            with open("majiq_events_progress2.txt", "a") as f:
+                                                f.write(f"ds 1 {ds}\n")
+                                                f.write(f"us 1 {us}\n")
+                                                
+                                            print(f"diff_exon_abs is {diff_exon_abs} selected event {sample} has event_st {event_st} selected start {start} event end {event_end} selected end {end} - please check")
+                                                
+                                        else : # THIS IS FOR NEGATIVE STRAND
+                                            start = ds.iloc[:,7]
+                                            end = us.iloc[:,8]
+                                            
+                                            # First check if star > event_start, then select upstream exon
+                                            if start>=event_st :
+                                                # Get exon (line number in bed file) to read
+                                                exon = ds.iloc[:,10]
+                                                
