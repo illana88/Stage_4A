@@ -888,7 +888,7 @@ if arg1==1 or arg1==2 or arg1==5 :
                 inp_prefix = args[0].split('/')[0]
 
                 if args[2]==1 :
-                    os.makedirs(f"{inp_prefix}/sashimi_plots/",exist_ok=True)
+                    os.makedirs(f"{inp_prefix}/sashimi_plots",exist_ok=True)
                     if len(os.listdir(f"{inp_prefix}/sashimi_plots/"))!=0 :
                         for f in glob.glob(f"{inp_prefix}/sashimi_plots/*.*") :
                             os.remove(f)
@@ -996,7 +996,7 @@ if arg1==1 or arg1==2 or arg1==5 :
 
                 ###### THIS IS FOR ALL MAJIQ EVENTS
                 if args[2]==2 :
-                    os.makedirs("all_events_sashimi/",exist_ok=True)
+                    os.makedirs("all_events_sashimi",exist_ok=True)
                     if len(os.listdir("all_events_sashimi/"))!=0 :
                         for f in glob.glob("all_events_sashimi/*.*") :
                             os.remove(f)
@@ -1070,10 +1070,10 @@ if arg1==1 or arg1==2 or arg1==5 :
 
                         command = [
                             "./ggsashimi_txV3.py",
-                            "-A", median_j,
-                            "-b", bams_file,
+                            "-A", "median_j",
+                            "-b", "all_bams.tsv",
                             "-c", line,
-                            "-g", gtf_file,
+                            "-g", "Homo_sapiens.GRCh38.103.chr.sorted_new.gtf",
                             "-GeneName", gene_name,
                             "-MajiqStrnd", strnd,
                             "-ORIG", "1",
@@ -1081,17 +1081,17 @@ if arg1==1 or arg1==2 or arg1==5 :
                             "-DEX", exon2,
                             "-MajiqTx", majiq_event,
                             "-Majiq", fn,
-                            "-Tx", tx_id,
+                            "-Tx", TxID,
                             "-M", "1",
                             "-C", "3",
-                            "-o", output_dir,
+                            "-o", f"all_events_sashimi/{fn}",
                             "-O", "3",
                             "--alpha", "0.25",
                             "--base-size=20",
                             "--ann-height=2.5",
                             "--height=2.5",
                             "--width=18",
-                            "-P", palette_file
+                            "-P", "palette.txt"
                         ]
 
                         subprocess.run(command)
@@ -1103,7 +1103,7 @@ if arg1==1 or arg1==2 or arg1==5 :
                 # THIS SECTION IS FOR CE_INCLUSION EVENTS
                 # WILL MERGE INCLUSION AND EXTENSION EVENTS
                 if args[2]==3 :
-                    os.makedirs(f"{inp_prefix}/ce_incl_sashimi_plots/",exist_ok=True)
+                    os.makedirs(f"{inp_prefix}/ce_incl_sashimi_plots",exist_ok=True)
                     if len(os.listdir(f"{inp_prefix}/ce_incl_sashimi_plots/"))!=0 :
                         for f in glob.glob(f"{inp_prefix}/ce_incl_sashimi_plots/*.*") :
                             os.remove(f)
@@ -1211,10 +1211,10 @@ if arg1==1 or arg1==2 or arg1==5 :
 
                         command = [
                             "./ggsashimi_txV3.py",
-                            "-A", median_j,
-                            "-b", bams_file,
+                            "-A", "median_j",
+                            "-b", "all_bams.tsv",
                             "-c", line,
-                            "-g", gtf_file,
+                            "-g", "Homo_sapiens.GRCh38.103.chr.sorted_new.gtf",
                             "-GeneName", gene_name,
                             "-MajiqStrnd", strnd,
                             "-ORIG", "1",
@@ -1223,17 +1223,17 @@ if arg1==1 or arg1==2 or arg1==5 :
                             "-FullTitle", fulltitle,
                             "-MajiqTx", majiq_event,
                             "-Majiq", fn,
-                            "-Tx", tx_id,
+                            "-Tx", TxID,
                             "-M", "1",
                             "-C", "3",
-                            "-o", output_dir,
+                            "-o", f"{inp_prefix}/ce_incl_sashimi_plots/{fn}",
                             "-O", "3",
                             "--alpha", "0.25",
                             "--base-size=20",
                             "--ann-height=2.5",
                             "--height=2.5",
                             "--width=18",
-                            "-P", palette_file
+                            "-P", "palette.txt"
                         ]
 
                         subprocess.run(command)
@@ -1244,4 +1244,248 @@ if arg1==1 or arg1==2 or arg1==5 :
 
                 # CE_EXTENSION
                 if args[2]==4 :
+                    os.makedirs(f"{inp_prefix}/ce_ext_sashimi_plots",exist_ok=True)
+                    if len(os.listdir(f"{inp_prefix}/ce_ext_sashimi_plots/"))!=0 :
+                        for f in glob.glob(f"{inp_prefix}/ce_ext_sashimi_plots/*.*") :
+                            os.remove(f)
+                
+                    bed = inp_bed
+
+                    with open(bed, 'r') as file:
+                        all_bed_data = [line.strip() for line in file]
                     
+                    with open(bed, 'r') as file:
+                        nrecrds = sum(1 for line in file)
+                    
+                    nrecrdst = nrecrds/3
+
+                    print(f"read {nrecrdst} records")
+                    csv = inp_csv
+
+                    with open(csv, 'r') as file:
+                        all_csv_data = [line.strip() for line in file]
+                    
+                    i = 0
+                    eventn = 0
+
+                    while i<nrecrds :
+                        # Construct string for ggsashimi
+                        line1 = all_bed_data[i]
+                        line2 = all_bed_data[i+1]
+                        line3 = all_bed_data[i+2]
+
+                        i = i + 3
+
+                        # Read strand
+                        strnd = line1.iloc[:, 5]
+
+                        # Also read TxID
+                        TxID = line1.iloc[7]
+
+                        if strnd=='+' :
+                            strndflg = "plus"
+
+                            # us exon length
+                            exon1 = line1.iloc[:, 3]
+
+                            # ds exon length
+                            exon2 = line3.iloc[:, 3]
+
+                            # Now modify to reflect whole up/dn exons
+                            up = line1.iloc[:, 1]
+                            upn = up - exon1
+				            
+                            # ds exon
+                            dn = line3.iloc[:, 2]
+                            dnn = dn + exon2
+
+                            l123 = f"{line1} {line2} {line3}".split()
+                            fulltitle = f"{l123[0]}-{l123[1]}:{l123[2]}-{l123[9]}:{l123[10]}-{l123[17]}:{l123[18]}"
+
+                            comb = f"{line1} {upn} {dnn}".split()
+                            line = f"{comb[0]}:{comb[8]}-{comb[9]}"
+
+                        else :
+                            # us exon length
+                            exon1 = line3.iloc[:, 3]
+
+                            # ds exon length
+                            exon2 = line1.iloc[:, 3]
+
+                            # Now modify to reflect whole up/dn exons
+                            dn = line3.iloc[:, 1]
+                            dnn = dn - exon1
+				            
+                            # ds exon
+                            up = line1.iloc[:, 2]
+                            upn = up + exon2
+
+                            l123 = f"{line1} {line2} {line3}".split()
+                            fulltitle = f"{l123[0]}-{l123[17]}:{l123[18]}-{l123[9]}:{l123[10]}-{l123[1]}:{l123[2]}"
+
+                            comb = f"{line1} {dnn} {upn}".split()
+                            line = f"{comb[0]}:{comb[8]}-{comb[9]}"
+
+                        event = all_csv_data[eventn]
+
+                        fields = event.split(',')
+                        fn = f"{fields[7]}-{fields[1]}_{fields[2]}-{fields[3]}"
+
+                        # String for majiq event
+                        chr_name = event.split(',')[1]
+                        start = event.split(',')[2]
+                        end = event.split(',')[3]
+                        gene_name = event.split(',')[7]
+                        intron = end - start
+
+                        #gene_name-start-intron-end #for now using strand from ggsashimi
+                        comb_line = f"{chr_name} {start} {end}".split()
+                        majiq_event = f"{comb_line[0]}-{comb_line[1]}-{comb_line[2]}"
+
+                        # Also get actual event identified
+                        event_identified = f"{line2.iloc[:,0]}-{line2.iloc[:,1]}-{line2.iloc[:,2]}"
+                        eventn = eventn + 1
+
+                        print(f"processing event num {eventn} and event {fn}")
+
+                        command = [
+                            "./ggsashimi_txV3.py",
+                            "-A", "median_j",
+                            "-b", "all_bams.tsv",
+                            "-c", line,
+                            "-g", "Homo_sapiens.GRCh38.103.chr.sorted_new.gtf",
+                            "-GeneName", gene_name,
+                            "-MajiqStrnd", strnd,
+                            "-ORIG", "1",
+                            "-UEX", exon1,
+                            "-DEX", exon2,
+                            "-FullTitle", fulltitle,
+                            "-MajiqTx", majiq_event,
+                            "-Majiq", fn,
+                            "-Tx", TxID,
+                            "-M", "1",
+                            "-C", "3",
+                            "-o", f"{inp_prefix}/ce_ext_sashimi_plots/{fn}",
+                            "-O", "3",
+                            "--alpha", "0.25",
+                            "--base-size=20",
+                            "--ann-height=2.5",
+                            "--height=2.5",
+                            "--width=18",
+                            "-P", "palette.txt"
+                        ]
+
+                        subprocess.run(command)
+
+                    # Now merge all pdf's
+                    command = ["python", "merge_sashimis.py", f"{inp_prefix}/ce_ext_sashimi_plots/"]
+                    subprocess.run(command)
+                
+                ######THIS IS FOR ALL IR EVENTS
+                if args[2]==5 :
+                    os.makedirs(f"{inp_prefix}/ir_sashimi_plots",exist_ok=True)
+                    if len(os.listdir(f"{inp_prefix}/ir_sashimi_plots/"))!=0 :
+                        for f in glob.glob(f"{inp_prefix}/ir_sashimi_plots/*.*") :
+                            os.remove(f)
+                
+                    bed = inp_bed
+
+                    with open(bed, 'r') as file:
+                        all_bed_data = [line.strip() for line in file]
+                    
+                    with open(bed, 'r') as file:
+                        nrecrds = sum(1 for line in file)
+
+                    print(f"read {nrecrds} records")
+                    csv = inp_csv
+
+                    with open(csv, 'r') as file:
+                        all_csv_data = [line.strip() for line in file]
+                    
+                    i = 0
+                    eventn = 0
+
+                    while i<nrecrds :
+                        # Construct string for ggsashimi
+                        line1 = all_bed_data[i]
+
+                        i = i + 1
+
+                        # Read strand
+                        strnd = line1.iloc[:, 5]
+
+                        # Also read TxID
+                        TxID = line1.iloc[7]
+
+                        line = f"{line1[0]}:{line1[1]-50}-{line1[2]+50}"
+
+                        # Get majiq event
+                        event = all_csv_data[eventn]
+                        eventn = eventn + 1
+
+                        # THIS IS TO KEEP DIFFERENT FILE NAMES FOR EVENTS WITH IDENTICAL COORDINATES AND GENE_NAMES
+                        gene_name = event.split(',')[4]
+
+                        if i==1 :
+                            temp_gene = event.split(',')[4]
+                            trackj = 1
+                        
+                        elif temp_gene == gene_name :
+                            trackj = trackj + 1
+                        
+                        else :
+                            temp_gene = event.split(',')[4]
+                            trackj = 1
+                        
+                        # SHOULD NOT HAVE THIS BUT NEED TO KEEP AS PER REQUEST
+                        fields = event.split(',')
+                        fn = f"{fields[4]}-{fields[0]}_{fields[1]}-{fields[2]}-{trackj}" #also gene_id to avoid same file names for repeated events
+
+                        # String for majiq event
+                        chr_name = event.split(',')[0]
+                        start = event.split(',')[1]
+                        end = event.split(',')[2]
+
+                        comb_line = f"{chr_name} {start} {end}".split()
+                        majiq_event = f"{comb_line[0]}-{comb_line[1]}-{comb_line[2]}"
+                        exon1 = 0
+                        exon2 = 0
+
+                        # Also get actual event identified
+                        event_identified = f"{line1.iloc[:,0]}-{line1.iloc[:,1]}-{line1.iloc[:,2]}"
+
+                        print(f"processing event num {eventn} and event {fn}")
+
+                        command = [
+                            "./ggsashimi_txV3.py",
+                            "-A", "median_j",
+                            "-b", "all_bams.tsv",
+                            "-c", line,
+                            "-g", "Homo_sapiens.GRCh38.103.chr.sorted_new.gtf",
+                            "-GeneName", gene_name,
+                            "-MajiqStrnd", strnd,
+                            "-ORIG", "1",
+                            "-UEX", exon1,
+                            "-DEX", exon2,
+                            "-MajiqTx", majiq_event,
+                            "-Majiq", fn,
+                            "-Tx", TxID,
+                            "-M", "1",
+                            "-C", "3",
+                            "-o", f"{inp_prefix}/ir_sashimi_plots/{fn}",
+                            "-O", "3",
+                            "--alpha", "0.25",
+                            "--base-size=20",
+                            "--ann-height=2.5",
+                            "--height=2.5",
+                            "--width=18",
+                            "-P", "palette.txt"
+                        ]
+
+                        subprocess.run(command)
+
+                    # Now merge all pdf's
+                    command = ["python", "merge_sashimis.py", f"{inp_prefix}/ir_sashimi_plots/"]
+                    subprocess.run(command)
+
+            
