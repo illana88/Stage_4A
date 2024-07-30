@@ -2677,4 +2677,136 @@ if arg1==4 or arg1==5 :
             with open("Summary_stats.txt", "a") as f :
                 f.write("CALLING TxEnsDB103_layeredV6.R to generate bed files\n")
             
+            command = [
+                "Rscript",
+                "txens.R",
+                "inpfile",
+                "principal_txs.csv",
+                "res_ce_all/Summary_stats.txt"
+            ]
+
+            subprocess.run(command, capture_output=True, text=True)
+
+        with open('votre_fichier.csv', 'r') as fichier:
+            all_csv_data = [ligne.strip() for ligne in fichier] # For saving gene_ids as well to generate sashimi compatible csv file
+
+        event_i = 0
+        samples = glob.glob('event_bedfiles/temp_*.bed')
+        overlap_allowed = 5 # Overlap allowed (intron/exon) for ce events
+
+        for sample in samples :
+            # Read line from csv file
+            line_csv = all_csv_data[event_i-1]
+            event_i = event_i + 1
+
+            # Get  all exons bed
+            allexons = sample.split('/')[1].split('_')[1]
+
+            # Also get 5UTR and 3UTR bed files
+            gene_name1 = allexons.split('.')[0]
+            gene_name = gene_name1.split('-')[0]
+
+            # First sort the bed
+            bed = pybedtools.BedTool(f"event_bedfiles/{allexons}")
+            sorted_bed = bed.sort()
+            sorted_bed.saveas(f"event_bedfiles/t{allexons}")
+
+            # Also read Tx Files to retrieve selected Tx - should find better ways
+            with open(f"event_bedfiles/TxID{allexons}", 'r') as fichier:
+                premiere_ligne = fichier.readline().strip()
+
+            colonnes = premiere_ligne.split()
+            TxID = colonnes[6]
+
+            df = pd.read_csv(sample, sep='\\s+', header=None)
+            strnd = df[5]
+
+            print(sample)
+
+            # Get distance to downstream exon (for ties, report first) from current reference and pick start, end and d
+            a = pybedtools.BedTool(sample)
+            b = pybedtools.BedTool(f'event_bedfiles/t{allexons}')
             
+            closest = a.closest(b, s=True, D="a", iu=True, d=True, t="first")
+            ds = closest.to_dataframe(names = [
+                "chr_a", "start_a", "end_a", "name_a", "row_line_a", "strand_a",
+                "chr_b", "start_b", "end_b", "name_b", "row_line_b", "strand_b", "distance"
+            ])
+
+            # Also get distance to upstream exon from current reference and pick start, end and d
+            closest = a.closest(b, s=True, D="a", id=True, d=True, t="first")
+            us = closest.to_dataframe(names = [
+                "chr_a", "start_a", "end_a", "name_a", "row_line_a", "strand_a",
+                "chr_b", "start_b", "end_b", "name_b", "row_line_b", "strand_b", "distance"
+            ])
+
+            # Get up/dn exon lengths
+            upexonl = us.iloc[:,9].tolist()[0]
+            dnexonl = ds.iloc[:,9].tolist()[0]
+
+            # Get up and down stream exon numbers
+            upexon = us.iloc[:,10].tolist()[0]
+            dnexon = ds.iloc[:,10].tolist()[0]
+
+            # Get overlap with up/dn exon - 0 means complete overlap which is assumed as exon skip event
+            dsovlp1 = ds.iloc[:,12].tolist()[0]
+            usovlp1 = us.iloc[:,12].tolist()[0]
+
+            # Take absolute values
+            dsovlp = abs(dsovlp1)
+            usovlp = abs(usovlp1)
+
+            diff_exon = int(upexon) - int(dnexon)
+
+            # Take absolute value
+            diff_exon_abs = abs(diff_exon)
+
+            if (upexon==dnexon and upexonl!=dnexonl) : # condition [ $upexonl -ne $dnexonl ] REMOVES EXON_SKIP events
+                with open("res_ce_all/ex1_ex2_ce.txt", "a") as f :
+                    f.write(f"{gene_name} is a CE event")
+                    f.write(f"ds {ds}")
+                    f.write(f"us {us}")
+                
+                # Get distance to downstream exon (for ties, report first) from current reference and pick start, end and d
+                closest = a.closest(b, s=True, D="a", iu=True, d=True, t="first", io=True)
+                dsn = closest.to_dataframe(names = [
+                    "chr_a", "start_a", "end_a", "name_a", "row_line_a", "strand_a",
+                    "chr_b", "start_b", "end_b", "name_b", "row_line_b", "strand_b", "distance"
+                ])
+
+                # Also get ds overlap
+                closest = a.closest(b, s=True, D="a", iu=True, d=True, t="first")
+                dso = closest.to_dataframe(names = [
+                    "chr_a", "start_a", "end_a", "name_a", "row_line_a", "strand_a",
+                    "chr_b", "start_b", "end_b", "name_b", "row_line_b", "strand_b", "distance"
+                ])
+
+                # Get start and end of dso
+                dso1 = dso.iloc[:,1].tolist()[0]
+                dso2 = dso.iloc[:,8].tolist()[0]
+                dsodiff = int(dso2) - int(dso1)
+
+                # Also get distance to upstream exon from current reference and pick start, end and d
+                closest = a.closest(b, s=True, D="a", id=True, d=True, t="last", io=True)
+                usn = closest.to_dataframe(names = [
+                    "chr_a", "start_a", "end_a", "name_a", "row_line_a", "strand_a",
+                    "chr_b", "start_b", "end_b", "name_b", "row_line_b", "strand_b", "distance"
+                ])
+
+                # Also get us overlap
+                closest = a.closest(b, s=True, D="a", id=True, d=True, t="last")
+                uso = closest.to_dataframe(names = [
+                    "chr_a", "start_a", "end_a", "name_a", "row_line_a", "strand_a",
+                    "chr_b", "start_b", "end_b", "name_b", "row_line_b", "strand_b", "distance"
+                ])
+
+                # Get up/dn exon lengths
+                usnexonl = usn.iloc[:,9].tolist()[0]
+                dsnexonl = dsn.iloc[:,9].tolist()[0]
+
+                with open("res_ce_all/ex1_ex2_ce.txt", "a") as f :
+                    f.write(f"now dsn {dsn}")
+                    f.write(f"now usn {usn}")
+                    f.write(f"dsodiff {dsodiff}")
+                
+                
