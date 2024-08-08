@@ -21,6 +21,11 @@ import shutil
 if os.access("Summary_stats.txt",os.F_OK):
     os.remove(("Summary_stats.txt"))
 
+
+
+
+
+
 if arg1==0 or arg1==2 or arg1==5 :
     with open("Summary_stats.txt","w") as fichier :
         fichier.write("STARTING pgp-a.sh WITH FLAG 0\n")
@@ -56,7 +61,8 @@ if arg1==0 or arg1==2 or arg1==5 :
             samp = os.path.basename(sample)
             samp = samp.split('.')[0]
             commande_shell = f"stringtie {sample} -p 8 -G gencode.v38.annotation.gtf -o iPSC_gtfs/{samp}.gtf"
-            subprocess.run(commande_shell, shell=True, check=True)
+            result = subprocess.run(commande_shell, shell=True, check=True)
+            print(result.stdout)
             
         if len(os.listdir("iPSC_gtfs"))!=0 :
             print("DONE WITH SringTie Calculations - NOW GENERATING LIST of ABUNDANT Txs")
@@ -94,97 +100,15 @@ if arg1==0 or arg1==2 or arg1==5 :
             
             with open("Summary_stats.txt","a") as fichier :
                 fichier.write("Now calling abundant_tx.R\n")
-                
-                
-                
-                
-            ########## abundant_tx.R codé en Pyhton ##########
             
-            if os.access("principal_tx.csv",os.F_OK):
-                # Delete file if it exists
-                os.remove(("principal_tx.csv"))
-                
-            # Create a list of the files from your target directory
-            file_list = [f for f in os.listdir("iPSC_gtfs/") if f.endswith('.csv')]
-            
-            ddf = pd.DataFrame({
-                'TxID': pd.Series(dtype='str'),
-                'GeneID': pd.Series(dtype='str'),
-                'Gene_Name': pd.Series(dtype='str'),
-                'cov': pd.Series(dtype='float'),
-                'FPKM': pd.Series(dtype='float'),
-                'TPM': pd.Series(dtype='float')
-            })
-            
-            all_ddf = pd.DataFrame({
-                'TxID': pd.Series(dtype='str'),
-                'GeneID': pd.Series(dtype='str'),
-                'Gene_Name': pd.Series(dtype='str'),
-                'cov': pd.Series(dtype='float'),
-                'FPKM': pd.Series(dtype='float'),
-                'TPM': pd.Series(dtype='float')
-            })
-            
-            for i in range(len(file_list)):
-                print(f"reading file : {file_list[i]}")
-                rec = pd.read_csv(f"iPSC_gtfs/{file_list[i]}", sep="\\s+", header=None, dtype=str)
-                rec.columns = ["TxID","GeneID","Gene_Name","cov","FPKM","TPM"]
-                
-                rec = rec.astype({
-                    'TxID': 'str',
-                    'GeneID': 'str',
-                    'Gene_Name': 'str',
-                    'cov': 'float',
-                    'FPKM': 'float',
-                    'TPM': 'float'
-                })
-                
-                all_ddf = pd.concat([all_ddf, rec], ignore_index=True)
-            
-            # # Remove spaces -> vraiment nécessaire ???
-            # def remove_spaces(s):
-            #     if isinstance(s, str):
-            #         return re.sub(r' ', '', s)
-                
-            # all_ddf = all_ddf.apply(lambda col: col.map(remove_spaces))
+            command = [
+                "python",
+                "abundant_tx.py"
+            ]
 
-            # print('type de cov dans all_ddf après remove spaces : ', all_ddf['cov'].dtype)
-            # pd.set_option('display.max_columns', None)
-            # print('all_ddf après remove spaces : ', all_ddf.head())
-            
-            # And sort for fast retrieval
-            all_ddf = all_ddf.sort_values(by='Gene_Name')
-            
-            # Get unique gene names
-            unique_genes = pd.unique(all_ddf['Gene_Name'])
-            
-            Tx_ddf = pd.DataFrame({
-                'TxID': pd.Series(dtype='str'),
-                'GeneID': pd.Series(dtype='str'),
-                'Gene_Name': pd.Series(dtype='str')
-            })
-            
-            # Select row with max cov for each gene
-            print('Now Generating Txs Table, Will take a while !!!!!!!')
-            
-            for i in range (len(unique_genes)):
-                TxSubset = all_ddf[all_ddf['Gene_Name'] == unique_genes[i]]
-                tx_gene = TxSubset[TxSubset['cov'] == TxSubset['cov'].max()]
-                tx_gene = tx_gene.iloc[:, :3]
-                Tx_ddf = pd.concat([Tx_ddf, tx_gene], ignore_index=True)
-            
-            # Write in file
-            # Also remove trailing version numbers
-            Tx_ddf['GeneID'] = Tx_ddf['GeneID'].str.split('.', n=1, expand=True)[0]
-            Tx_ddf['TxID'] = Tx_ddf['TxID'].str.split('.', n=1, expand=True)[0]
-            Tx_ddf.to_csv("principal_txs.csv", index=False, sep=',', header=False)
-            print('Done With Txs Table: principal_txs.csv')
+            result = subprocess.run(command, capture_output=True, text=True)
+            print(result.stdout)
 
-            ########## FIN abundant_tx.R codé en Pyhton ##########
-            
-            
-            
-            
             print("DONE WITH ABUNDANT Txs file Generation (principal_txs.csv) for input BAM SAMPLES")
             with open("Summary_stats.txt","a") as fichier :
                 fichier.write("DONE WITH ABUNDANT Txs file Generation (principal_txs.csv) for input BAM SAMPLES\n")
@@ -212,928 +136,936 @@ if arg1==0 or arg1==2 or arg1==5 :
             
             
             
-# NEXT SORT FILE ON COLUMN 5 - THIS IS IMPORTANT AS PIPELINE DEPENDS ON IT
-if arg1==1 or arg1==2 or arg1==5 :
-    with open("Summary_stats.txt","a") as fichier :
-        fichier.write("STARTING pgp-a.sh WITH FLAG 1 for all events sashimi plots\n")
+# # NEXT SORT FILE ON COLUMN 5 - THIS IS IMPORTANT AS PIPELINE DEPENDS ON IT
+# if arg1==1 or arg1==2 or arg1==5 :
+#     with open("Summary_stats.txt","a") as fichier :
+#         fichier.write("STARTING pgp-a.sh WITH FLAG 1 for all events sashimi plots\n")
 
-    ##### REMETTRE LA BONNE INDENTATION #####
-    #import os
-    arg2 = "selected_events.csv" # arg2 = input("Argument 2 :")
+########### REMETTRE LA BONNE INDENTATION ###########
 
-    if os.access(arg2 ,os.F_OK):
-        splicing_events_file = arg2.split('.')[0]
+arg2 = "selected_events.csv" # arg2 = input("Argument 2 :")
 
-    ########## FIN DU TEST ##########
-
-        selected_events = pd.read_csv(arg2, delimiter=',')
-        sorted_selected_events = selected_events.sort_values(by=selected_events.columns[4])
-        sorted_selected_events.to_csv("sorted_selected_events.csv", index=False)
-        
-    else :
-        print('PLEASE PROVIDE SPLICING_EVENTS csv file  bash pgp_0.sh flag splicing_events.csv and RERUN')
-        
-        with open("Summary_stats.txt","a") as fichier :
-            fichier.write('PLEASE PROVIDE SPLICING_EVENTS csv file  bash pgp_0.sh flag splicing_events.csv and RERUN\n')
-            fichier.write('NOW EXITING\n')
-            
-        sys.exit(1)
-        
-    with open('sorted_selected_events.csv', 'r') as file:
-        lines = file.readlines()
-        total_events = len(lines)
-        
-    print(f"CAME IN FOR SASHIMI PLOTS FOR ALL {total_events} EVENTS")
+if os.access(arg2 ,os.F_OK):
+    splicing_events_file = arg2.split('.')[0]
     
-    with open("Summary_stats.txt","a") as fichier :
-        fichier.write(f"CAME IN FOR SASHIMI PLOTS FOR ALL {total_events} EVENTS\n")
-        
-    # ALSO get bed file for sashimi plots for all events.
-    # FORMAT IS: chr, start of up_ex,end of ds_ex, 1, 0, strand, gene_name, TxID
-    generate_all_events_sashimi_beds = 1
+########### FIN DU TEST ###########
     
-    if generate_all_events_sashimi_beds == 1 :
-        os.makedirs("temp_all_events_sashimi",exist_ok=True)
-        print('################################ GENERATING BED FILE FOR SASHIMI PLOTS FOR ALL EVENTS')
+    
+#         selected_events = pd.read_csv(arg2, delimiter=',')
+#         sorted_selected_events = selected_events.sort_values(by=selected_events.columns[4])
+#         sorted_selected_events.to_csv("sorted_selected_events.csv", index=False)
         
-        with open("Summary_stats.txt","a") as fichier :
-            fichier.write('################################ GENERATING BED FILE FOR SASHIMI PLOTS FOR ALL EVENTS\n')
+#     else :
+#         print('PLEASE PROVIDE SPLICING_EVENTS csv file  bash pgp_0.sh flag splicing_events.csv and RERUN')
+        
+#         with open("Summary_stats.txt","a") as fichier :
+#             fichier.write('PLEASE PROVIDE SPLICING_EVENTS csv file  bash pgp_0.sh flag splicing_events.csv and RERUN\n')
+#             fichier.write('NOW EXITING\n')
             
-        # SHOULD ADD CHECKS ON EXON_NUM READING FROM FILE
+#         sys.exit(1)
         
-        if len(os.listdir("temp_all_events_sashimi"))!=0 :
-            for f in glob.glob("temp_all_events_sashimi/*.*") :
+#     with open('sorted_selected_events.csv', 'r') as file:
+#         lines = file.readlines()
+#         total_events = len(lines)
+        
+#     print(f"CAME IN FOR SASHIMI PLOTS FOR ALL {total_events} EVENTS")
+    
+#     with open("Summary_stats.txt","a") as fichier :
+#         fichier.write(f"CAME IN FOR SASHIMI PLOTS FOR ALL {total_events} EVENTS\n")
+        
+#     # ALSO get bed file for sashimi plots for all events.
+#     # FORMAT IS: chr, start of up_ex,end of ds_ex, 1, 0, strand, gene_name, TxID
+#     generate_all_events_sashimi_beds = 1
+    
+#     if generate_all_events_sashimi_beds == 1 :
+#         os.makedirs("temp_all_events_sashimi",exist_ok=True)
+#         print('################################ GENERATING BED FILE FOR SASHIMI PLOTS FOR ALL EVENTS')
+        
+#         with open("Summary_stats.txt","a") as fichier :
+#             fichier.write('################################ GENERATING BED FILE FOR SASHIMI PLOTS FOR ALL EVENTS\n')
+            
+#         # SHOULD ADD CHECKS ON EXON_NUM READING FROM FILE
+        
+#         if len(os.listdir("temp_all_events_sashimi"))!=0 :
+#             for f in glob.glob("temp_all_events_sashimi/*.*") :
+#                 os.remove(f)
+#         generate_event_beds = 1
+#         if generate_event_beds == 1 :
+#             os.makedirs("event_bedfiles",exist_ok=True)
+#             if len(os.listdir("event_bedfiles"))!=0 :
+#                 for f in glob.glob("event_bedfiles/*.*") :
+#                     os.remove(f)
+#             with open("Summary_stats.txt","a") as fichier :
+#                 fichier.write('************************ From pgp-a.sh, CALLING TxEnsDB103_layeredV6.R \n')
+            
+            
+            
+            
+#             ########## TxEnsDB103_layeredV6.R codé en Pyhton ##########
+
+#             command = [
+#                 "Rscript",
+#                 "txens.R",
+#                 "sorted_selected_events.csv",
+#                 "principal_txs.csv",
+#                 "temp_all_events_sashimi/FINAL_STATS_ALL_SASHIMIS.txt"
+#             ]
+
+#             result = subprocess.run(command, capture_output=True, text=True)
+#             print(result.stdout)
+
+#             # Using ENSG (commented out this - junction start and end range) to get transcripts
+#             # Starting from previous version (TxEnsDB103_layeredV1.R), it has 41 events for which Tx selected does not encapsulate the event
+#             # An example is event: chr12	22515151	22517985	AC053513.1
+#             # So coordinate based search is back on to see if it makes difference
+#             # THIS SCRIPT HAS BEEN MODIFIED - SO REPLACE IT IN ALL VERSIONS
+#             # 04/20/2022 - removing 5'utr
+
+#             # def download_ftp_file(ftp_url, local_file):
+#             #     ftp = ftplib.FTP("ftp.ensembl.org")
+#             #     ftp.login()
+#             #     ftp.cwd(ftp_url)
+#             #     with open(local_file, "wb") as f:
+#             #         ftp.retrbinary("RETR " + local_file, f.write)
+#             #     ftp.quit()
+
+#             # files = {
+#             #     "gtf": "ftp://ftp.ensembl.org/pub/release-103/gtf/homo_sapiens/Homo_sapiens.GRCh38.103.gtf.gz",
+#             #     "transcript_fasta": "ftp://ftp.ensembl.org/pub/release-103/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz",
+#             #     "protein_fasta": "ftp://ftp.ensembl.org/pub/release-103/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz"
+#             # }
+
+#             # paths = {
+#             #     "gtf": "Homo_sapiens.GRCh38.103.gtf.gz",
+#             #     "transcript_fasta": "Homo_sapiens.GRCh38.cdna.all.fa.gz",
+#             #     "protein_fasta": "Homo_sapiens.GRCh38.pep.all.fa.gz"
+#             # }
+
+#             # for file_type, ftp_path in files.items():
+#             #     local_path = paths[file_type]
+#             #     if not os.path.exists(local_path):
+#             #         print(f"Téléchargement de {ftp_path}...")
+#             #         download_ftp_file(os.path.dirname(ftp_path), os.path.basename(local_path))
+#             #         print(f"{local_path} téléchargé avec succès.")
+#             #     else:
+#             #         print(f"{local_path} existe déjà. Téléchargement ignoré.")
+
+#             # GeneIDField = 6
+            
+#             # # Read Peaks File
+#             # SpliceData = pd.read_csv('sorted_sorted_selected_events.csv', header=None)
+            
+#             # # # Also read Tx list
+#             # Tx_list = pd.read_csv('principal_txs.csv', header=None)
+            
+#             # # Also read appris annoation data to get principal 1 isoform
+#             # appr_anno1 = pd.read_csv("GRCh38_appris_data.principal.txt", sep="\t", header=None)
+#             # # V1 - hugo_symbol, V2 - ENSG_ID, V3 - TX_ID, V4 - , V2 - PRINCIPAL/ALTERNATE
+#             # appr_anno1.columns = ['V1', 'V2', 'V3', 'V4', 'V5']
+#             # # Select only PRINCIPAL.1 ISOFORMS
+#             # appr_anno = appr_anno1[appr_anno1['V5'].str.contains("PRINCIPAL:1")]
+            
+#             # if os.access("all_tx_events.csv",os.F_OK):
+#             #     os.remove(("all_tx_events.csv"))
+                
+#             # if os.access("all_events_bed_sashimi.tab",os.F_OK):
+#             #     os.remove(("all_events_bed_sashimi.tab"))
+                
+#             # if os.access("events_to_tx_mapping_valid.csv",os.F_OK):
+#             #     os.remove(("events_to_tx_mapping_valid.csv"))
+                
+#             # if os.access("events_to_tx_mapping_invalid.csv",os.F_OK):
+#             #     os.remove(("events_to_tx_mapping_invalid.csv"))
+            
+#             # with open("temp_all_events_sashimi/FINAL_STATS_ALL_SASHIMIS.txt","a") as fichier :
+#             #     fichier.write('                                 \n')
+#             #     fichier.write(f"Starting From TxEnsDB103_layeredV6.R: --------------- Processing file: 'sorted_sorted_selected_events.csv' with: {SpliceData.shape[0]} events to generate each event .bed files in event_bedfiles/ folder: \n")
+            
+#             # print("Started Generating BED files for Splicing Events in folder event_bedfiles/ from File: 'sorted_sorted_selected_events.csv'")
+            
+#             # trackj = 1
+#             # temp_gene = ""
+#             # current_gene = ""
+#             # tx_lengths = []
+            
+#             # df_notfound = pd.DataFrame({
+#             #     'seqnames': pd.Series(dtype='str'),
+#             #     'start': pd.Series(dtype='numeric'),
+#             #     'end': pd.Series(dtype='numeric'),
+#             #     'strand': pd.Series(dtype='str'),
+#             #     'genename': pd.Series(dtype='str'),
+#             #     'junc_type': pd.Series(dtype='str')
+#             # })
+            
+#             # df_zeroutr = pd.DataFrame({
+#             #     'seqnames': pd.Series(dtype='str'),
+#             #     'start': pd.Series(dtype='numeric'),
+#             #     'end': pd.Series(dtype='numeric'),
+#             #     'strand': pd.Series(dtype='str'),
+#             #     'genename': pd.Series(dtype='str'),
+#             #     'junc_type': pd.Series(dtype='str')
+#             # })
+            
+#             # repeated_entries = 0
+#             # iPSC_events = 0
+#             # appris_events = 0
+#             # principalTx_events = 0
+#             # events_xTx = 0
+#             # Tx_str = 0 # 0 for iPSC, 1 for APPRIS and 2 for EnsDB
+#             # Tx_valid = 0
+#             # Total_Events = SpliceData.shape[0]
+#             # probable_noise_events = 0
+#             # probable_noncoding_events = 0
+#             # utr5_events = 0
+            
+#             # for i in range(SpliceData.shape[0]) :
+#             #     # Step 0 - get transcripts for each gene (MAJIQ only reports for some)
+#             #     # Deal with multiple events for the same gene
+                
+#             #     if "Tx_name" in globals() :
+#             #         del Tx_name
+                
+#             #     if i == 1 :
+#             #         temp_gene = SpliceData[i,5]
+#             #         trackj = 1
+                
+#             #     elif temp_gene == SpliceData[i,5] :
+#             #         trackj = trackj+1
+                    
+#             #     else :
+#             #         temp_gene = SpliceData[i,5]
+#             #         trackj = 1
+                
+#             #     # Get gene name and gene_id (from granges filter) using event coordinates
+#             #     intervals = []
+                
+#             #     for index, row in SpliceData.iterrows():
+#             #         chrom = row['col1'][3:]
+#             #         start = row['col2']
+#             #         end = row['col3']
+#             #         strand = row['col4']
+                    
+#             #         interval = Interval(chrom, start, end, strand=strand)
+#             #         intervals.append(interval)
+                    
+#             #     event_bed = BedTool(intervals)
+#             #     gene_intervals = []
+                
+#             #     for index, row in gene_df.iterrows():
+#             #         interval = Interval(row['chrom'], row['start'], row['end'], strand=row['strand'], name=row['gene_id'])
+#             #         gene_intervals.append(interval)
+                
+#             #     gene_bed = BedTool(gene_intervals)
+#             #     gn = event_bed.intersect(gene_bed, wao=True)
+                
+#             #     # First check if gene_name exactly matches upto gene_version and then get all its Txs
+#             #     genes_data = gn.to_dataframe()
+#             #     gn_id = SpliceData[i,6]
+                
+#             #     # Reset Tx flag
+#             #     Tx_flg = 0
+                
+#             #     if genes_data.shape[1]>0 :
+#             #         # First try iPSC Tx
+#             #         if genes_data.shape[1]>1 :
+#             #             # Some events (coordinates) are mapped to multiple gene_id's, so select one that has same gene_id as majiq and spans
+#             #             # The genomic range or the one which spans the genomic range
+#             #             flg_ex = 0
+                        
+#             #             for ti in range(genes_data.shape[1]) :
+#             #                 if (SpliceData[i,2]>=genes_data.iloc[ti]['start'] and SpliceData[i,3]<=genes_data.iloc[ti]['end'] and len(Tx_list[Tx_list['V2'] == genes_data.iloc[ti]['gene_id']][1])>0) :
+#             #                     Tx_name = Tx_list[Tx_list['V2'] == genes_data.iloc[ti]['gene_id']][1]
+#             #                     flg_ex = 1
+#             #                     break
+#             #                 if flg_ex==1 :
+#             #                     break
+                            
+#             #         else :
+#             #             if (SpliceData[i,2]>=genes_data.iloc['start'] and SpliceData[i,3]<=genes_data.iloc['end'] and len(Tx_list[Tx_list['V2'] == genes_data.iloc['gene_id']][1])>0) :
+#             #                 Tx_name = Tx_list[Tx_list['V2'] == genes_data.iloc['gene_id']][1]
+                            
+#             #         if ("Tx_name" in globals() and len(Tx_name)>0):                   
+#             #             filtered_transcripts = [edb.transcript_by_id(tx_id) for tx_id in Tx_name if edb.transcript_by_id(tx_id) is not None]
+#             #             tl1 = {transcript.transcript_id: len(transcript) for transcript in filtered_transcripts}
+#             #             # Make sure that we have transcript in EnsDB
+                        
+#             #             if len(tl1)>0 :
+#             #                 # And event coordinates lies within the Tx
+#             #                 exon_data = []
+                            
+#             #                 for tx_id in Tx_name :
+#             #                     transcript = edb.transcript_by_id(tx_id)
+                                
+#             #                     for exon in transcript.exons :
+#             #                         exon_data.append({
+#             #                             'transcript_id': transcript.transcript_id,
+#             #                             'gene_id': transcript.gene_id,
+#             #                             'chromosome': exon.contig,
+#             #                             'start': exon.start,
+#             #                             'end': exon.end,
+#             #                             'strand': exon.strand
+#             #                         })
+                                    
+#             #                 dat = pd.DataFrame(exon_data)
+                            
+#             #                 if (SpliceData[i,2]>=min(dat.iloc[:, 1]) and SpliceData[i,3]<=max(dat.iloc[:, 2])) : # Make sure that event lies within the transcript
+#             #                     iPSC_events = iPSC_events+1
+#             #                     Tx_str = 'iPSC'
+#             #                     Tx_flg = 1
+                    
+#             #         if (Tx_flg==0 and len(pd.merge(appr_anno, genes_data, left_on='V2', right_on='gene_id')['V3']))
+            
+#             # ########## FIN TxEnsDB103_layeredV6.R codé en Pyhton ##########
+
+
+
+
+#             with open("Summary_stats.txt","a") as fichier :
+#                 fichier.write("************************ BACK FROM TxEnsDB103_layeredV6.R, CONTINUING pgp-a.sh \n")
+             
+#             pd.set_option('display.max_columns', None)
+            
+#             csv_data = pd.read_csv('all_tx_events.csv', header=None)
+#             csvi = 0
+#             samples = glob.glob('event_bedfiles/temp_*.bed')
+            
+#             with open("Summary_stats.txt","a") as fichier :
+#                 fichier.write("GENERATING BED FILES FOR EACH EVENT\n")
+            
+#             for sample in samples :
+#                 # Read csv entry
+#                 csv_ln = csv_data.iloc[csvi]
+#                 csvi = csvi + 1
+            
+#                 allexons = sample.split('/')[1].split('_')[1]
+#                 gene_name1 = allexons.split('.')[0]
+#                 gene_name = gene_name1.split('-')[0]
+            
+#                 # First sort the bed
+#                 bedfile = pybedtools.BedTool(f'event_bedfiles/{allexons}')
+#                 sorted_bed = bedfile.sort()
+#                 sorted_bed.saveas(f'event_bedfiles/t{allexons}')
+                
+#                 # Also read Tx Files to retrieve selected Tx - should find better ways
+#                 df = pd.read_csv(f'event_bedfiles/TxID{allexons}', sep='\\s+', header=None)
+#                 TxID = df.iloc[0, 6]
+                
+#                 df = pd.read_csv(sample, sep='\\s+', header=None)
+#                 strnd = df.iloc[0, 5]
+            
+#                 # Get distance to downstream exon (for ties, report first) from current reference and pick start, end and d
+#                 a = pybedtools.BedTool(sample)
+#                 b = pybedtools.BedTool(f'event_bedfiles/t{allexons}')
+                
+#                 closest = a.closest(b, s=True, D="a", iu=True, d=True, t="first")
+#                 ds = closest.to_dataframe(names = [
+#                     "chr_a", "start_a", "end_a", "name_a", "row_line_a", "strand_a",
+#                     "chr_b", "start_b", "end_b", "name_b", "row_line_b", "strand_b", "distance"
+#                 ])
+            
+#                 # Also get distance to upstream exon from current reference and pick start, end and d
+#                 closest = a.closest(b, s=True, D="a", id=True, d=True, t="last")
+#                 us = closest.to_dataframe(names = [
+#                     "chr_a", "start_a", "end_a", "name_a", "row_line_a", "strand_a",
+#                     "chr_b", "start_b", "end_b", "name_b", "row_line_b", "strand_b", "distance"
+#                 ])
+            
+#                 # Get up and down stream exon numbers
+#                 upexon = us.iloc[:,10].tolist()[0]
+#                 dnexon = ds.iloc[:,10].tolist()[0]
+                
+#                 # Events star and end
+#                 event_st = us.iloc[:, 1].tolist()[0]
+#                 event_end = us.iloc[:, 2].tolist()[0]
+#                 diff_exon = int(upexon) - int(dnexon)
+            
+#                 # Take absolute value
+#                 diff_exon_abs = abs(diff_exon)
+            
+#                 if diff_exon_abs>=1 : #ALL EVENTS THAT SPANS 2 OR MORE EXONS
+                
+#                     if strnd == '+' :
+#                         start = us.iloc[:, 7].tolist()[0]
+#                         end = ds.iloc[:, 8].tolist()[0]
+#                     else :
+#                         start = ds.iloc[:, 7].tolist()[0]
+#                         end = us.iloc[:, 8].tolist()[0]
+                    
+#                     # Also save
+#                     # FORMAT IS: chr, start of up_ex,end of ds_ex, 1, 0, strand, gene_name, TxID
+#             		# First check if event lies between selected exons
+#                     if (float(start)<=float(event_st) and float(end)>=float(event_end)) :
+#                         liste = [str(element) for element in us.values.tolist()[0]]
+#                         input_data = liste + [start, end, strnd, gene_name, TxID]
+#                         output_data = [input_data[0], str(input_data[13]), str(input_data[14]), '1', '0', input_data[15], input_data[16], input_data[17]]
+                        
+#                         with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi2.bed", "a") as f:
+#                             f.write("\t".join(output_data) + "\n")
+            
+#                         with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi.bed", "a") as f:
+#                             f.write("\t".join(output_data) + "\n")
+                        
+#                         with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi2.csv", "a", newline='') as f:
+#                             writer = csv.writer(f)
+#                             writer.writerow(csv_ln)
+                            
+#                         with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi.csv", "a", newline='') as f:
+#                             writer = csv.writer(f)
+#                             writer.writerow(csv_ln)
+            
+#                     else :
+#                         if strnd == '+' :
+#                             start = us.iloc[:, 7].tolist()[0]
+#                             end = ds.iloc[:, 8].tolist()[0] # Both are same
+                            
+#                             # First check if star > event_start, then select upstream exon
+#                             if float(start)>=float(event_st) :
+#                                 # Get exon (line number in bed file) to read
+#                                 exon = ds.iloc[:, 10].tolist()[0]
+#                                 exon = int(exon) - 2
+                                
+#                                 with open(f"event_bedfiles/{allexons}", 'r') as file:
+#                                     bed_data = [line.strip() for line in file]
+                                
+#                                 bed_ln = bed_data[exon-1].split('\t')
+                                
+#                                 # Update start
+#                                 start = bed_ln[1] ##### Testé jusqu'ici et tout fonctionne #####
+                                
+#                             # Now check if end <event_end
+#                             if float(end)<=float(event_end) :
+#                                 # Get exon (line number in bed file) to read
+#                                 exon = us.iloc[:, 10].tolist()[0]
+            
+#                                 with open(f"event_bedfiles/{allexons}", 'r') as file:
+#                                     bed_data = [line.strip() for line in file]
+                                
+#                                 #print('bed_data ',bed_data)
+#                                 bed_ln = bed_data[exon-1].split('\t')
+#                                 #print('exon ', exon, ' bed_ln ', bed_ln)
+            
+#                                 # Update end
+#                                 end = bed_ln[2]
+                                    
+#                             # Now one more time check if event lies between selected exons
+#                             if (float(start)<=float(event_st) and float(end)>=float(event_end)):
+#                                 liste = [str(element) for element in us.values.tolist()[0]]
+#                                 input_data = liste + [start, end, strnd, gene_name, TxID]
+#                                 output_data = [input_data[0], str(input_data[13]), str(input_data[14]), '1', '0', input_data[15], input_data[16], input_data[17]]
+                                
+#                                 with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi2.bed", "a") as f:
+#                                     f.write("\t".join(output_data) + "\n")
+            
+#                                 with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi.bed", "a") as f:
+#                                     f.write("\t".join(output_data) + "\n")
+                                
+#                                 with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi2.csv", "a", newline='') as f:
+#                                     writer = csv.writer(f)
+#                                     writer.writerow(csv_ln)
+                                    
+#                                 with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi.csv", "a", newline='') as f:
+#                                     writer = csv.writer(f)
+#                                     writer.writerow(csv_ln)
+                                        
+#                             else :
+#                                 with open(f"temp_all_events_sashimi/{splicing_events_file}_progress2.txt", "a") as f:
+#                                     f.write(f"ds 1 {ds}\n")
+            
+#                                 with open(f"temp_all_events_sashimi/{splicing_events_file}_progress2.txt", "a") as f:
+#                                     f.write(f"us 1 {us}\n")
+                                
+#                                 #print(f"diff_exon_abs is {diff_exon_abs} selected event {sample} has event_st {event_st} selected start {start} event end {event_end} selected end {end} - please check")
+                                    
+#                         else : # THIS IS FOR NEGATIVE STRAND
+                            
+#                             start = ds.iloc[:, 7].tolist()[0]
+#                             end = us.iloc[:, 8].tolist()[0]
+            
+#                             # First check if star > event_start, then select upstream exon
+#                             if int(start)>=int(event_st) :
+                                
+#                                 # Get exon (line number in bed file) to read
+#                                 exon = ds.iloc[:, 10].tolist()[0]
+#                                 exon = int(exon) # Tx on -ve strand has exons listed from bottom to top in increasing order
+            
+#                                 with open(f"event_bedfiles/{allexons}", 'r') as file:
+#                                     bed_data = [line.strip() for line in file]
+                                
+#                                 bed_ln = bed_data[exon-1].split('\t')
+            
+#                                 # Update start
+#                                 start = bed_ln[1]
+                                    
+#                             # Now check if end <event_end
+#                             if int(end)<=int(event_end) :
+                                
+#                                 # Get exon (line number in bed file) to read
+#                                 exon = us.iloc[:, 10].tolist()[0]
+#                                 exon = int(exon) - 2 # Tx on -ve strand has exons listed from bottom to top in increasing order
+            
+#                                 with open(f"event_bedfiles/{allexons}", 'r') as file:
+#                                     bed_data = [line.strip() for line in file]
+            
+#                                 bed_ln = bed_data[exon-1].split('\t')
+            
+#                                 # Update end
+#                                 end = bed_ln[2]
+            
+#                             # Now one more time check if event lies between selected exons
+#                             if (int(start)<=int(event_st) and int(end)>=int(event_end)):
+#                                 liste = [str(element) for element in us.values.tolist()[0]]
+#                                 input_data = liste + [start, end, strnd, gene_name, TxID]
+#                                 output_data = [input_data[0], str(input_data[13]), str(input_data[14]), '1', '0', input_data[15], input_data[16], input_data[17]]
+                                
+#                                 with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi2.bed", "a") as f:
+#                                     f.write("\t".join(output_data) + "\n")
+            
+#                                 with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi.bed", "a") as f:
+#                                     f.write("\t".join(output_data) + "\n")
+                                
+#                                 with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi2.csv", "a", newline='') as f:
+#                                     writer = csv.writer(f)
+#                                     writer.writerow(csv_ln)
+                                    
+#                                 with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi.csv", "a", newline='') as f:
+#                                     writer = csv.writer(f)
+#                                     writer.writerow(csv_ln)
+                                        
+#                             else :
+#                                 with open(f"temp_all_events_sashimi/{splicing_events_file}_progress2.txt", "a") as f:
+#                                     f.write(f"ds 2 {ds}\n")
+#                                     f.write(f"us 2 {us}\n")
+                                
+#                                 print(f"diff_exon_abs is {diff_exon_abs} selected event {sample} has event_st {event_st} selected start {start} event end {event_end} selected end {end} - please check")
+                                 
+#                 elif diff_exon_abs==0 :
+#                     if strnd == '+' :
+#                         start = us.iloc[:, 7].tolist()[0]
+#                         end = ds.iloc[:, 8].tolist()[0] # Both are same
+            
+#             		 	# First check if star > event_start, then select upstream exon
+#                         if int(start)>=int(event_st) :
+                            
+#                             # Get exon (line number in bed file) to read
+#                             exon = us.iloc[:, 10].tolist()[0]
+#                             exon = int(exon) - 2
+            
+#                             with open(f"event_bedfiles/{allexons}", 'r') as file:
+#                                 bed_data = [line.strip() for line in file]
+            
+#                             bed_ln = bed_data[exon-1].split('\t')
+            
+#                             # Update start
+#                             start = bed_ln[1]
+            
+#                             # Now go on the other side
+#                             if int(start)>=int(event_st) : # Get the other exon
+                                
+#                                 # Get exon (line number in bed file) to read
+#                                 exon = us.iloc[:, 10].tolist()[0]
+                
+#                                 with open(f"event_bedfiles/{allexons}", 'r') as file:
+#                                     bed_data = [line.strip() for line in file]
+                
+#                                 bed_ln = bed_data[exon-1].split('\t')
+                
+#                                 # Update start
+#                                 start = bed_ln[1]
+            
+#                         # Now check if end <event_end
+#                         if int(end)<=int(event_end) :
+                            
+#                             # Get exon (line number in bed file) to read
+#                             exon = us.iloc[:, 10].tolist()[0]
+            
+#                             with open(f"event_bedfiles/{allexons}", 'r') as file:
+#                                 bed_data = [line.strip() for line in file]
+            
+#                             print(f"bed_data {bed_data}")
+#                             bed_ln = bed_data[exon-1].split('\t')
+#                             print(f"exon {exon} bed_ln {bed_ln}")
+            
+#                             # Update end
+#                             end = bed_ln[2]
+            
+#                             if int(end)<=int(event_end) :
+#                                 # Get exon (line number in bed file) to read
+#                                 exon = us.iloc[:, 10].tolist()[0]
+#                                 exon = int(exon) - 2 # Reading line for readarray starts from 0
+            
+#                                 with open(f"event_bedfiles/{allexons}", 'r') as file:
+#                                     bed_data = [line.strip() for line in file]
+            
+#                                 bed_ln = bed_data[exon-1].split('\t')
+            
+#                                 # Update end
+#                                 end = bed_ln[2]
+            
+#                         # Now one more time check if event lies between selected exons
+#                         if (int(start)<=int(event_st) and int(end)>=int(event_end)) :
+#                             liste = [str(element) for element in us.values.tolist()[0]]
+#                             input_data = liste + [start, end, strnd, gene_name, TxID]
+#                             output_data = [input_data[0], str(input_data[13]), str(input_data[14]), '1', '0', input_data[15], input_data[16], input_data[17]]
+                            
+#                             with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi01.bed", "a") as f:
+#                                 f.write("\t".join(output_data) + "\n")
+            
+#                             with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi.bed", "a") as f:
+#                                 f.write("\t".join(output_data) + "\n")
+            
+#                             with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi01.csv", "a", newline='') as f:
+#                                 writer = csv.writer(f)
+#                                 writer.writerow(csv_ln)
+                                
+#                             with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi.csv", "a", newline='') as f:
+#                                 writer = csv.writer(f)
+#                                 writer.writerow(csv_ln)
+            
+#                         else :
+#                             with open(f"temp_all_events_sashimi/{splicing_events_file}_progress01.txt", "a") as f:
+#                                 f.write(f"ds {ds}\n")
+#                                 f.write(f"us {us}\n")
+            
+#                             print(f"diff_exon_abs is {diff_exon_abs} selected event {sample} has event_st {event_st} selected start {start} event end {event_end} selected end {end} - please check")
+            
+#                     else : # THIS IS FOR NEGATIVE STRAND
+#                         start = ds.iloc[:, 7].tolist()[0]
+#                         end = us.iloc[:, 8].tolist()[0]
+            
+#                         # First check if star > event_start, then select upstream exon
+#                         if int(start)>=int(event_st) :
+#                             # Get exon (line number in bed file) to read
+#                             exon = us.iloc[:, 10].tolist()[0]
+            
+#                             with open(f"event_bedfiles/{allexons}", 'r') as file:
+#                                 bed_data = [line.strip() for line in file]
+            
+#                             bed_ln = bed_data[exon-1].split('\t')
+            
+#                             # Update start
+#                             start = bed_ln[1]
+                        
+#                         # Now check if end <event_end
+#                         if int(end)<=int(event_end) :
+#                             # Get exon (line number in bed file) to read
+#                             exon =us.iloc[:, 10].tolist()[0]
+#                             exon = int(exon) - 2 #Tx on -ve strand has exons listed from bottom to top in increasing order
+                            
+#                             with open(f"event_bedfiles/{allexons}", 'r') as file:
+#                                 bed_data = [line.strip() for line in file]
+            
+#                             bed_ln = bed_data[exon-1].split('\t')
+            
+#                             # Update end
+#                             end = bed_ln[2]
+            
+#                         # Now one more time check if event lies between selected exons
+#                         if (int(start)<=int(event_st) and int(end)>=int(event_end)) :
+#                             liste = [str(element) for element in us.values.tolist()[0]]
+#                             input_data = liste + [start, end, strnd, gene_name, TxID]
+#                             output_data = [input_data[0], str(input_data[13]), str(input_data[14]), '1', '0', input_data[15], input_data[16], input_data[17]]
+                            
+#                             with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi02.bed", "a") as f:
+#                                 f.write("\t".join(output_data) + "\n")
+            
+#                             with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi.bed", "a") as f:
+#                                 f.write("\t".join(output_data) + "\n")
+            
+#                             with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi02.csv", "a", newline='') as f:
+#                                 writer = csv.writer(f)
+#                                 writer.writerow(csv_ln)
+                                
+#                             with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi.csv", "a", newline='') as f:
+#                                 writer = csv.writer(f)
+#                                 writer.writerow(csv_ln)
+            
+#                         else :
+#                             with open(f"temp_all_events_sashimi/{splicing_events_file}_progress02.txt", "a") as f:
+#                                 f.write(f"ds {ds}\n")
+#                                 f.write(f"us {us}\n")
+            
+#                             print(f"diff_exon_abs is {diff_exon_abs} selected event {sample} has event_st {event_st} selected start {start} event end {event_end} selected end {end} - please check")
+                            
+            
+                    
+#                     # First check if star > event_start, then select upstream exon
+            
+#                 else :
+#                     with open(f"temp_all_events_sashimi/{splicing_events_file}_progress_all.txt", "a") as f:
+#                         f.write(f"ds {ds}\n")
+#                         f.write(f"us {us}\n")   
+            
+#             print("################################ DONE GENERATING BED AND OTHER RELATED FILES FOR ALL EVENTS TO CONTINUE FOR SASHIMI PLOTD")
+            
+#             with open("Summary_stats.txt", "a") as f:
+#                 f.write("################################ DONE GENERATING BED AND OTHER RELATED FILES FOR ALL EVENTS TO CONTINUE FOR SASHIMI PLOTD\n")
+            
+#             if arg1==1 or arg1==2 or arg1==5 :
+#                 print("################################ STARTED CREATING SASHIMI PLOTS FOR ALL EVENTS - MAY TAKE MANY HOURS ")
+            
+#                 with open("Summary_stats.txt", "a") as f:
+#                     f.write("################################ STARTED CREATING SASHIMI PLOTS FOR ALL EVENTS - MAY TAKE MANY HOURS \n")
+            
+#                 # CALL run_sashimiV1.sh for SASHIMI PLOTS
+
+
+
+########### REMETTRE LA BONNE INDENTATION ###########
+
+########## run_sashimiV1.sh codé en Pyhton ##########
+
+# command = [
+#     "python",
+#     "run_sashimiV1.py",
+#     f"temp_all_events_sashimi/{splicing_events_file}",
+#     f"temp_all_events_sashimi/{splicing_events_file}",
+#     "2"
+# ]
+
+# result = subprocess.run(command, capture_output=True, text=True)
+# print(result.stdout)
+
+# THIS IS FINAL SCRIPT FOR SASHIMI PLOTS FOR ALL PARTS OF PGP
+
+# THIS SCRIPT CONTAINS SASHIMI PLOT CODE FOR
+# 0. PLEASE NOTE THAT FOLLOWING 2 FILES (OR SOFT LINKS) SHOULD BE IN CURRENT FOLDER
+    #01: ggsashimi_txV4.py
+    #02: Homo_sapiens.GRCh38.103.chr.sorted_new.gtf
+# 1. Skiptic Events
+# 2. ALL MAJIQ EVENTS
+# 3. CE (INCLUDING INCLUSION, EXTENSION AND IR) events
+
+args = [f"temp_all_events_sashimi/{splicing_events_file}", f"temp_all_events_sashimi/{splicing_events_file}", 2]
+
+# First CHECK IF Called from pgp-a/b or pgp-c
+# CHECK IF 3 ARGUMENTS ARE PROVIDED
+
+if len(args)==3 :
+
+    ######### NEW - Now read input csv and bed files and flag
+    inp_csv = args[0]
+    inp_bed = args[1]
+    
+    # Get folder
+    inp_prefix = args[0].split('/')[0]
+    
+    if args[2]==1 :
+        os.makedirs(f"{inp_prefix}/sashimi_plots",exist_ok=True)
+        if len(os.listdir(f"{inp_prefix}/sashimi_plots/"))!=0 :
+            for f in glob.glob(f"{inp_prefix}/sashimi_plots/*.*") :
                 os.remove(f)
-        generate_event_beds = 1
-        if generate_event_beds == 1 :
-            os.makedirs("event_bedfiles",exist_ok=True)
-            if len(os.listdir("event_bedfiles"))!=0 :
-                for f in glob.glob("event_bedfiles/*.*") :
-                    os.remove(f)
-            with open("Summary_stats.txt","a") as fichier :
-                fichier.write('************************ From pgp-a.sh, CALLING TxEnsDB103_layeredV6.R \n')
+        
+        bed = f"{inp_bed}"
+        
+        with open(bed, 'r') as file:
+            all_bed_data = [line.strip() for line in file]
             
+        with open(bed, 'r') as file:
+            nrecrds = sum(1 for line in file)
             
+        print("########### NRECRDS ###########")
+        print(nrecrds)
+        
+        nrecrdst = nrecrds/2
+        print(f"read {nrecrdst} records")
+        csv = f"{inp_csv}"
+        
+        with open(csv, 'r') as file:
+            all_csv_data = [line.strip() for line in file]
+        
+        i = 0
+        eventn = 0
+                        
+        while i<nrecrds :
+            # Construct string for ggsashimi
+            line1 = all_bed_data[i]
+            line2 = all_bed_data[i+1]
+            i = i + 2
+    
+            # Read strand
+            strnd = line1.iloc[:, 5]
+            # Also read TxID
+            TxID = line1.iloc[:, 7]
+    
+            # us exon length
+            exon1 = 0
+            # ds exon length
+            exon2 = 0
+    
+            combined_line = f"{line1} {line2}".split()
+            field1 = combined_line[0]
+            field2 = int(combined_line[1]) - 50
+            field11 = int(combined_line[10]) + 50
+            line = f"{field1}:{field2}-{field11}"
+    
+            event = all_csv_data[eventn]
+            gene_name = event.split(',')[7]
+    
+            fields = event.split(',')
+            field8 = fields[7]
+            field2 = fields[1]
+            field3 = fields[2]
+            field4 = fields[3]
+            fn = f"{field8}-{field2}_{field3}-{field4}"
+    
+            # String for majiq event
+            chr_name = event.split(',')[1]
+            start = event.split(',')[2]
+            end = event.split(',')[3]
+    
+            # For now using strand from ggsashimi
+            comb_line = f"{chr_name} {start} {end}".split()
+            majiq_event = f"{comb_line[0]}-{comb_line[1]}-{comb_line[2]}"
+    
+            # Also get actual event identified
+            event_identified = f"PGPEvent-{combined_line[2]}-{combined_line[9]}"
+            eventn = eventn + 1
+    
+            print("processing event num {eventn} and event {fn}") # And majiq event is $majiq_event and event identified is $event_identified
+    
+            # Here removed -PGPTx flag
+            command = [
+                "python"
+                "./ggsashimi_txV3.py",
+                "-A", "median_j",
+                "-b", "all_bams.tsv",
+                "-c", line,
+                "-g", "Homo_sapiens.GRCh38.103.chr.sorted_new.gtf",
+                "-GeneName", gene_name,
+                "-MajiqStrnd", strnd,
+                "-ORIG", "1",
+                "-UEX", exon1,
+                "-DEX", exon2,
+                "-MajiqTx", majiq_event,
+                "-Majiq", fn,
+                "-Tx", TxID,
+                "-M", "1",
+                "-C", "3",
+                "-o", f"{inp_prefix}/sashimi_plots/{fn}",
+                "-O", "3",
+                "--alpha", "0.25",
+                "--base-size=20",
+                "--ann-height=2.5",
+                "--height=2.5",
+                "--width=18",
+                "-P", "palette.txt"
+            ]
+    
+            subprocess.run(command)
+    
+        # Now merge all pdf's
+        command = [
+            "python", "merge_sashimis.py", f"{inp_prefix}/sashimi_plots/"
+        ]
+    
+        subprocess.run(command)
+
+    ###### THIS IS FOR ALL MAJIQ EVENTS
+    if args[2]==2 :
+        os.makedirs("all_events_sashimi",exist_ok=True)
+        if len(os.listdir("all_events_sashimi/"))!=0 :
+            for f in glob.glob("all_events_sashimi/*.*") :
+                os.remove(f)
+    
+        bed = f"{args[1]}_all_sashimi.bed"
+
+        with open(bed, 'r') as file:
+            all_bed_data = [line.strip() for line in file]
+        
+        with open(bed, 'r') as file:
+            nrecrds = sum(1 for line in file)
+
+        print(f"read {nrecrds} records")
+        csv = f"{args[1]}_all_sashimi.csv"
+
+        with open(csv, 'r') as file:
+            all_csv_data = [line.strip() for line in file]
+        
+        i = 0
+        eventn = 0
+
+        while i<nrecrds :
+            # Construct string for ggsashimi
+            line1 = all_bed_data[i].split('\t')
+            i = i + 1
+
+            # Read strand
+            strnd = '+'
+
+            # Also read TxID
+            TxID = line1[7]
+            line = f"{line1[0]}:{int(line1[1])-50}-{int(line1[2])+50}" # This is the actual event
+
+            # Get majiq event
+            event = all_csv_data[eventn]
+            eventn = eventn + 1
+
+            # THIS IS TO KEEP DIFFERENT FILE NAMES FOR EVENTS WITH IDENTICAL COORDINATES AND GENE_NAMES
+            gene_name = event.split(',')[4]
+
+            if i==1 :
+                temp_gene = event.split(',')[4]
+                trackj=1
+
+            elif temp_gene==gene_name :
+                trackj = trackj + 1
+
+            else :
+                temp_gene = event.split(',')[4]
+                trackj=1
             
+            # SHOULD NOT HAVE THIS BUT NEED TO KEEP AS PER REQUEST
+            fields = event.split(',')
+            fn = f"{fields[4]}-{fields[0]}-{fields[1]}-{fields[2]}-{trackj}"
+
+            # String for majiq event
+            chr_name = event.split(',')[0]
+            start = event.split(',')[1]
+            end = event.split(',')[2]
             
-            ########## TxEnsDB103_layeredV6.R codé en Pyhton ##########
+            comb_line = f"{chr_name} {start} {end}".split()
+            majiq_event = f"{comb_line[0]}-{comb_line[1]}-{comb_line[2]}"
+
+            exon1 = 0
+            exon2 = 0
+
+            # Also get actual event identified
+            event_identified = f"None -{line1[1]}-{line1[2]}"
+
+            print(f"processing event num {eventn} and event {fn}")
 
             command = [
-                "Rscript",
-                "txens.R",
-                "sorted_selected_events.csv",
-                "principal_txs.csv",
-                "temp_all_events_sashimi/FINAL_STATS_ALL_SASHIMIS.txt"
+                "python",
+                "ggsashimi_txV3.py",
+                "-A", "median_j",
+                "-b", "all_bams.tsv",
+                "-c", line,
+                "-g", "Homo_sapiens.GRCh38.103.chr.sorted_new.gtf",
+                "-GeneName", gene_name,
+                "-MajiqStrnd", strnd,
+                "-ORIG", "1",
+                "-UEX", str(exon1),
+                "-DEX", str(exon2),
+                "-MajiqTx", majiq_event,
+                "-Majiq", fn,
+                "-Tx", TxID,
+                "-M", "1",
+                "-C", "3",
+                "-o", f"all_events_sashimi/{fn}",
+                "-O", "3",
+                "--alpha", "0.25",
+                "--base-size=20",
+                "--ann-height=2.5",
+                "--height=2.5",
+                "--width=18",
+                "-P", "palette.txt"
             ]
 
-            subprocess.run(command, capture_output=True, text=True)
-
-            # Using ENSG (commented out this - junction start and end range) to get transcripts
-            # Starting from previous version (TxEnsDB103_layeredV1.R), it has 41 events for which Tx selected does not encapsulate the event
-            # An example is event: chr12	22515151	22517985	AC053513.1
-            # So coordinate based search is back on to see if it makes difference
-            # THIS SCRIPT HAS BEEN MODIFIED - SO REPLACE IT IN ALL VERSIONS
-            # 04/20/2022 - removing 5'utr
-
-            # def download_ftp_file(ftp_url, local_file):
-            #     ftp = ftplib.FTP("ftp.ensembl.org")
-            #     ftp.login()
-            #     ftp.cwd(ftp_url)
-            #     with open(local_file, "wb") as f:
-            #         ftp.retrbinary("RETR " + local_file, f.write)
-            #     ftp.quit()
-
-            # files = {
-            #     "gtf": "ftp://ftp.ensembl.org/pub/release-103/gtf/homo_sapiens/Homo_sapiens.GRCh38.103.gtf.gz",
-            #     "transcript_fasta": "ftp://ftp.ensembl.org/pub/release-103/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz",
-            #     "protein_fasta": "ftp://ftp.ensembl.org/pub/release-103/fasta/homo_sapiens/pep/Homo_sapiens.GRCh38.pep.all.fa.gz"
-            # }
-
-            # paths = {
-            #     "gtf": "Homo_sapiens.GRCh38.103.gtf.gz",
-            #     "transcript_fasta": "Homo_sapiens.GRCh38.cdna.all.fa.gz",
-            #     "protein_fasta": "Homo_sapiens.GRCh38.pep.all.fa.gz"
-            # }
-
-            # for file_type, ftp_path in files.items():
-            #     local_path = paths[file_type]
-            #     if not os.path.exists(local_path):
-            #         print(f"Téléchargement de {ftp_path}...")
-            #         download_ftp_file(os.path.dirname(ftp_path), os.path.basename(local_path))
-            #         print(f"{local_path} téléchargé avec succès.")
-            #     else:
-            #         print(f"{local_path} existe déjà. Téléchargement ignoré.")
-
-            # GeneIDField = 6
-            
-            # # Read Peaks File
-            # SpliceData = pd.read_csv('sorted_sorted_selected_events.csv', header=None)
-            
-            # # # Also read Tx list
-            # Tx_list = pd.read_csv('principal_txs.csv', header=None)
-            
-            # # Also read appris annoation data to get principal 1 isoform
-            # appr_anno1 = pd.read_csv("GRCh38_appris_data.principal.txt", sep="\t", header=None)
-            # # V1 - hugo_symbol, V2 - ENSG_ID, V3 - TX_ID, V4 - , V2 - PRINCIPAL/ALTERNATE
-            # appr_anno1.columns = ['V1', 'V2', 'V3', 'V4', 'V5']
-            # # Select only PRINCIPAL.1 ISOFORMS
-            # appr_anno = appr_anno1[appr_anno1['V5'].str.contains("PRINCIPAL:1")]
-            
-            # if os.access("all_tx_events.csv",os.F_OK):
-            #     os.remove(("all_tx_events.csv"))
-                
-            # if os.access("all_events_bed_sashimi.tab",os.F_OK):
-            #     os.remove(("all_events_bed_sashimi.tab"))
-                
-            # if os.access("events_to_tx_mapping_valid.csv",os.F_OK):
-            #     os.remove(("events_to_tx_mapping_valid.csv"))
-                
-            # if os.access("events_to_tx_mapping_invalid.csv",os.F_OK):
-            #     os.remove(("events_to_tx_mapping_invalid.csv"))
-            
-            # with open("temp_all_events_sashimi/FINAL_STATS_ALL_SASHIMIS.txt","a") as fichier :
-            #     fichier.write('                                 \n')
-            #     fichier.write(f"Starting From TxEnsDB103_layeredV6.R: --------------- Processing file: 'sorted_sorted_selected_events.csv' with: {SpliceData.shape[0]} events to generate each event .bed files in event_bedfiles/ folder: \n")
-            
-            # print("Started Generating BED files for Splicing Events in folder event_bedfiles/ from File: 'sorted_sorted_selected_events.csv'")
-            
-            # trackj = 1
-            # temp_gene = ""
-            # current_gene = ""
-            # tx_lengths = []
-            
-            # df_notfound = pd.DataFrame({
-            #     'seqnames': pd.Series(dtype='str'),
-            #     'start': pd.Series(dtype='numeric'),
-            #     'end': pd.Series(dtype='numeric'),
-            #     'strand': pd.Series(dtype='str'),
-            #     'genename': pd.Series(dtype='str'),
-            #     'junc_type': pd.Series(dtype='str')
-            # })
-            
-            # df_zeroutr = pd.DataFrame({
-            #     'seqnames': pd.Series(dtype='str'),
-            #     'start': pd.Series(dtype='numeric'),
-            #     'end': pd.Series(dtype='numeric'),
-            #     'strand': pd.Series(dtype='str'),
-            #     'genename': pd.Series(dtype='str'),
-            #     'junc_type': pd.Series(dtype='str')
-            # })
-            
-            # repeated_entries = 0
-            # iPSC_events = 0
-            # appris_events = 0
-            # principalTx_events = 0
-            # events_xTx = 0
-            # Tx_str = 0 # 0 for iPSC, 1 for APPRIS and 2 for EnsDB
-            # Tx_valid = 0
-            # Total_Events = SpliceData.shape[0]
-            # probable_noise_events = 0
-            # probable_noncoding_events = 0
-            # utr5_events = 0
-            
-            # for i in range(SpliceData.shape[0]) :
-            #     # Step 0 - get transcripts for each gene (MAJIQ only reports for some)
-            #     # Deal with multiple events for the same gene
-                
-            #     if "Tx_name" in globals() :
-            #         del Tx_name
-                
-            #     if i == 1 :
-            #         temp_gene = SpliceData[i,5]
-            #         trackj = 1
-                
-            #     elif temp_gene == SpliceData[i,5] :
-            #         trackj = trackj+1
-                    
-            #     else :
-            #         temp_gene = SpliceData[i,5]
-            #         trackj = 1
-                
-            #     # Get gene name and gene_id (from granges filter) using event coordinates
-            #     intervals = []
-                
-            #     for index, row in SpliceData.iterrows():
-            #         chrom = row['col1'][3:]
-            #         start = row['col2']
-            #         end = row['col3']
-            #         strand = row['col4']
-                    
-            #         interval = Interval(chrom, start, end, strand=strand)
-            #         intervals.append(interval)
-                    
-            #     event_bed = BedTool(intervals)
-            #     gene_intervals = []
-                
-            #     for index, row in gene_df.iterrows():
-            #         interval = Interval(row['chrom'], row['start'], row['end'], strand=row['strand'], name=row['gene_id'])
-            #         gene_intervals.append(interval)
-                
-            #     gene_bed = BedTool(gene_intervals)
-            #     gn = event_bed.intersect(gene_bed, wao=True)
-                
-            #     # First check if gene_name exactly matches upto gene_version and then get all its Txs
-            #     genes_data = gn.to_dataframe()
-            #     gn_id = SpliceData[i,6]
-                
-            #     # Reset Tx flag
-            #     Tx_flg = 0
-                
-            #     if genes_data.shape[1]>0 :
-            #         # First try iPSC Tx
-            #         if genes_data.shape[1]>1 :
-            #             # Some events (coordinates) are mapped to multiple gene_id's, so select one that has same gene_id as majiq and spans
-            #             # The genomic range or the one which spans the genomic range
-            #             flg_ex = 0
-                        
-            #             for ti in range(genes_data.shape[1]) :
-            #                 if (SpliceData[i,2]>=genes_data.iloc[ti]['start'] and SpliceData[i,3]<=genes_data.iloc[ti]['end'] and len(Tx_list[Tx_list['V2'] == genes_data.iloc[ti]['gene_id']][1])>0) :
-            #                     Tx_name = Tx_list[Tx_list['V2'] == genes_data.iloc[ti]['gene_id']][1]
-            #                     flg_ex = 1
-            #                     break
-            #                 if flg_ex==1 :
-            #                     break
-                            
-            #         else :
-            #             if (SpliceData[i,2]>=genes_data.iloc['start'] and SpliceData[i,3]<=genes_data.iloc['end'] and len(Tx_list[Tx_list['V2'] == genes_data.iloc['gene_id']][1])>0) :
-            #                 Tx_name = Tx_list[Tx_list['V2'] == genes_data.iloc['gene_id']][1]
-                            
-            #         if ("Tx_name" in globals() and len(Tx_name)>0):                   
-            #             filtered_transcripts = [edb.transcript_by_id(tx_id) for tx_id in Tx_name if edb.transcript_by_id(tx_id) is not None]
-            #             tl1 = {transcript.transcript_id: len(transcript) for transcript in filtered_transcripts}
-            #             # Make sure that we have transcript in EnsDB
-                        
-            #             if len(tl1)>0 :
-            #                 # And event coordinates lies within the Tx
-            #                 exon_data = []
-                            
-            #                 for tx_id in Tx_name :
-            #                     transcript = edb.transcript_by_id(tx_id)
-                                
-            #                     for exon in transcript.exons :
-            #                         exon_data.append({
-            #                             'transcript_id': transcript.transcript_id,
-            #                             'gene_id': transcript.gene_id,
-            #                             'chromosome': exon.contig,
-            #                             'start': exon.start,
-            #                             'end': exon.end,
-            #                             'strand': exon.strand
-            #                         })
-                                    
-            #                 dat = pd.DataFrame(exon_data)
-                            
-            #                 if (SpliceData[i,2]>=min(dat.iloc[:, 1]) and SpliceData[i,3]<=max(dat.iloc[:, 2])) : # Make sure that event lies within the transcript
-            #                     iPSC_events = iPSC_events+1
-            #                     Tx_str = 'iPSC'
-            #                     Tx_flg = 1
-                    
-            #         if (Tx_flg==0 and len(pd.merge(appr_anno, genes_data, left_on='V2', right_on='gene_id')['V3']))
-            
-            # ########## FIN TxEnsDB103_layeredV6.R codé en Pyhton ##########
-
-
-
-
-            with open("Summary_stats.txt","a") as fichier :
-                fichier.write("************************ BACK FROM TxEnsDB103_layeredV6.R, CONTINUING pgp-a.sh \n")
-
-# ##### REMETTRE LA BONNE INDENTATION #####
-
-# import pandas as pd
-# import glob
-# import pybedtools
-# import csv
-             
-# pd.set_option('display.max_columns', None)
-
-# csv_data = pd.read_csv('all_tx_events.csv', header=None)
-# csvi = 0
-# samples = glob.glob('event_bedfiles/temp_*.bed')
-
-# os.remove(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi2.csv")
-# os.remove(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi.csv")
-
-# with open("Summary_stats.txt","a") as fichier :
-#     fichier.write("GENERATING BED FILES FOR EACH EVENT\n")
-
-# for sample in samples :
-#     # Read csv entry
-#     csv_ln = csv_data.iloc[csvi]
-#     csvi = csvi + 1
-
-#     allexons = sample.split('/')[1].split('_')[1]
-#     gene_name1 = allexons.split('.')[0]
-#     gene_name = gene_name1.split('-')[0]
-
-#     # First sort the bed
-#     bedfile = pybedtools.BedTool(f'event_bedfiles/{allexons}')
-#     sorted_bed = bedfile.sort()
-#     sorted_bed.saveas(f'event_bedfiles/t{allexons}')
-    
-#     # Also read Tx Files to retrieve selected Tx - should find better ways
-#     df = pd.read_csv(f'event_bedfiles/TxID{allexons}', sep='\\s+', header=None)
-#     TxID = df.iloc[0, 6]
-    
-#     df = pd.read_csv(sample, sep='\\s+', header=None)
-#     strnd = df.iloc[0, 5]
-
-#     # Get distance to downstream exon (for ties, report first) from current reference and pick start, end and d
-#     a = pybedtools.BedTool(sample)
-#     b = pybedtools.BedTool(f'event_bedfiles/t{allexons}')
-    
-#     closest = a.closest(b, s=True, D="a", iu=True, d=True, t="first")
-#     ds = closest.to_dataframe(names = [
-#         "chr_a", "start_a", "end_a", "name_a", "row_line_a", "strand_a",
-#         "chr_b", "start_b", "end_b", "name_b", "row_line_b", "strand_b", "distance"
-#     ])
-
-#     # Also get distance to upstream exon from current reference and pick start, end and d
-#     closest = a.closest(b, s=True, D="a", id=True, d=True, t="last")
-#     us = closest.to_dataframe(names = [
-#         "chr_a", "start_a", "end_a", "name_a", "row_line_a", "strand_a",
-#         "chr_b", "start_b", "end_b", "name_b", "row_line_b", "strand_b", "distance"
-#     ])
-
-#     # Get up and down stream exon numbers
-#     upexon = us.iloc[:,10].tolist()[0]
-#     dnexon = ds.iloc[:,10].tolist()[0]
-    
-#     # Events star and end
-#     event_st = us.iloc[:, 1].tolist()[0]
-#     event_end = us.iloc[:, 2].tolist()[0]
-#     diff_exon = int(upexon) - int(dnexon)
-
-#     # Take absolute value
-#     diff_exon_abs = abs(diff_exon)
-
-#     if diff_exon_abs>=1 : #ALL EVENTS THAT SPANS 2 OR MORE EXONS
-    
-#         if strnd == '+' :
-#             start = us.iloc[:, 7].tolist()[0]
-#             end = ds.iloc[:, 8].tolist()[0]
-#         else :
-#             start = ds.iloc[:, 7].tolist()[0]
-#             end = us.iloc[:, 8].tolist()[0]
-        
-#         # Also save
-#         # FORMAT IS: chr, start of up_ex,end of ds_ex, 1, 0, strand, gene_name, TxID
-# 		# First check if event lies between selected exons
-#         if (float(start)<=float(event_st) and float(end)>=float(event_end)) :
-#             liste = [str(element) for element in us.values.tolist()[0]]
-#             input_data = liste + [start, end, strnd, gene_name, TxID]
-#             output_data = [input_data[0], str(input_data[13]), str(input_data[14]), '1', '0', input_data[15], input_data[16], input_data[17]]
-            
-#             with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi2.bed", "a") as f:
-#                 f.write("\t".join(output_data) + "\n")
-
-#             with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi.bed", "a") as f:
-#                 f.write("\t".join(output_data) + "\n")
-            
-#             with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi2.csv", "a", newline='') as f:
-#                 writer = csv.writer(f)
-#                 writer.writerow(csv_ln)
-                
-#             with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi.csv", "a", newline='') as f:
-#                 writer = csv.writer(f)
-#                 writer.writerow(csv_ln)
-
-#         else :
-#             if strnd == '+' :
-#                 start = us.iloc[:, 7].tolist()[0]
-#                 end = ds.iloc[:, 8].tolist()[0] # Both are same
-                
-#                 # First check if star > event_start, then select upstream exon
-#                 if float(start)>=float(event_st) :
-#                     # Get exon (line number in bed file) to read
-#                     exon = ds.iloc[:, 10].tolist()[0]
-#                     exon = int(exon) - 2
-                    
-#                     with open(f"event_bedfiles/{allexons}", 'r') as file:
-#                         bed_data = [line.strip() for line in file]
-                    
-#                     bed_ln = bed_data[exon-1].split('\t')
-                    
-#                     # Update start
-#                     start = bed_ln[1] ##### Testé jusqu'ici et tout fonctionne #####
-                    
-#                 # Now check if end <event_end
-#                 if float(end)<=float(event_end) :
-#                     # Get exon (line number in bed file) to read
-#                     exon = us.iloc[:, 10].tolist()[0]
-
-#                     with open(f"event_bedfiles/{allexons}", 'r') as file:
-#                         bed_data = [line.strip() for line in file]
-                    
-#                     #print('bed_data ',bed_data)
-#                     bed_ln = bed_data[exon-1].split('\t')
-#                     #print('exon ', exon, ' bed_ln ', bed_ln)
-
-#                     # Update end
-#                     end = bed_ln[2]
-                        
-#                 # Now one more time check if event lies between selected exons
-#                 if (float(start)<=float(event_st) and float(end)>=float(event_end)):
-#                     liste = [str(element) for element in us.values.tolist()[0]]
-#                     input_data = liste + [start, end, strnd, gene_name, TxID]
-#                     output_data = [input_data[0], str(input_data[13]), str(input_data[14]), '1', '0', input_data[15], input_data[16], input_data[17]]
-                    
-#                     with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi2.bed", "a") as f:
-#                         f.write("\t".join(output_data) + "\n")
-
-#                     with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi.bed", "a") as f:
-#                         f.write("\t".join(output_data) + "\n")
-                    
-#                     with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi2.csv", "a", newline='') as f:
-#                         writer = csv.writer(f)
-#                         writer.writerow(csv_ln)
-                        
-#                     with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi.csv", "a", newline='') as f:
-#                         writer = csv.writer(f)
-#                         writer.writerow(csv_ln)
-                            
-#                 else :
-#                     with open(f"temp_all_events_sashimi/{splicing_events_file}_progress2.txt", "a") as f:
-#                         f.write(f"ds 1 {ds}\n")
-
-#                     with open(f"temp_all_events_sashimi/{splicing_events_file}_progress2.txt", "a") as f:
-#                         f.write(f"us 1 {us}\n")
-                    
-#                     #print(f"diff_exon_abs is {diff_exon_abs} selected event {sample} has event_st {event_st} selected start {start} event end {event_end} selected end {end} - please check")
-                        
-#             else : # THIS IS FOR NEGATIVE STRAND
-                
-#                 start = ds.iloc[:, 7].tolist()[0]
-#                 end = us.iloc[:, 8].tolist()[0]
-
-#                 # First check if star > event_start, then select upstream exon
-#                 if int(start)>=int(event_st) :
-                    
-#                     # Get exon (line number in bed file) to read
-#                     exon = ds.iloc[:, 10].tolist()[0]
-#                     exon = int(exon) # Tx on -ve strand has exons listed from bottom to top in increasing order
-
-#                     with open(f"event_bedfiles/{allexons}", 'r') as file:
-#                         bed_data = [line.strip() for line in file]
-                    
-#                     bed_ln = bed_data[exon-1].split('\t')
-
-#                     # Update start
-#                     start = bed_ln[1]
-                        
-#                 # Now check if end <event_end
-#                 if int(end)<=int(event_end) :
-                    
-#                     # Get exon (line number in bed file) to read
-#                     exon = us.iloc[:, 10].tolist()[0]
-#                     exon = int(exon) - 2 # Tx on -ve strand has exons listed from bottom to top in increasing order
-
-#                     with open(f"event_bedfiles/{allexons}", 'r') as file:
-#                         bed_data = [line.strip() for line in file]
-
-#                     bed_ln = bed_data[exon-1].split('\t')
-
-#                     # Update end
-#                     end = bed_ln[2]
-
-#                 # Now one more time check if event lies between selected exons
-#                 if (int(start)<=int(event_st) and int(end)>=int(event_end)):
-#                     liste = [str(element) for element in us.values.tolist()[0]]
-#                     input_data = liste + [start, end, strnd, gene_name, TxID]
-#                     output_data = [input_data[0], str(input_data[13]), str(input_data[14]), '1', '0', input_data[15], input_data[16], input_data[17]]
-                    
-#                     with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi2.bed", "a") as f:
-#                         f.write("\t".join(output_data) + "\n")
-
-#                     with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi.bed", "a") as f:
-#                         f.write("\t".join(output_data) + "\n")
-                    
-#                     with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi2.csv", "a", newline='') as f:
-#                         writer = csv.writer(f)
-#                         writer.writerow(csv_ln)
-                        
-#                     with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi.csv", "a", newline='') as f:
-#                         writer = csv.writer(f)
-#                         writer.writerow(csv_ln)
-                            
-#                 else :
-#                     with open(f"temp_all_events_sashimi/{splicing_events_file}_progress2.txt", "a") as f:
-#                         f.write(f"ds 2 {ds}\n")
-#                         f.write(f"us 2 {us}\n")
-                    
-#                     print(f"diff_exon_abs is {diff_exon_abs} selected event {sample} has event_st {event_st} selected start {start} event end {event_end} selected end {end} - please check")
-                     
-#     elif diff_exon_abs==0 :
-#         if strnd == '+' :
-#             start = us.iloc[:, 7].tolist()[0]
-#             end = ds.iloc[:, 8].tolist()[0] # Both are same
-
-# 		 	# First check if star > event_start, then select upstream exon
-#             if int(start)>=int(event_st) :
-                
-#                 # Get exon (line number in bed file) to read
-#                 exon = us.iloc[:, 10].tolist()[0]
-#                 exon = int(exon) - 2
-
-#                 with open(f"event_bedfiles/{allexons}", 'r') as file:
-#                     bed_data = [line.strip() for line in file]
-
-#                 bed_ln = bed_data[exon-1].split('\t')
-
-#                 # Update start
-#                 start = bed_ln[1]
-
-#                 # Now go on the other side
-#                 if int(start)>=int(event_st) : # Get the other exon
-                    
-#                     # Get exon (line number in bed file) to read
-#                     exon = us.iloc[:, 10].tolist()[0]
-    
-#                     with open(f"event_bedfiles/{allexons}", 'r') as file:
-#                         bed_data = [line.strip() for line in file]
-    
-#                     bed_ln = bed_data[exon-1].split('\t')
-    
-#                     # Update start
-#                     start = bed_ln[1]
-
-#             # Now check if end <event_end
-#             if int(end)<=int(event_end) :
-                
-#                 # Get exon (line number in bed file) to read
-#                 exon = us.iloc[:, 10].tolist()[0]
-
-#                 with open(f"event_bedfiles/{allexons}", 'r') as file:
-#                     bed_data = [line.strip() for line in file]
-
-#                 print(f"bed_data {bed_data}")
-#                 bed_ln = bed_data[exon-1].split('\t')
-#                 print(f"exon {exon} bed_ln {bed_ln}")
-
-#                 # Update end
-#                 end = bed_ln[2]
-
-#                 if int(end)<=int(event_end) :
-#                     # Get exon (line number in bed file) to read
-#                     exon = us.iloc[:, 10].tolist()[0]
-#                     exon = int(exon) - 2 # Reading line for readarray starts from 0
-
-#                     with open(f"event_bedfiles/{allexons}", 'r') as file:
-#                         bed_data = [line.strip() for line in file]
-
-#                     bed_ln = bed_data[exon-1].split('\t')
-
-#                     # Update end
-#                     end = bed_ln[2]
-
-#             # Now one more time check if event lies between selected exons
-#             if (int(start)<=int(event_st) and int(end)>=int(event_end)) :
-#                 liste = [str(element) for element in us.values.tolist()[0]]
-#                 input_data = liste + [start, end, strnd, gene_name, TxID]
-#                 output_data = [input_data[0], str(input_data[13]), str(input_data[14]), '1', '0', input_data[15], input_data[16], input_data[17]]
-                
-#                 with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi01.bed", "a") as f:
-#                     f.write("\t".join(output_data) + "\n")
-
-#                 with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi.bed", "a") as f:
-#                     f.write("\t".join(output_data) + "\n")
-
-#                 with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi01.csv", "a", newline='') as f:
-#                     writer = csv.writer(f)
-#                     writer.writerow(csv_ln)
-                    
-#                 with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi.csv", "a", newline='') as f:
-#                     writer = csv.writer(f)
-#                     writer.writerow(csv_ln)
-
-#             else :
-#                 with open(f"temp_all_events_sashimi/{splicing_events_file}_progress01.txt", "a") as f:
-#                     f.write(f"ds {ds}\n")
-#                     f.write(f"us {us}\n")
-
-#                 print(f"diff_exon_abs is {diff_exon_abs} selected event {sample} has event_st {event_st} selected start {start} event end {event_end} selected end {end} - please check")
-
-#                 ########## FIN DU TEST ##########
-
-        #         else : # THIS IS FOR NEGATIVE STRAND
-        #             start = ds.iloc[:, 7]
-        #             end = us.iloc[:, 8]
-
-        #             # First check if star > event_start, then select upstream exon
-        #             if start>=event_st :
-        #                 # Get exon (line number in bed file) to read
-        #                 exon = us.iloc[:, 10]
-
-        #                 with open(f"event_bedfiles/{allexons}", 'r') as file:
-        #                     bed_data = [line.strip() for line in file]
-
-        #                 bed_ln = bed_data[exon]
-
-        #                 # Update start
-        #                 start = bed_ln.iloc[:, 1]
-                    
-        #             # Now check if end <event_end
-        #             if end<=event_end :
-        #                 # Get exon (line number in bed file) to read
-        #                 exon =us.iloc[:, 10]
-        #                 exon = exon - 2 #Tx on -ve strand has exons listed from bottom to top in increasing order
-                        
-        #                 with open(f"event_bedfiles/{allexons}", 'r') as file:
-        #                     bed_data = [line.strip() for line in file]
-
-        #                 bed_ln = bed_data[exon]
-
-        #                 # Update end
-        #                 end = bed_ln.iloc[:, 2]
-
-        #             # Now one more time check if event lies between selected exons
-        #             if (start<=event_st and end>=event_end) :
-        #                 input_data = us + [start, end, strnd] + gene_name + TxID
-
-        #                 output_data = [input_data[0], input_data[13], input_data[14], "1", "0", input_data[15], input_data[16], input_data[17]]
-        #                 with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi02.bed", "a") as f:
-        #                     f.write("\t".join(output_data) + "\n")
-
-        #                 with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi.bed", "a") as f:
-        #                     f.write("\t".join(output_data) + "\n")
-
-        #                 with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi02.csv", "a") as f:
-        #                     f.write(csv_ln)
-
-        #                 with open(f"temp_all_events_sashimi/{splicing_events_file}_all_sashimi.csv", "a") as f:
-        #                     f.write(csv_ln)
-                        
-        #             else :
-        #                 with open(f"temp_all_events_sashimi/{splicing_events_file}_progress02.txt", "a") as f:
-        #                     f.write(f"ds {ds}\n")
-
-        #                 with open(f"temp_all_events_sashimi/{splicing_events_file}_progress02.txt", "a") as f:
-        #                     f.write(f"us {us}\n")
-                        
-        #                 print(f"diff_exon_abs is {diff_exon_abs} selected event {sample} has event_st {event_st} selected start {start} event end {event_end} selected end {end} - please check")
-                
-        #         # First check if star > event_start, then select upstream exon
-
-        #     else :
-        #         with open(f"temp_all_events_sashimi/{splicing_events_file}_progress_all.txt", "a") as f:
-        #             f.write(f"ds {ds}\n")
-
-        #         with open(f"temp_all_events_sashimi/{splicing_events_file}_progress_all.txt", "a") as f:
-        #             f.write(f"us {us}\n")
-
-        # print("################################ DONE GENERATING BED AND OTHER RELATED FILES FOR ALL EVENTS TO CONTINUE FOR SASHIMI PLOTD")
-
-        # with open("Summary_stats.txt", "a") as f:
-        #     f.write("################################ DONE GENERATING BED AND OTHER RELATED FILES FOR ALL EVENTS TO CONTINUE FOR SASHIMI PLOTD\n")
-        
-        # if arg1==1 or arg1==2 or arg1==5 :
-        #     print("################################ STARTED CREATING SASHIMI PLOTS FOR ALL EVENTS - MAY TAKE MANY HOURS ")
-
-        #     with open("Summary_stats.txt", "a") as f:
-        #         f.write("################################ STARTED CREATING SASHIMI PLOTS FOR ALL EVENTS - MAY TAKE MANY HOURS \n")
-
-        #     # CALL run_sashimiV1.sh for SASHIMI PLOTS
-
-
-
-
-#             ########## run_sashimiV1.sh codé en Pyhton ##########
-
-#             # THIS SI FINAL SCRIPT FOR SASHIMI PLOTS FOR ALL PARTS OF PGP
-
-#             # THIS SCRIPT CONTAINS SASHIMI PLOT CODE FOR
-#             # 0. PLEASE NOTE THAT FOLLOWING 2 FILES (OR SOFT LINKS) SHOULD BE IN CURRENT FOLDER
-#                 #01: ggsashimi_txV4.py
-#                 #02: Homo_sapiens.GRCh38.103.chr.sorted_new.gtf
-#             # 1. Skiptic Events
-#             # 2. ALL MAJIQ EVENTS
-#             # 3. CE (INCLUDING INCLUSION, EXTENSION AND IR) events
-
-#             args = [f"temp_all_events_sashimi/{splicing_events_file}", f"temp_all_events_sashimi/{splicing_events_file}", 2]
-
-#             # First CHECK IF Called from pgp-a/b or pgp-c
-#             # CHECK IF 3 ARGUMENTS ARE PROVIDED
-
-#             if len(args)==3 :
-
-#                 ######### NEW - Now read input csv and bed files and flag
-#                 inp_csv = args[0]
-#                 inp_bed = args[1]
-
-#                 # Get folder
-#                 inp_prefix = args[0].split('/')[0]
-
-#                 if args[2]==1 :
-#                     os.makedirs(f"{inp_prefix}/sashimi_plots",exist_ok=True)
-#                     if len(os.listdir(f"{inp_prefix}/sashimi_plots/"))!=0 :
-#                         for f in glob.glob(f"{inp_prefix}/sashimi_plots/*.*") :
-#                             os.remove(f)
-                    
-#                     bed = f"{inp_bed}"
-
-#                     with open(bed, 'r') as file:
-#                         all_bed_data = [line.strip() for line in file]
-                        
-#                     with open(bed, 'r') as file:
-#                         nrecrds = sum(1 for line in file)
-
-#                     nrecrdst = nrecrds/2
-#                     print(f"read {nrecrdst} records")
-#                     csv = f"{inp_csv}"
-
-#                     with open(csv, 'r') as file:
-#                         all_csv_data = [line.strip() for line in file]
-                    
-#                     i = 0
-#                     eventn = 0
-                    
-#                     while i<nrecrds :
-#                         # Construct string for ggsashimi
-#                         line1 = all_bed_data[i]
-#                         line2 = all_bed_data[i+1]
-#                         i = i + 2
-
-#                         # Read strand
-#                         strnd = line1.iloc[:, 5]
-#                         # Also read TxID
-#                         TxID = line1.iloc[:, 7]
-
-#                         # us exon length
-#                         exon1 = 0
-#                         # ds exon length
-#                         exon2 = 0
-
-#                         combined_line = f"{line1} {line2}".split()
-#                         field1 = combined_line[0]
-#                         field2 = int(combined_line[1]) - 50
-#                         field11 = int(combined_line[10]) + 50
-#                         print(f"{field1}:{field2}-{field11}")
-
-#                         event = all_csv_data[eventn]
-#                         gene_name = event.split(',')[7]
-
-#                         fields = event.split(',')
-#                         field8 = fields[7]
-#                         field2 = fields[1]
-#                         field3 = fields[2]
-#                         field4 = fields[3]
-#                         fn = f"{field8}-{field2}_{field3}-{field4}"
-
-#                         # String for majiq event
-#                         chr_name = event.split(',')[1]
-#                         start = event.split(',')[2]
-#                         end = event.split(',')[3]
-
-#                         # For now using strand from ggsashimi
-#                         comb_line = f"{chr_name} {start} {end}".split()
-#                         majiq_event = f"{comb_line[0]}-{comb_line[1]}-{comb_line[2]}"
-
-#                         # Also get actual event identified
-#                         event_identified = f"PGPEvent-{combined_line[2]}-{combined_line[9]}"
-#                         eventn = eventn + 1
-
-#                         print("processing event num {eventn} and event {fn}") # And majiq event is $majiq_event and event identified is $event_identified
-
-#                         # Here removed -PGPTx flag
-#                         command = [
-#                             "./ggsashimi_txV3.py",
-#                             "-A", "median_j",
-#                             "-b", "all_bams.tsv",
-#                             "-c", line,
-#                             "-g", "Homo_sapiens.GRCh38.103.chr.sorted_new.gtf",
-#                             "-GeneName", gene_name,
-#                             "-MajiqStrnd", strnd,
-#                             "-ORIG", "1",
-#                             "-UEX", exon1,
-#                             "-DEX", exon2,
-#                             "-MajiqTx", majiq_event,
-#                             "-Majiq", fn,
-#                             "-Tx", TxID,
-#                             "-M", "1",
-#                             "-C", "3",
-#                             "-o", f"{inp_prefix}/sashimi_plots/{fn}",
-#                             "-O", "3",
-#                             "--alpha", "0.25",
-#                             "--base-size=20",
-#                             "--ann-height=2.5",
-#                             "--height=2.5",
-#                             "--width=18",
-#                             "-P", "palette.txt"
-#                         ]
-
-#                         subprocess.run(command)
-
-#                     # Now merge all pdf's
-#                     command = [
-#                         "python", "merge_sashimis.py", f"{inp_prefix}/sashimi_plots/"
-#                     ]
-
-#                     subprocess.run(command)
-
-#                 ###### THIS IS FOR ALL MAJIQ EVENTS
-#                 if args[2]==2 :
-#                     os.makedirs("all_events_sashimi",exist_ok=True)
-#                     if len(os.listdir("all_events_sashimi/"))!=0 :
-#                         for f in glob.glob("all_events_sashimi/*.*") :
-#                             os.remove(f)
-                
-#                     bed = f"{args[1]}_all_sashimi.bed"
-
-#                     with open(bed, 'r') as file:
-#                         all_bed_data = [line.strip() for line in file]
-                    
-#                     with open(bed, 'r') as file:
-#                         nrecrds = sum(1 for line in file)
-
-#                     print(f"read {nrecrds} records")
-#                     csv = f"{args[1]}_all_sashimi.csv"
-
-#                     with open(csv, 'r') as file:
-#                         all_csv_data = [line.strip() for line in file]
-                    
-#                     i = 0
-#                     eventn = 0
-
-#                     while i<nrecrds :
-#                         # Construct string for ggsashimi
-#                         line1 = all_bed_data[i]
-#                         i = i + 1
-
-#                         # Read strand
-#                         strnd = '+'
-
-#                         # Also read TxID
-#                         TxID = line1.iloc[7]
-#                         line = f"{line1.iloc[0]}:{line1.iloc[1]-50}-{line1.iloc[2]+50}" # This is the actual event
-
-#                         # Get majiq event
-#                         event = all_csv_data[eventn]
-#                         eventn = eventn + 1
-
-#                         # THIS IS TO KEEP DIFFERENT FILE NAMES FOR EVENTS WITH IDENTICAL COORDINATES AND GENE_NAMES
-#                         gene_name = event.split(',')[4]
-
-#                         if i==1 :
-#                             temp_gene = event.split(',')[4]
-#                             trackj=1
-
-#                         elif temp_gene==gene_name :
-#                             trackj = trackj + 1
-
-#                         else :
-#                             temp_gene = event.split(',')[4]
-#                             trackj=1
-                        
-#                         # SHOULD NOT HAVE THIS BUT NEED TO KEEP AS PER REQUEST
-#                         fields = event.split(',')
-#                         fn = f"{fields[4]}-{fields[0]}-{fields[1]}-{fields[2]}-{trackj}"
-
-#                         # String for majiq event
-#                         chr_name = event.split(',')[0]
-#                         start = event.split(',')[1]
-#                         end = event.split(',')[2]
-                        
-#                         comb_line = f"{chr_name} {start} {end}".split()
-#                         majiq_event = f"{comb_line[0]}-{comb_line[1]}-{comb_line[2]}"
-
-#                         exon1 = 0
-#                         exon2 = 0
-
-#                         # Also get actual event identified
-#                         event_identified = f"None -{line1.iloc[:,1]}-{line1.iloc[:,2]}"
-
-#                         print(f"processing event num {eventn} and event {fn}")
-
-#                         command = [
-#                             "./ggsashimi_txV3.py",
-#                             "-A", "median_j",
-#                             "-b", "all_bams.tsv",
-#                             "-c", line,
-#                             "-g", "Homo_sapiens.GRCh38.103.chr.sorted_new.gtf",
-#                             "-GeneName", gene_name,
-#                             "-MajiqStrnd", strnd,
-#                             "-ORIG", "1",
-#                             "-UEX", exon1,
-#                             "-DEX", exon2,
-#                             "-MajiqTx", majiq_event,
-#                             "-Majiq", fn,
-#                             "-Tx", TxID,
-#                             "-M", "1",
-#                             "-C", "3",
-#                             "-o", f"all_events_sashimi/{fn}",
-#                             "-O", "3",
-#                             "--alpha", "0.25",
-#                             "--base-size=20",
-#                             "--ann-height=2.5",
-#                             "--height=2.5",
-#                             "--width=18",
-#                             "-P", "palette.txt"
-#                         ]
-
-#                         subprocess.run(command)
-
-#                     # Now merge all pdf's
-#                     command = ["python", "merge_sashimis.py", "all_events_sashimi/"]
-#                     subprocess.run(command)
+            subprocess.run(command)
+
+        # # Now merge all pdf's
+        # command = ["python", "merge_sashimis.py", "all_events_sashimi/"]
+        # subprocess.run(command)
                 
 #                 # THIS SECTION IS FOR CE_INCLUSION EVENTS
 #                 # WILL MERGE INCLUSION AND EXTENSION EVENTS
@@ -1245,6 +1177,7 @@ if arg1==1 or arg1==2 or arg1==5 :
 #                         print(f"processing event num {eventn} and event {fn}")
 
 #                         command = [
+#                             "python",
 #                             "./ggsashimi_txV3.py",
 #                             "-A", "median_j",
 #                             "-b", "all_bams.tsv",
@@ -1384,6 +1317,7 @@ if arg1==1 or arg1==2 or arg1==5 :
 #                         print(f"processing event num {eventn} and event {fn}")
 
 #                         command = [
+#                            "python",
 #                             "./ggsashimi_txV3.py",
 #                             "-A", "median_j",
 #                             "-b", "all_bams.tsv",
@@ -1492,6 +1426,7 @@ if arg1==1 or arg1==2 or arg1==5 :
 #                         print(f"processing event num {eventn} and event {fn}")
 
 #                         command = [
+#                            "python",
 #                             "./ggsashimi_txV3.py",
 #                             "-A", "median_j",
 #                             "-b", "all_bams.tsv",
@@ -2068,7 +2003,8 @@ if arg1==1 or arg1==2 or arg1==5 :
 #                             print("processing event num {eventn} and event {fn}")
                             
 #                             command = [
-#                                 "./ggsashimi_txV3.py",
+#                                 "python",
+#                                 "ggsashimi_txV3.py",
 #                                 "-A", "median_j",
 #                                 "-b", "all_bams.tsv",
 #                                 "-c", line,
@@ -2372,6 +2308,7 @@ if arg1==1 or arg1==2 or arg1==5 :
                             
 #                             ### Should remove this
 #                             command = [
+#                                "python",
 #                                 "./ggsashimi_txV3.py",
 #                                 "-A", "median_j",
 #                                 "-b", "all_bams.tsv",
@@ -2698,7 +2635,8 @@ if arg1==1 or arg1==2 or arg1==5 :
 #                 "res_ce_all/Summary_stats.txt"
 #             ]
 
-#             subprocess.run(command, capture_output=True, text=True)
+#             result = subprocess.run(command, capture_output=True, text=True)
+#             print(result.stdout)
 
 #         with open('votre_fichier.csv', 'r') as fichier:
 #             all_csv_data = [ligne.strip() for ligne in fichier] # For saving gene_ids as well to generate sashimi compatible csv file
@@ -2943,14 +2881,14 @@ if arg1==1 or arg1==2 or arg1==5 :
 #                         csv_writer.writerow(row)
                         
 #                 # NOW REMOVE ANY EVENT FOR WHICH START>END
-#                 upex_st = upex.iloc[:,1]
-#                 upex_en = upex.iloc[:,2]
+#                 upex_st = upex.iloc[:,1].tolist()[0]
+#                 upex_en = upex.iloc[:,2].tolist()[0]
                 
-#                 ce_st = ce.iloc[:,1]
-#                 ce_en = ce.iloc[:,2]
+#                 ce_st = ce.iloc[:,1].tolist()[0]
+#                 ce_en = ce.iloc[:,2].tolist()[0]
                 
-#                 dsex_st = dsex.iloc[:,1]
-#                 dsex_en = dsex.iloc[:,2]
+#                 dsex_st = dsex.iloc[:,1].tolist()[0]
+#                 dsex_en = dsex.iloc[:,2].tolist()[0]
                 
 #                 if (upex_st<upex_en and ce_st<ce_en and dsex_st<dsex_en) :
 #                     # Finally paste three segments to a bed file
@@ -2984,4 +2922,784 @@ if arg1==1 or arg1==2 or arg1==5 :
 #                         csv_writer.writerow(row)
                         
 #                 comb = line_csv.split(',')
+#                 first = [comb[0], comb[1], comb[2], comb[3], comb[4], comb[5], comb[6]]
+#                 combi = first.split(',')
+#                 with open('res_ce_all/Annotated_junctions.csv', 'a', newline='') as outfile:
+#                     csv_writer = csv.writer(outfile)
+#                     csv_writer.writerow([combi[0], combi[1], combi[2], combi[3], combi[4], combi[5], combi[6]])
                 
+#             elif diff_exon_abs==1 :
+#                 # THESE ARE CE INTRONIC events
+#                 # CE event with difference of one exon
+                
+#                 # Get start and end of dso
+#                 usd = us.iloc[:,12].tolist()[0]
+#                 usd_abs = abs(usd)
+#                 dsd = ds.iloc[:,12].tolist()[0]
+#                 dsd_abs = abs(dsd)
+                
+#                 # Record 1 (downstream exon). chr# end_ce+d       end_ce+d_nuc_sz      strand  gene_name
+#                 # ADDED TO REMOVE ALL EXONS THAT LIE INSIDE AN INTRON
+#                 if (usd_abs<=5 or dsd_abs<=5) :
+#                     if strnd=='+' :
+#                         if upexonl<60 :
+#                             comb = us.split('\t')
+#                             upex = [comb[0], comb[7], comb[8], comb[9], comb[4], comb[5], gene_name]
+                            
+#                         else :
+#                             comb = us.split('\t')
+#                             upex = [comb[0], comb[8]-60, comb[8], comb[9], comb[4], comb[5], gene_name]
+                            
+#                         use = us.iloc[:,8].tolist()[0]
+#                         comb = ds.split('\t')
+#                         ce1 = [comb[0], use, comb[7]-1, comb[9], comb[4], comb[5]]
+#                         comb1 = ce1.split('\t')
+#                         ce = [comb1[0], comb1[1], comb1[2], comb1[9], comb1[4], comb1[5], gene_name]
+                        
+#                         if dnexonl<60 :
+#                             comb = ds.split('\t')
+#                             dsex = [comb[0], comb[7]-1, comb[8], comb[9], comb[4], comb[5], gene_name]
+                            
+#                         else :
+#                             comb = ds.split('\t')
+#                             dsex = [comb[0], comb[8]-1, comb[8]+60-1, comb[9], comb[4], comb[5], gene_name]
+                        
+#                         # CE scan region
+#                         junc1 = ds.iloc[:,1].tolist()[0]
+#                         junc2 = ds.iloc[:,2].tolist()[0]
+                        
+#                         # Gave problem with single bp differences
+#                         upex2 = us.iloc[:,8].tolist()[0]
+#                         dsex1 = ds.iloc[:,7].tolist()[0]
+                        
+#                         # This works better
+#                         if (usd_abs < dsd_abs) :
+#                             comb = ds.split('\t')
+#                             ce_scan1 = [comb[0], junc2, comb[7], comb[9], comb[4], comb[5], gene_name]
+                        
+#                         else :
+#                             comb = us.split('\t')
+#                             ce_scan1 = [comb[0], junc1, comb[8], comb[9], comb[4], comb[5], gene_name]
+                        
+#                     if strnd=='-' :
+#                         if upexonl<60 :
+#                             comb = us.split('\t')
+#                             upex = [comb[0], comb[7]-1, comb[8], comb[9], comb[4], comb[5], gene_name]
+                            
+#                         else :
+#                             comb = us.split('\t')
+#                             upex = [comb[0], comb[7]-1, comb[7]+60-1, comb[9], comb[4], comb[5], gene_name]
+                        
+#                         use = ds.iloc[:,8].tolist()[0]
+#                         comb = ds.split('\t')
+#                         ce1 = [comb[0], use, comb[7]-1, comb[9], comb[4], comb[5]]
+#                         comb1 = ce1.split('\t')
+#                         ce = [comb1[0], comb1[1], comb1[2], comb1[9], comb1[4], comb1[5], gene_name]
+                        
+#                         if dnexonl<60 :
+#                             comb = ds.split('\t')
+#                             dsex = [comb[0], comb[7]-1, comb[8], comb[9], comb[4], comb[5], gene_name]
+                            
+#                         else :
+#                             comb = ds.split('\t')
+#                             dsex = [comb[0], comb[8]-60, comb[8], comb[9], comb[4], comb[5], gene_name]
+                        
+#                         # CE scan region
+#                         junc1 = ds.iloc[:,1].tolist()[0]
+#                         junc2 = ds.iloc[:,2].tolist()[0]
+#                         upex1 = us.iloc[:,7].tolist()[0]
+#                         dsex2 = ds.iloc[:,8].tolist()[0]
+                        
+#                         # This works better
+#                         if (usd_abs < dsd_abs) :
+#                             comb = ds.split('\t')
+#                             ce_scan1 = [comb[0], junc1, comb[8], comb[9], comb[4], comb[5], gene_name]
+                        
+#                         else :
+#                             comb = us.split('\t')
+#                             ce_scan1 = [comb[0], junc2, comb[7], comb[9], comb[4], comb[5], gene_name]
+                        
+#                     with open(sample, 'r') as infile, open('res_ce_all/IGV_ce_inclusion.csv', 'a', newline='') as outfile:
+#                         csv_writer = csv.writer(outfile)
+                        
+#                         for line in infile:
+#                             fields = line.strip().split()
+#                             first_column = f"{fields[0]}:{fields[1]}-{fields[2]}"
+#                             row = [first_column, fields[0], fields[1], fields[2], fields[3], fields[4], fields[5], gene_name, TxID]
+#                             csv_writer.writerow(row)
+                    
+#                     # NOW REMOVE ANY EVENT FOR WHICH START>END
+#                     upex_st = upex.iloc[:,1].tolist()[0]
+#                     upex_en = upex.iloc[:,2].tolist()[0]
+                    
+#                     ce_st = ce.iloc[:,1].tolist()[0]
+#                     ce_en = ce.iloc[:,2].tolist()[0]
+                    
+#                     dsex_st = dsex.iloc[:,1].tolist()[0]
+#                     dsex_en = dsex.iloc[:,2].tolist()[0]
+                    
+#                     # Also coe ce boundary range
+#                     with open("res_ce_all/ce_all_scan_range_junctions.bed", "a") as f :
+#                         f.write(f"{upex}\n")
+#                         f.write(f"{ce_scan1}\n")
+#                         f.write(f"{dsex}\n")
+                    
+#                     with open("res_ce_all/ce_all_scan_range.bed", "a") as f :
+#                         f.write(f"{ce_scan1}")
+                    
+#                 else :
+#                     # BOTH ENDS OF THESE EVENTS LIE INSIDE INTRON
+#                     with open("res_ce_all/non_ce_events.txt", "a") as f :
+#                         f.write(f"{gene_name} is unknown event type for gene {gene_name}")
+                    
+#                     comb = line_csv.split(',')
+#                     add = [comb[0], comb[1], comb[2], comb[3], comb[4], comb[5], comb[6]].split(',')
+                    
+#                     with open(f"res_ce_all/Annotated_junctions.csv", "a", newline='') as f:
+#                         writer = csv.writer(f)
+#                         writer.writerow([add[0], add[1], add[2], add[3], add[4], add[5], add[6]])
+                    
+#             else :
+#                 with open("res_ce_all/non_ce_events.txt", "a") as f :
+#                     f.write(f"{gene_name} is unknown event type for gene {gene_name}\n")
+                
+#                 comb = line_csv.split(',')
+#                 add = [comb[0], comb[1], comb[2], comb[3], comb[4], comb[5], comb[6]].split(',')
+                
+#                 with open(f"res_ce_all/Annotated_junctions.csv", "a", newline='') as f:
+#                     writer = csv.writer(f)
+#                     writer.writerow([add[0], add[1], add[2], add[3], add[4], add[5], add[6]])
+                
+#         ########## THIS SECTION WRITES NEW FILE res_ce_all/ce_all_scan_intron.bed to scan whole intron between two exons for probable ce events
+#         with open("res_ce_all/ce_all_scan_range_junctions.bed", 'r') as file:
+#             nrecrds = sum(1 for line in file)
+        
+#         with open("res_ce_all/ce_all_scan_range_junctions.bed", 'r') as file:
+#             all_data = [line.strip() for line in file]
+        
+#         i = 0
+#         while i<nrecrds :
+#             line11 = all_data[i]
+#             line12 = all_data[i+1]
+#             line13 = all_data[i+2]
+#             i = i + 3
+#             strand = line11.split('\t')[5]
+            
+#             if strand=='+' :
+#                 comb = [line11, line13].split('\t')
+#                 with open("res_ce_all/ce_all_scan_intron.bed", "a") as f :
+#                     f.write([comb[0], comb[2], comb[8], comb[10], comb[11], comb[12], comb[13]])
+                
+#             elif strand=='-' :
+#                 comb = [line13, line11].split('\t')
+#                 with open("res_ce_all/ce_all_scan_intron.bed", "a") as f :
+#                     f.write([comb[0], comb[2], comb[8], comb[10], comb[11], comb[12], comb[13]])
+            
+#         ################## END SECTION WRITES NEW FILE res_ce_all/ce_all_scan_intron.bed
+#         # Also copy for coverage calculations and avoid intronic_range calculations
+#         with open("res_ce_all/ce_all_scan_range.bed", 'r') as infile, open("res_ce_all/ce_all_scan_unique_range.bed", 'a', newline='') as outfile:
+#             csv_writer = csv.writer(outfile)
+#             for line in infile:
+#                 csv_writer.writerow(line)
+        
+# CRYPTICS SECTION ENDS HERE
+
+# EVENT COVERAGE CALCULATIONS STARTS HERE
+# Step 3. Now calculate coverages for each ce-range from all TDP samples and aggregate them for each junction
+# Flag for step 3
+# FILES NEEDED FOR THIS STEP: res_ce_all/ce_all_scan_unique_range.bed, bam_files/*.bam, bam_beds/*.bed for all samples in bam_files folder
+# coverages_bed_files_create_flg = 0
+
+# if arg1==4 or arg1==5 :
+#     print("NOW STARTED COVERAGE CALCULATIONS, TAKES LONG TIME OFTEN HOURS/DAYS FOR > 200 EVENTS")
+    
+#     with open("res_ce_all/Summary_stats.txt", "a") as f :
+#         f.write("NOW STARTED COVERAGE CALCULATIONS, TAKES LONG TIME OFTEN HOURS/DAYS FOR > 200 EVENTS\n")
+    
+#     bamsamples_tdp = []
+#     with open("all_bams.tsv", 'r') as file:
+#         for line in file:
+#             columns = line.strip().split('\t')
+#             if len(columns) > 2 and re.search(r'TDP43', columns[2]) :
+#                 filename = columns[1]
+#                 basename = filename.split('/')[-1]
+#                 name_without_ext = basename.split('.')[0]
+#                 bamsamples_tdp.append(name_without_ext)
+                
+#                 if bamsamples_tdp :
+#                     os.makedirs("coverages",exist_ok=True)
+#                     i = 1 # Counter to use for calculations
+#                     last_genename = ""
+                    
+#                     with open('res_ce_all/ce_all_scan_intron.bed', 'r') as file : # col2 col3 col4 col5 col6 col7
+#                         for line in file:
+#                             line = line.rstrip('\n')
+                            
+#                             # Now do calculations fot this ce across all replicates
+#                             # Invert the range if it is not already
+#                             genename = line[6]
+                            
+#                             if last_genename==genename :
+#                                 i = i + 1
+#                                 last_genename = genename
+                                
+#                             else :
+#                                 i = 1
+#                                 last_genename = genename
+                            
+#                             #########
+#                             chrm_n = line[0]
+#                             chrm_start = line[1]
+#                             chrm_end = line[2]
+#                             fnm_tdp = f"{chrm_n}_{chrm_start}_{chrm_end}_{genename}.cov.bed"
+                            
+#                             print(f"fnm_tdp {fnm_tdp}")
+#                             if chrm_start<chrm_end :
+#                                 comb = line.split('\t')
+#                                 with open("temp_coord.bed", "w") as f :
+#                                     f.write([comb[0], comb[1], comb[2], comb[3], comb[4], comb[5], comb[6]])
+                                
+#                             else :
+#                                 comb = line.split('\t')
+#                                 with open("temp_coord.bed", "w") as f :
+#                                     f.write([comb[0], comb[2], comb[1], comb[3], comb[4], comb[5], comb[6]])
+                                
+#                             # And now for TDP43
+#                             print("coverage calculations for tdp sampels for:")
+#                             with open("temp_coord.bed", 'r') as file :
+#                                 for line in file:
+#                                     print(line, end='')
+                            
+#                             for bamsamp in bamsamples_tdp :
+#                                 a = pybedtools.BedTool("temp_coord.bed")
+#                                 b = pybedtools.BedTool(f"bam_beds/{bamsamp}-sorted.bam.bed")
+#                                 result = a.coverage(b, g=f"bam_beds/{bamsamp}.chromosomes.txt", d=True, sorted=True)
+#                                 result.saveas(f"temp_coord_{bamsamp}_tdp.bed.cov")
+                            
+#                             # Finally sum all coverages across replicates for this ce
+#                             samples1 = ""
+                            
+#                             for bamsamp1 in bamsamples_tdp :
+#                                 samples1 += f" temp_coord_{bamsamp1}_tdp.bed.cov"
+                            
+#                             print(f"got all coverage files for tdp {samples1}")
+#                             samples2 = samples1.split()
+                            
+#                             dfs = [pd.read_csv(file, sep='\t', header=None) for file in samples2]
+#                             combined_df = pd.concat(dfs, axis=1)
+#                             numFiles = len(samples2)
+#                             results = []
+                            
+#                             for index, row in combined_df.iterrows() :
+#                                 row_data = row.iloc[:len(row) // numFiles]
+#                                 sum_value = row[len(row) // numFiles:].sum()
+                                
+#                                 result_line = '\t'.join(row_data.astype(str)) + '\t' + str(sum_value)
+#                                 results.append(result_line)
+                            
+#                             with open(f"coverages/{fnm_tdp}", 'w') as f:
+#                                 f.write('\n'.join(results))
+                            
+#                             # Also remove temp_coord_ for each sample done
+#                             for bamsamp in bamsamples_tdp :
+#                                 if os.path.exists(f"temp_coord_{bamsamp}_tdp.bed.cov"):
+#                                     os.remove(f"temp_coord_{bamsamp}_tdp.bed.cov")
+                                
+#                 else :
+#                     print("I did not get any BAM files from all_bams.tsv (from column 2), Please make sure that col3 contains string TDP43 for KD samples, ESITING")
+#                     with open("res_ce_all/Summary_stats.txt", "a") as f :
+#                         f.write("I did not get any BAM files from all_bams.tsv (from column 2), Please make sure that col3 contains string TDP43 for KD samples, ESITING\n")
+                    
+#                     sys.exit(1)
+                
+
+
+
+
+
+# # CE IDENTIFICATION STARTS HERE
+
+# # Step 4. using majiq_coverages_automateV1.R script identify final ce_extension_coord.bed and ce_extension_coord.bed files
+# fact = 3
+
+# with open(inpfile, 'r') as file:
+#     total_splicing_events = sum(1 for line in file)
+
+# unknow_events = 0
+
+# if os.path.exists("res_ce_all/Annotated_junctions.csv") :
+#     with open("res_ce_all/Annotated_junctions.csv", 'r') as file:
+#         unknow_events = sum(1 for line in file)
+    
+# not_found = 0
+
+# if os.path.exists("EnsDB_tx_not_found.csv") :
+#     with open("EnsDB_tx_not_found.csv", 'r') as file:
+#         not_found = sum(1 for line in file)
+
+# problematic = 0
+
+# if os.path.exists("res_ce_all/IGV_problematic_junctions.csv") :
+#     with open("res_ce_all/IGV_problematic_junctions.csv", 'r') as file:
+#         problematic = sum(1 for line in file)
+        
+# unseccesful_r1 = 0
+
+# if os.path.exists("res_ce_all/skipped_ce.csv") :
+#     with open("res_ce_all/skipped_ce.csv", 'r') as file:
+#         unseccesful_r1 = sum(1 for line in file)
+
+# unseccesful_r = unseccesful_r1/3
+
+# with open("res_ce_all/Summary_stats.txt", "a") as f :
+#     f.write(f"Total splicing events read are: {total_splicing_events}\n")
+#     f.write(f"Out of these {total_splicing_events} total events\n")
+#     f.write(f"Events not found in EnsDB are: {not_found}, please see EnsDB_tx_not_found.csv file\n")
+#     f.write(f"Events that are not CE: {unknow_events} , please see res_ce_all/non_ce_events.txt and res_ce_all/Annotated_junctions.csv file\n")
+#     f.write(f"Events that are somewhat problematic: {problematic} , please see res_ce_all/problematic_junctions.txt and res_ce_all/IGV_problematic_junctions.csv files\n")
+
+# ce_boundary_events = total_splicing_events - not_found - unknow_events - problematic
+
+# with open("res_ce_all/Summary_stats.txt", "a") as f :
+#     f.write("#######################################\n")
+
+
+
+
+
+
+# if arg1==4 or arg1==5 :
+#     with open("res_ce_all/Summary_stats.txt", "a") as f :
+#         f.write(f"Now starting ce_boundary calculations for a remaining total of: {ce_boundary_events} events, BY INVOKING Auto_CoverV4_layered_intronV3.R SCRIPT\n")
+    
+#     print("IDENTIFYING CE BOUNDARIES BY CALLING Auto_CoverV4_layered_intronV3.R script")
+    
+#     command = [
+#         "python",
+#         "Auto_CoverV4_layered_intronV3.py",
+#         "res_ce_all/IGV_ce_inclusion.csv",
+#         "res_ce_all/ce_all_scan_range_junctions.bed",
+#         ".6",
+#         "res_ce_all/ce_all_scan_intron.bed"
+#     ]
+
+#     result = subprocess.run(command, capture_output=True, text=True)
+#     print(result.stdout)
+    
+#     print("BACK FROM CE_BOUNDARY CALCULATIONS")
+    
+#     with open("res_ce_all/Summary_stats.txt", "a") as f :
+#         f.write("################################################\n")
+    
+#     # Step 4 ENDS
+#     # Step 5. Finally identify nt and AA sequences
+#     # Get nt and aa for ce boundaries
+    
+#     # First remove duplicates from ce' boundary coordinates
+# 	# NEW CODE STARTS HERE
+#     nrecrds = 0
+#     nrecrdst = 0
+    
+#     if os.access("res_ce_all/ce_inclusion_coord.bed",os.F_OK) :
+#         with open("res_ce_all/ce_inclusion_coord.bed", 'r') as file:
+#             nrecrds = sum(1 for line in file)
+#         nrecrdst = nrecrds/3
+    
+#     if nrecrds!=0 :
+#         with open("res_ce_all/Summary_stats.txt", "a") as f :
+#             f.write(f"Back From R Session, Now checking FOR DUPLICATES for a total of ce_inclusion events: {nrecrdst}\n")
+        
+#         with open("res_ce_all/ce_inclusion_coord.bed", 'r') as file:
+#             all_data = [line.strip() for line in file]
+        
+#         # Also read ce_inclusion_coord_sashimi.bed to get TxID
+#         with open("res_ce_all/ce_inclusion_coord_sashimi.bed", 'r') as file:
+#             sashimi_data = [line.strip() for line in file]
+        
+#         # Also read csv file
+#         with open("res_ce_all/IGV_R_returned_ce_inclusion.csv", 'r') as file:
+#             csv_data = [line.strip() for line in file]
+        
+#         csvi = 0
+#         i = 0
+        
+#         while i<nrecrds :
+#             line11 = all_data[i]
+#             line12 = all_data[i+1]
+#             line13 = all_data[i+2]
+            
+#             # TxID
+# 			# For sashimi
+#             lines1 = sashimi_data[i]
+#             lines2 = sashimi_data[i+1]
+#             lines3 = sashimi_data[i+2]
+            
+#             csv_ln = csv_data[csvi]
+#             csvi = csvi + 1
+#             i = i + 3
+#             j = i
+            
+#             # Now go through rest of the data
+#             flg = 0
+            
+#             while j<nrecrds :
+#                 line21 = all_data[j]
+#                 line22 = all_data[j+1]
+#                 line23 = all_data[j+2]
+                
+#                 if (line11==line21 and line12==line22 and line13==line23) :
+#                     flg = 1
+                
+#                 j = j + 3
+                
+#             if flg==0 :
+#                 comb11 = line11.split('\t')
+#                 comb12 = line12.split('\t')
+#                 comb13 = line13.split('\t')
+                
+#                 with open("res_ce_all/ce_inclusion_coord_uniq.bed", "a") as f :
+#                     f.write(f"{comb11[0]}, {comb11[1]}, {comb11[2]}, {comb11[3]}, {comb11[4]}, {comb11[5]}, {comb11[6]}\n")
+#                     f.write(f"{comb12[0]}, {comb12[1]}, {comb12[2]}, {comb12[3]}, {comb12[4]}, {comb12[5]}, {comb12[6]}\n")
+#                     f.write(f"{comb13[0]}, {comb13[1]}, {comb13[2]}, {comb13[3]}, {comb13[4]}, {comb13[5]}, {comb13[6]}\n")
+                    
+#                 # Also save bed file for sashimi plots
+#                 comb1 = lines1.split('\t')
+#                 comb2 = lines2.split('\t')
+#                 comb3 = lines3.split('\t')
+                
+#                 with open("res_ce_all/ce_inclusion_coord_uniq_sashimi.bed", "a") as f :
+#                     f.write(f"{comb1[0]}, {comb1[1]}, {comb1[2]}, {comb1[3]}, {comb1[4]}, {comb1[5]}, {comb1[6]}, {comb1[7]}\n")
+#                     f.write(f"{comb2[0]}, {comb2[1]}, {comb2[2]}, {comb2[3]}, {comb2[4]}, {comb2[5]}, {comb2[6]}, {comb2[7]}\n")
+                
+#                 # Also SAVING CE coordinates
+#                 with open("res_ce_all/ce_inclusion_coord_only.bed", "a") as f :
+#                     f.write(f"{comb2[0]}, {comb2[1]}, {comb2[2]}, {comb2[2]-comb2[1]}, {comb2[4]}, {comb2[5]}, {comb2[6]}, {comb2[7]}\n")
+                
+#                 with open("res_ce_all/ce_inclusion_coord_uniq_sashimi.bed", "a") as f :
+#                     f.write(f"{comb3[0]}, {comb3[1]}, {comb3[2]}, {comb3[3]}, {comb3[4]}, {comb3[5]}, {comb3[6]}, {comb3[7]}\n")
+                
+#                 # Also save csv file
+#                 with open("res_ce_all/CE_inclusion.csv", "a", newline='') as f:
+#                     writer = csv.writer(f)
+#                     writer.writerow(csv_ln)
+                
+#             else :
+#                 with open("res_ce_all/ce_inclusion_coord_repeated.bed", "a") as f :
+#                     f.write(f"{comb11[0]}, {comb11[1]}, {comb11[2]}, {comb11[3]}, {comb11[4]}, {comb11[5]}, {comb11[6]}\n")
+#                     f.write(f"{comb12[0]}, {comb12[1]}, {comb12[2]}, {comb12[3]}, {comb12[4]}, {comb12[5]}, {comb12[6]}\n")
+#                     f.write(f"{comb13[0]}, {comb13[1]}, {comb13[2]}, {comb13[3]}, {comb13[4]}, {comb13[5]}, {comb13[6]}\n")
+                
+#         with open("res_ce_all/ce_inclusion_coord_uniq.bed", 'r') as file:
+#             nrecrds_uniqt = sum(1 for line in file)
+        
+#         nrecrds_uniq = nrecrds_uniqt/3
+#         repeated_ce_boundary_events = nrecrdst - nrecrds_uniq
+        
+#         with open("res_ce_all/Summary_stats.txt", "a") as f :
+#             f.write(f"Total unique ce_inclusion events are: {nrecrds_uniq}, please see res_ce_all/ce_inclusion_coord_uniq.bed and res_ce_all/CE_inclusion.csv\n")
+#             f.write(f"Total repeated ce_inclusion events are: {repeated_ce_boundary_events}, please see res_ce_all/ce_inclusion_coord_repeated.bed\n")
+        
+#         print(f"total repeated ce_inclusion events were {repeated_ce_boundary_events}")
+        
+#     else :
+#         with open("res_ce_all/Summary_stats.txt", "a") as f :
+#             f.write(f"Back From R Session, total ce_inclusion events: {nrecrdst}\n")
+        
+
+
+
+
+
+# # First remove duplicates from IR events
+# # NEW CODE STARTS HERE
+# nrecrds_ir = 0
+# nrecrds_irt = 0
+
+# if os.access("res_ce_all/ce_extension_coord.bed",os.F_OK) :
+#     with open("res_ce_all/ce_extension_coord.bed", 'r') as file:
+#         nrecrds_ir = sum(1 for line in file)
+#     nrecrds_irt = nrecrds_ir/3
+
+# if nrecrds_ir!=0 :
+#     with open("res_ce_all/Summary_stats.txt", "a") as f :
+#         f.write(f"Total ce_extension events are: {nrecrds_irt}, Now checking for repeated ce_extension events\n")
+    
+#     with open("res_ce_all/ce_extension_coord.bed", 'r') as file:
+#         all_data = [line.strip() for line in file]
+    
+#     # Also read ce_inclusion_coord_sashimi.bed to get TxID
+#     with open("res_ce_all/ce_extension_coord_sashimi.bed", 'r') as file:
+#         sashimi_data_ext = [line.strip() for line in file]
+    
+#     # Also read csv file
+#     with open("res_ce_all/IGV_R_returned_ce_extension.csv", 'r') as file:
+#         csv_data_ir = [line.strip() for line in file]
+    
+#     csvi = 0
+#     i = 0
+    
+#     while i<nrecrds_ir :
+#         line11 = all_data[i]
+#         line12 = all_data[i+1]
+#         line13 = all_data[i+2]
+
+#         # For sashimi
+#         lines1 = sashimi_data_ext[i]
+#         lines2 = sashimi_data_ext[i+1]
+#         lines3 = sashimi_data_ext[i+2]
+        
+#         # TxID
+#         txid_recrd = sashimi_data_ext[i]
+#         txid = txid_recrd.split('\t')[7]
+        
+#         csv_ln = csv_data_ir[csvi]
+#         csvi = csvi + 1
+#         i = i + 3
+#         j = i
+        
+#         # Now go through rest of the data
+#         flg = 0
+        
+#         while j<nrecrds_ir :
+#             line21 = all_data[j]
+#             line22 = all_data[j+1]
+#             line23 = all_data[j+2]
+            
+#             if (line11==line21 and line12==line22 and line13==line23) :
+#                 flg = 1
+            
+#             j = j + 3
+            
+#         if flg==0 :
+#             comb11 = line11.split('\t')
+#             comb12 = line12.split('\t')
+#             comb13 = line13.split('\t')
+            
+#             with open("res_ce_all/ce_extension_coord_uniq.bed", "a") as f :
+#                 f.write(f"{comb11[0]}, {comb11[1]}, {comb11[2]}, {comb11[3]}, {comb11[4]}, {comb11[5]}, {comb11[6]}\n")
+#                 f.write(f"{comb12[0]}, {comb12[1]}, {comb12[2]}, {comb12[3]}, {comb12[4]}, {comb12[5]}, {comb12[6]}\n")
+#                 f.write(f"{comb13[0]}, {comb13[1]}, {comb13[2]}, {comb13[3]}, {comb13[4]}, {comb13[5]}, {comb13[6]}\n")
+                
+#             # Also save bed file with TxID for sashimi plots
+#             comb1 = lines1.split('\t')
+#             comb2 = lines2.split('\t')
+#             comb3 = lines3.split('\t')
+            
+#             with open("res_ce_all/ce_extension_coord_uniq_sashimi.bed", "a") as f :
+#                 f.write(f"{comb1[0]}, {comb1[1]}, {comb1[2]}, {comb1[3]}, {comb1[4]}, {comb1[5]}, {comb1[6]}, {comb1[7]}\n")
+#                 f.write(f"{comb2[0]}, {comb2[1]}, {comb2[2]}, {comb2[3]}, {comb2[4]}, {comb2[5]}, {comb2[6]}, {comb2[7]}\n")
+            
+#             # Also save ce coordinates only
+#             with open("res_ce_all/ce_extension_coord_only.bed", "a") as f :
+#                 f.write(f"{comb2[0]}, {comb2[1]}, {comb2[2]}, {comb2[2]-comb2[1]}, {comb2[4]}, {comb2[5]}, {comb2[6]}, {comb2[7]}\n")
+            
+#             with open("res_ce_all/ce_extension_coord_uniq_sashimi.bed", "a") as f :
+#                 f.write(f"{comb3[0]}, {comb3[1]}, {comb3[2]}, {comb3[3]}, {comb3[4]}, {comb3[5]}, {comb3[6]}, {comb3[7]}\n")
+            
+#             # Also save csv file
+#             with open("res_ce_all/CE_extension.csv", "a", newline='') as f:
+#                 writer = csv.writer(f)
+#                 writer.writerow(csv_ln)
+            
+#         else :
+#             with open("res_ce_all/ce_extension_coord_repeated.bed", "a") as f :
+#                 f.write(f"{comb11[0]}, {comb11[1]}, {comb11[2]}, {comb11[3]}, {comb11[4]}, {comb11[5]}, {comb11[6]}\n")
+#                 f.write(f"{comb12[0]}, {comb12[1]}, {comb12[2]}, {comb12[3]}, {comb12[4]}, {comb12[5]}, {comb12[6]}\n")
+#                 f.write(f"{comb13[0]}, {comb13[1]}, {comb13[2]}, {comb13[3]}, {comb13[4]}, {comb13[5]}, {comb13[6]}\n")
+            
+#     # Get total unique coordinates
+#     with open("res_ce_all/ce_extension_coord_uniq.bed", 'r') as file:
+#         nrecrds_uniq_irt = sum(1 for line in file)
+    
+#     nrecrds_uniq_ir = nrecrds_uniq_irt/3
+#     repeated_IR_events = nrecrds_irt - nrecrds_uniq_ir
+    
+#     with open("res_ce_all/Summary_stats.txt", "a") as f :
+#         f.write(f"Total unique ce_extension events are: {nrecrds_uniq_ir}, please see res_ce_all/ce_extension_coord_uniq.bed and res_ce_all/CE_extension.csv files\n")
+#         f.write(f"Total repeated ce_extension events are: {repeated_IR_events}, please see res_ce_all/ce_extension_coord_repeated.bed\n")
+    
+#     print(f"Total repeated ce_extension events were {repeated_IR_events}")
+    
+#     # Now copy back data to ce_coord
+#     # NEW CODE ENDS HERE - IR
+
+# # Step 5 ENDS
+# # NOW FOR IR EVENTS
+# # First remove duplicates from IR events
+# # NEW CODE STARTS HERE
+# nrecrds_ir = 0
+# nrecrds_irt = 0
+
+# if os.access("res_ce_all/IR_coord.bed",os.F_OK) :
+#     with open("res_ce_all/IR_coord.bed", 'r') as file:
+#         nrecrds_ir = sum(1 for line in file)
+    
+# if nrecrds_ir!=0 :
+#     with open("res_ce_all/Summary_stats.txt", "a") as f :
+#         f.write(f"TOTAL IR EVENTS ARE: {nrecrds_ir}, NOW CHECKING FOR REPEATED IR EVENTS\n")
+    
+#     print(f"TOTAL IR EVENTS ARE: {nrecrds_ir}, NOW CHECKING FOR REPEATED IR EVENTS")
+    
+#     with open("res_ce_all/IR_coord.bed", 'r') as file:
+#         all_data = [line.strip() for line in file]
+    
+#     # Also read ce_inclusion_coord_sashimi.bed to get TxID
+#     with open("res_ce_all/IR_coord_sashimi.bed", 'r') as file:
+#         sashimi_data_ext = [line.strip() for line in file]
+    
+#     # Also read csv file
+#     with open("res_ce_all/IGV_R_returned_IR.csv", 'r') as file:
+#         csv_data_ir = [line.strip() for line in file]
+    
+#     csvi = 0
+#     i = 0
+    
+#     while i<nrecrds_ir :
+#         line11 = all_data[i]
+        
+#         # For sashimi
+#         lines1 = sashimi_data_ext[i]
+        
+# 		# TxID
+#         txid_recrd = sashimi_data_ext[i]
+#         txid = txid_recrd.split('\t')[7]
+        
+#         csv_ln = csv_data_ir[csvi]
+#         csvi = csvi + 1
+#         i = i + 1
+#         j = i
+        
+#         # Now go through rest of the data
+#         flg = 0
+        
+#         while j<nrecrds_ir :
+#             line21 = all_data[j]
+            
+#             if line11==line21 :
+#                 flg = 1
+            
+#             j = j + 1
+            
+#         if flg==0 :
+#             comb11 = line11.split('\t')
+#             comb1 = lines1.split('\t')
+            
+#             with open("res_ce_all/IR_coord_uniq.bed", "a") as f :
+#                 f.write(f"{comb11[0]}, {comb11[1]}, {comb11[2]}, {comb11[3]}, {comb11[4]}, {comb11[5]}, {comb11[6]}\n")
+            
+#             with open("res_ce_all/IR_coord_uniq_sashimi.bed", "a") as f :
+#                 f.write(f"{comb1[0]}, {comb1[1]}, {comb1[2]}, {comb1[3]}, {comb1[4]}, {comb1[5]}, {comb1[6]}, {comb1[7]}\n")
+            
+#             # Also save ce coordinates only
+#             with open("res_ce_all/IR_coord_only.bed", "a") as f :
+#                 f.write(f"{comb1[0]}, {comb1[1]}, {comb1[2]}, {comb1[2]-comb1[1]}, {comb1[4]}, {comb1[5]}, {comb1[6]}, {comb1[7]}\n")
+            
+#             # Also save csv file
+#             comb = csv_ln.split(',')
+#             combi = [comb[1], comb[2], comb[3], comb[6], comb[7], comb[8]].split(',')
+            
+#             with open("res_ce_all/IR.csv", "a") as f :
+#                 f.write("{combi[0]}, {combi[1]}, {combi[2]}, {combi[3]}, {combi[4]}, {combi[5]}")
+            
+#         else :
+#             with open("res_ce_all/IR_coord_repeated.bed", "a") as f :
+#                 f.write(f"{comb11[0]}, {comb11[1]}, {comb11[2]}, {comb11[3]}, {comb11[4]}, {comb11[5]}, {comb11[6]}\n")
+            
+#     # Get total unique coordinates
+#     with open("res_ce_all/IR_coord_uniq.bed", 'r') as file:
+#         nrecrds_uniq_irt = sum(1 for line in file)
+    
+#     repeated_IR_events = nrecrds_ir - nrecrds_uniq_irt
+    
+#     with open("res_ce_all/Summary_stats.txt", "a") as f :
+#         f.write(f"TOTAL UNIQUE IR EVENTS ARE: {nrecrds_uniq_irt}, please see res_ce_all/IR_coord_uniq.bed and res_ce_all/IR.csv files\n")
+#         f.write(f"Total repeated IR events are: {repeated_IR_events}, please see res_ce_all/IR_coord_repeated.bed\n")
+#         f.write("THOSE WERE ALL PERTINENT STAT - Please let us know if something is missing or some more stats can be useful!!!\n")
+    
+#     print(f"Total repeated IR events were {repeated_IR_events}")
+    
+#     # Now copy back data to ce_coord
+#     # NEW CODE ENDS HERE - IR
+
+# # SASHIMI PLOTS SECTION
+# else :
+#     print(f"CE_BOUNDARY_EVENTS ARE {ce_boundary_events} SO ABONDONED CE_BOUNDARY CALCULATIONS")
+
+# ###### END IR EVENTS
+# # FINAL STATISTICS
+# # DELETE ALL sashimi files as we plot sashimi in part-b
+# print("FINAL CLEANUP - Removing intermediate/unnecessary files")
+
+# if len(os.listdir("res_skiptics"))!=0 :
+#     for f in glob.glob("res_skiptics/*sashimi*") :
+#         os.remove(f)
+        
+# if len(os.listdir("res_ce_all"))!=0 :
+#     for f in glob.glob("res_ce_all/*sashimi*") :
+#         os.remove(f)
+        
+# for f in glob.glob("*.bed") :
+#     os.remove(f)
+
+# if os.path.exists("all_events_bed_sashimi.tab"):
+#     os.remove("all_events_bed_sashimi.tab")
+
+# if os.path.exists("dump.fasta"):
+#     os.remove("dump.fasta")
+
+# if os.path.exists("res_ce_all/ce_all_scan_intron.bed"):
+#     os.remove("res_ce_all/ce_all_scan_intron.bed")
+
+# if os.path.exists("res_ce_all/ce_all_scan_range_junctions.bed"):
+#     os.remove("res_ce_all/ce_all_scan_range_junctions.bed")
+
+# if os.path.exists("res_ce_all/ce_all_scan_range.bed"):
+#     os.remove("res_ce_all/ce_all_scan_range.bed")
+
+# if os.path.exists("res_ce_all/ce_all_scan_unique_range.bed"):
+#     os.remove("res_ce_all/ce_all_scan_unique_range.bed")
+
+# if os.path.exists("res_ce_all/ce_extension_coord_only.bed"):
+#     os.remove("res_ce_all/ce_extension_coord_only.bed")
+
+# if os.path.exists("res_ce_all/ce_extension_coord.bed"):
+#     os.remove("res_ce_all/ce_extension_coord.bed")
+
+# if os.path.exists("res_ce_all/ce_inclusion_coord_only.bed"):
+#     os.remove("res_ce_all/ce_inclusion_coord_only.bed")
+
+# if os.path.exists("res_ce_all/ce_inclusion_coord_repeated.bed"):
+#     os.remove("res_ce_all/ce_inclusion_coord_repeated.bed")
+
+# if os.path.exists("res_ce_all/ce_inclusion_coord_uniq.bed"):
+#     os.remove("res_ce_all/ce_inclusion_coord_uniq.bed")
+
+# if os.path.exists("res_ce_all/ce_inclusion_coord.bed"):
+#     os.remove("res_ce_all/ce_inclusion_coord.bed")
+
+# if os.path.exists("res_ce_all/IR_coord_only.bed"):
+#     os.remove("res_ce_all/IR_coord_only.bed")
+
+# if os.path.exists("res_ce_all/IR_coord_repeated.bed"):
+#     os.remove("res_ce_all/IR_coord_repeated.bed")
+
+# if os.path.exists("res_ce_all/IR_coord_uniq.bed"):
+#     os.remove("res_ce_all/IR_coord_uniq.bed")
+
+# if os.path.exists("res_ce_all/IR_coord.bed"):
+#     os.remove("res_ce_all/IR_coord.bed")
+
+# if os.path.exists("res_ce_all/IGV_R_returned_ce_extension.csv"):
+#     os.remove("res_ce_all/IGV_R_returned_ce_extension.csv")
+
+# if os.path.exists("res_ce_all/IGV_R_returned_ce_inclusion.csv"):
+#     os.remove("res_ce_all/IGV_R_returned_ce_inclusion.csv")
+
+# if os.path.exists("res_ce_all/IGV_R_returned_IR.csv"):
+#     os.remove("res_ce_all/IGV_R_returned_IR.csv")
+
+# if os.path.exists("res_ce_all/IGV_ce_inclusion.csv"):
+#     os.remove("res_ce_all/IGV_ce_inclusion.csv")
+
+# print("For final statistics on ce events, please see res_ce_all/Summary_stats.txt file")
+# print("ALL DONE - hopefully - Successfully")
