@@ -194,23 +194,34 @@ if arg1==1 or arg1==2 or arg1==5 :
             with open("Summary_stats.txt","a") as fichier :
                 fichier.write('************************ From pgp-a.sh, CALLING TxEnsDB103_layeredV6.R \n')
             
-            gtf_file = "Homo_sapiens.GRCh38.103.chr.sorted_new.gtf"
+            # gtf_file = "Homo_sapiens.GRCh38.103.chr.sorted_new.gtf"
             
-            os.makedirs("database", exist_ok=True)
-            edb_file = os.path.join("database", gtf_file + ".db")
+            # os.makedirs("database", exist_ok=True)
+            # edb_file = os.path.join("database", gtf_file + ".db")
             
-            if not os.path.exists(edb_file):
-                edb = gffutils.create_db(gtf_file, dbfn=edb_file, force=True, keep_order=True, merge_strategy="merge", sort_attribute_values=True)
-            else:
-                edb = gffutils.FeatureDB(edb_file, keep_order=True)
+            # if not os.path.exists(edb_file):
+            #     edb = gffutils.create_db(gtf_file, dbfn=edb_file, force=True, keep_order=True, merge_strategy="merge", sort_attribute_values=True)
+            # else:
+            #     edb = gffutils.FeatureDB(edb_file, keep_order=True)
             
+            # command = [
+            #     "python",
+            #     "TxEnsDB103_layeredV6.py",
+            #     "sorted_selected_events.csv",
+            #     "principal_txs.csv",
+            #     "temp_all_events_sashimi/FINAL_STATS_ALL_SASHIMIS.txt",
+            #     f"{edb}"
+            # ]
+            
+            # result = subprocess.run(command, capture_output=True, text=True)
+            # print(result.stdout)
+
             command = [
-                "python",
-                "TxEnsDB103_layeredV6.py",
+                "R",
+                "txens.R",
                 "sorted_selected_events.csv",
                 "principal_txs.csv",
-                "temp_all_events_sashimi/FINAL_STATS_ALL_SASHIMIS.txt",
-                f"{edb}"
+                "temp_all_events_sashimi/FINAL_STATS_ALL_SASHIMIS.txt"
             ]
             
             result = subprocess.run(command, capture_output=True, text=True)
@@ -871,501 +882,513 @@ if arg1==4 or arg1==5 :
 #             with open("res_ce_all/Summary_stats.txt", "a") as f :
 #                 f.write("CALLING TxEnsDB103_layeredV6.R to generate bed files\n")
 
-            gtf_file = "gencode.v38.annotation.gtf"
+            # gtf_file = "gencode.v38.annotation.gtf"
             
-            os.makedirs("database", exist_ok=True)
-            edb_file = os.path.join("database", gtf_file + ".db")
+            # os.makedirs("database", exist_ok=True)
+            # edb_file = os.path.join("database", gtf_file + ".db")
             
-            if not os.path.exists(edb_file):
-                edb = gffutils.create_db(gtf_file,
-                                         dbfn=edb_file,
-                                         force=True,
-                                         keep_order=True,
-                                         merge_strategy="merge",
-                                         sort_attribute_values=True,
-                                         disable_infer_genes=True,
-                                         disable_infer_transcripts=True)
-            else:
-                edb = gffutils.FeatureDB(edb_file, keep_order=True)
+            # if not os.path.exists(edb_file):
+            #     edb = gffutils.create_db(gtf_file,
+            #                              dbfn=edb_file,
+            #                              force=True,
+            #                              keep_order=True,
+            #                              merge_strategy="merge",
+            #                              sort_attribute_values=True,
+            #                              disable_infer_genes=True,
+            #                              disable_infer_transcripts=True)
+            # else:
+            #     edb = gffutils.FeatureDB(edb_file, keep_order=True)
 
-            print("CALLING TxEnsDB103_layeredV6.R to generate bed files")
+            # print("CALLING TxEnsDB103_layeredV6.R to generate bed files")
             
+            # command = [
+            #     "python",
+            #     "TxEnsDB103_layeredV6.py",
+            #     "sorted_selected_events.csv",
+            #     "principal_txs.csv",
+            #     "temp_all_events_sashimi/FINAL_STATS_ALL_SASHIMIS.txt",
+            #     edb_file
+            # ]
+            
+            # result = subprocess.run(command, capture_output=True, text=True)
+            # print(result.stdout)
+            # print(result.stderr)
+
             command = [
-                "python",
-                "TxEnsDB103_layeredV6.py",
+                "R",
+                "txens.R",
                 "sorted_selected_events.csv",
                 "principal_txs.csv",
-                "temp_all_events_sashimi/FINAL_STATS_ALL_SASHIMIS.txt",
-                edb_file
+                "temp_all_events_sashimi/FINAL_STATS_ALL_SASHIMIS.txt"
             ]
             
             result = subprocess.run(command, capture_output=True, text=True)
             print(result.stdout)
             print(result.stderr)
 
-#         with open('votre_fichier.csv', 'r') as fichier:
-#             all_csv_data = [ligne.strip() for ligne in fichier] # For saving gene_ids as well to generate sashimi compatible csv file
+            with open('votre_fichier.csv', 'r') as fichier:
+                all_csv_data = [ligne.strip() for ligne in fichier] # For saving gene_ids as well to generate sashimi compatible csv file
 
-#         event_i = 0
-#         samples = glob.glob('event_bedfiles/temp_*.bed')
-#         overlap_allowed = 5 # Overlap allowed (intron/exon) for ce events
+            event_i = 0
+            samples = glob.glob('event_bedfiles/temp_*.bed')
+            overlap_allowed = 5 # Overlap allowed (intron/exon) for ce events
 
-#         for sample in samples :
-#             # Read line from csv file
-#             line_csv = all_csv_data[event_i]
-#             event_i = event_i + 1
+            for sample in samples :
+                # Read line from csv file
+                line_csv = all_csv_data[event_i]
+                event_i = event_i + 1
 
-#             # Get  all exons bed
-#             allexons = sample.split('/')[1].split('_')[1]
+                # Get  all exons bed
+                allexons = sample.split('/')[1].split('_')[1]
 
-#             # Also get 5UTR and 3UTR bed files
-#             gene_name1 = allexons.split('.')[0]
-#             gene_name = gene_name1.split('-')[0]
+                # Also get 5UTR and 3UTR bed files
+                gene_name1 = allexons.split('.')[0]
+                gene_name = gene_name1.split('-')[0]
 
-#             # First sort the bed
-#             bed = pybedtools.BedTool(f"event_bedfiles/{allexons}")
-#             sorted_bed = bed.sort()
-#             sorted_bed.saveas(f"event_bedfiles/t{allexons}")
+                # First sort the bed
+                bed = pybedtools.BedTool(f"event_bedfiles/{allexons}")
+                sorted_bed = bed.sort()
+                sorted_bed.saveas(f"event_bedfiles/t{allexons}")
 
-#             # Also read Tx Files to retrieve selected Tx - should find better ways
-#             with open(f"event_bedfiles/TxID{allexons}", 'r') as fichier:
-#                 premiere_ligne = fichier.readline().strip()
+                # Also read Tx Files to retrieve selected Tx - should find better ways
+                with open(f"event_bedfiles/TxID{allexons}", 'r') as fichier:
+                    premiere_ligne = fichier.readline().strip()
 
-#             colonnes = premiere_ligne.split()
-#             TxID = colonnes[6]
+                colonnes = premiere_ligne.split()
+                TxID = colonnes[6]
 
-#             df = pd.read_csv(sample, sep='\\s+', header=None)
-#             strnd = df[5]
+                df = pd.read_csv(sample, sep='\\s+', header=None)
+                strnd = df[5]
 
-#             print(sample)
+                print(sample)
 
-#             # Get distance to downstream exon (for ties, report first) from current reference and pick start, end and d
-#             a = pybedtools.BedTool(sample)
-#             b = pybedtools.BedTool(f'event_bedfiles/t{allexons}')
+                # Get distance to downstream exon (for ties, report first) from current reference and pick start, end and d
+                a = pybedtools.BedTool(sample)
+                b = pybedtools.BedTool(f'event_bedfiles/t{allexons}')
+                
+                closest = a.closest(b, s=True, D="a", iu=True, d=True, t="first")
+                ds = closest.to_dataframe(names = [
+                    "chr_a", "start_a", "end_a", "name_a", "row_line_a", "strand_a",
+                    "chr_b", "start_b", "end_b", "name_b", "row_line_b", "strand_b", "distance"
+                ])
+
+                # Also get distance to upstream exon from current reference and pick start, end and d
+                closest = a.closest(b, s=True, D="a", id=True, d=True, t="first")
+                us = closest.to_dataframe(names = [
+                    "chr_a", "start_a", "end_a", "name_a", "row_line_a", "strand_a",
+                    "chr_b", "start_b", "end_b", "name_b", "row_line_b", "strand_b", "distance"
+                ])
+
+                # Get up/dn exon lengths
+                upexonl = us.iloc[:,9].tolist()[0]
+                dnexonl = ds.iloc[:,9].tolist()[0]
+
+                # Get up and down stream exon numbers
+                upexon = us.iloc[:,10].tolist()[0]
+                dnexon = ds.iloc[:,10].tolist()[0]
+
+                # Get overlap with up/dn exon - 0 means complete overlap which is assumed as exon skip event
+                dsovlp1 = ds.iloc[:,12].tolist()[0]
+                usovlp1 = us.iloc[:,12].tolist()[0]
+
+                # Take absolute values
+                dsovlp = abs(dsovlp1)
+                usovlp = abs(usovlp1)
+
+                diff_exon = int(upexon) - int(dnexon)
+
+                # Take absolute value
+                diff_exon_abs = abs(diff_exon)
+
+                if (upexon==dnexon and upexonl!=dnexonl) : # condition [ $upexonl -ne $dnexonl ] REMOVES EXON_SKIP events
+                    with open("res_ce_all/ex1_ex2_ce.txt", "a") as f :
+                        f.write(f"{gene_name} is a CE event")
+                        f.write(f"ds {ds}")
+                        f.write(f"us {us}")
+                    
+                    # Get distance to downstream exon (for ties, report first) from current reference and pick start, end and d
+                    closest = a.closest(b, s=True, D="a", iu=True, d=True, t="first", io=True)
+                    dsn = closest.to_dataframe(names = [
+                        "chr_a", "start_a", "end_a", "name_a", "row_line_a", "strand_a",
+                        "chr_b", "start_b", "end_b", "name_b", "row_line_b", "strand_b", "distance"
+                    ])
+
+                    # Also get ds overlap
+                    closest = a.closest(b, s=True, D="a", iu=True, d=True, t="first")
+                    dso = closest.to_dataframe(names = [
+                        "chr_a", "start_a", "end_a", "name_a", "row_line_a", "strand_a",
+                        "chr_b", "start_b", "end_b", "name_b", "row_line_b", "strand_b", "distance"
+                    ])
+
+                    # Get start and end of dso
+                    dso1 = dso.iloc[:,1].tolist()[0]
+                    dso2 = dso.iloc[:,8].tolist()[0]
+                    dsodiff = int(dso2) - int(dso1)
+
+                    # Also get distance to upstream exon from current reference and pick start, end and d
+                    closest = a.closest(b, s=True, D="a", id=True, d=True, t="last", io=True)
+                    usn = closest.to_dataframe(names = [
+                        "chr_a", "start_a", "end_a", "name_a", "row_line_a", "strand_a",
+                        "chr_b", "start_b", "end_b", "name_b", "row_line_b", "strand_b", "distance"
+                    ])
+
+                    # Also get us overlap
+                    closest = a.closest(b, s=True, D="a", id=True, d=True, t="last")
+                    uso = closest.to_dataframe(names = [
+                        "chr_a", "start_a", "end_a", "name_a", "row_line_a", "strand_a",
+                        "chr_b", "start_b", "end_b", "name_b", "row_line_b", "strand_b", "distance"
+                    ])
+
+                    # Get up/dn exon lengths
+                    usnexonl = usn.iloc[:,9].tolist()[0]
+                    dsnexonl = dsn.iloc[:,9].tolist()[0]
+
+                    with open("res_ce_all/ex1_ex2_ce.txt", "a") as f :
+                        f.write(f"now dsn {dsn}")
+                        f.write(f"now usn {usn}")
+                        f.write(f"dsodiff {dsodiff}")
+                    
+                    if (usnexonl=="." or dsnexonl==".") :
+                        with open("res_ce_all/problematic_junctions.txt", "a") as f :
+                            f.write(f"{gene_name} is ce with up exon length {usnexonl} and dsnexonl {dsnexonl} , LEAVING it for now PLEASE MAKE SURE IT IS PROPERLY IDENTIFIED")
+                        
+                        with open(sample, 'r') as infile, open("res_ce_all/IGV_problematic_junctionscsv", 'a', newline='') as outfile:
+                            writer = csv.writer(outfile)
+                            
+                            for line in infile:
+                                fields = line.strip().split()
+                                combined_field = f"{fields[0]}:{fields[1]}-{fields[2]}"
+                                output_fields = [combined_field] + fields + [gene_name]
+                                writer.writerow(output_fields)
+                            
+                    else : 
+                        if strnd=='-' :
+                            if dsodiff==1 :
+                                if upexonl<60 :
+                                    comb = us.split('\t')                                
+                                    upex = f"{comb[0]}\t{comb[7]+1}\t{comb[8]}\t{comb[9]}\t{comb[4]}\t{comb[5]}\t{gene_name}"
+                                
+                                else :
+                                    comb = us.split('\t')                                
+                                    upex = f"{comb[0]}\t{comb[7]+1}\t{comb[7]+60+1}\t{comb[9]}\t{comb[4]}\t{comb[5]}\t{gene_name}"
+                                    
+                                comb = us.split('\t')                                
+                                ce = f"{comb[0]}\t{comb[1]+2}\t{comb[7]}\t{comb[9]}\t{comb[4]}\t{comb[5]}\t{gene_name}"
+                                
+                                if dnexonl<60 :
+                                    comb = ds.split('\t')                                
+                                    dsex = f"{comb[0]}\t{comb[1]-60+1}\t{comb[1]+1}\t{comb[9]}\t{comb[4]}\t{comb[5]}\t{gene_name}"
+                                    
+                                else :
+                                    comb = ds.split('\t')                                
+                                    dsex = f"{comb[0]}\t{comb[1]-60+1}\t{comb[1]+1}\t{comb[9]}\t{comb[4]}\t{comb[5]}\t{gene_name}"
+                                    
+                            # Also get data for start and stop codons - only take -/+ 60 not the whole exon
+                            else :
+                                if upexonl<60 :
+                                    comb = us.split('\t')                                
+                                    upex = f"{comb[0]}\t{comb[2]}\t{comb[2]+60}\t{comb[9]}\t{comb[4]}\t{comb[5]}\t{gene_name}"
+                                
+                                else :
+                                    comb = us.split('\t')                                
+                                    upex = f"{comb[0]}\t{comb[2]}\t{comb[3]+60}\t{comb[9]}\t{comb[4]}\t{comb[5]}\t{gene_name}"
+                                    
+                                comb = ds.split('\t')                                
+                                ce = f"{comb[0]}\t{comb[8]+1}\t{comb[2]-1}\t{comb[9]}\t{comb[4]}\t{comb[5]}\t{gene_name}"
+                                
+                                if dnexonl<60 :
+                                    comb = ds.split('\t')                                
+                                    dsex = f"{comb[0]}\t{comb[7]}\t{comb[8]}\t{comb[9]}\t{comb[4]}\t{comb[5]}\t{gene_name}"
+                                    
+                                else :
+                                    comb = ds.split('\t')                                
+                                    dsex = f"{comb[0]}\t{comb[8]-60}\t{comb[8]}\t{comb[9]}\t{comb[4]}\t{comb[5]}\t{gene_name}"
+                                    
+                                # Also get data for start and stop codons - only take -/+ 60 not the whole exon
+                                junc1 = ds.iloc[:,1].tolist()[0]
+                                junc2 = ds.iloc[:,2].tolist()[0]
+                                upex1 = us.iloc[:,7].tolist()[0]
+                                dsex2 = ds.iloc[:,8].tolist()[0]
+                                
+                                # This works better
+                                if usd_abs<dsd_abs :
+                                    comb = ds.split('\t')
+                                    ce_scan1 = f"{comb[0]}\t{junc1}\t{comb[8]}\t{comb[9]}\t{comb[4]}\t{comb[5]}\t{gene_name}"
+                                    
+                                else :
+                                    comb = us.split('\t')
+                                    ce_scan1 = f"{comb[0]}\t{junc2}\t{comb[7]}\t{comb[9]}\t{comb[4]}\t{comb[5]}\t{gene_name}"
+                                    
+                        else :
+                            if upexonl<60 :
+                                comb = us.split('\t')                                
+                                upex = f"{comb[0]}\t{comb[7]}\t{comb[8]}\t{comb[9]}\t{comb[4]}\t{comb[5]}\t{gene_name}"
+                            
+                            else :
+                                comb = us.split('\t')                                
+                                upex = f"{comb[0]}\t{comb[8]-60}\t{comb[8]}\t{comb[9]}\t{comb[4]}\t{comb[5]}\t{gene_name}"
+                                
+                            use = us.iloc[:,8].tolist()[0]
+                            comb = dsn.split('\t')
+                            ce1 = f"{comb[0]}\t{use}\t{comb[7]-1}\t{comb[9]}\t{comb[4]}\t{comb[5]}\t"
+                            comb1 = ce1.split('\t')                                
+                            ce = f"{comb[0]}\t{comb[1]}\t{comb[2]}\t{comb[9]}\t{comb[4]}\t{comb[5]}\t{gene_name}"
+                            
+                            if dsnexonl<60 :
+                                comb = dsn.split('\t')                                
+                                dsex = f"{comb[0]}\t{comb[7]-1}\t{comb[8]}\t{comb[9]}\t{comb[4]}\t{comb[5]}\t{gene_name}"
+                                
+                            else :
+                                comb = dsn.split('\t')                                
+                                dsex = f"{comb[0]}\t{comb[7]-1}\t{comb[7]+60-1}\t{comb[9]}\t{comb[4]}\t{comb[5]}\t{gene_name}"
+                                
+                            # CE scan region
+                            junc1 = ds.iloc[:,1].tolist()[0]
+                            junc2 = ds.iloc[:,2].tolist()[0]
+                            
+                            # Gave problem with single bp differences
+                            upex2 = us.iloc[:,8].tolist()[0]
+                            dsex1 = ds.iloc[:,7].tolist()[0]
+                            
+                            # This works better
+                            if usd_abs<dsd_abs :
+                                comb = ds.split('\t')
+                                ce_scan1 = f"{comb[0]}\t{junc2}\t{comb[7]}\t{comb[9]}\t{comb[4]}\t{comb[5]}\t{gene_name}"
+                                
+                            else :
+                                comb = us.split('\t')
+                                ce_scan1 = f"{comb[0]}\t{junc1}\t{comb[8]}\t{comb[9]}\t{comb[4]}\t{comb[5]}\t{gene_name}"
+                            
+                    with open(sample, 'r') as infile, open('res_ce_all/IGV_ce_inclusion.csv', 'a', newline='') as outfile:
+                        csv_writer = csv.writer(outfile)
+                        
+                        for line in infile:
+                            fields = line.strip().split()
+                            first_column = f"{fields[0]}:{fields[1]}-{fields[2]}"
+                            row = [first_column, fields[0], fields[1], fields[2], fields[3], fields[4], fields[5], gene_name, TxID]
+                            csv_writer.writerow(row)
+                            
+                    # NOW REMOVE ANY EVENT FOR WHICH START>END
+                    upex_st = upex.iloc[:,1].tolist()[0]
+                    upex_en = upex.iloc[:,2].tolist()[0]
+                    
+                    ce_st = ce.iloc[:,1].tolist()[0]
+                    ce_en = ce.iloc[:,2].tolist()[0]
+                    
+                    dsex_st = dsex.iloc[:,1].tolist()[0]
+                    dsex_en = dsex.iloc[:,2].tolist()[0]
+                    
+                    if (upex_st<upex_en and ce_st<ce_en and dsex_st<dsex_en) :
+                        # Finally paste three segments to a bed file
+                        # First remove if any such file exists
+                        os.remove(f"{gene_name}_nt.bed")
+                        
+                        with open(f"{gene_name}_nt.bed", "a") as f :
+                            f.write(f"{upex}\n")
+                            f.write(f"{ce}\n")
+                            f.write(f"{dsex}\n")
+                        
+                        os.remove(f"{gene_name}_nt.bed")
+                        
+                    # Also coe ce boundary range
+                    with open("res_ce_all/ce_all_scan_range_junctions.bed", "a") as f :
+                        f.write(f"{upex}")
+                        f.write(f"{ce_scan1}")
+                        f.write(f"{dsex}")
+                    
+                    with open("res_ce_all/ce_all_scan_range.bed", "a") as f :
+                        f.write(f"{ce_scan1}")
+                    
+                elif (diff_exon_abs==1 and dsovlp==5 and usovlp==5) : # Deals with exon_joining events few bp of
+                    with open(sample, 'r') as infile, open('res_ce_all/Exon_skip.csv', 'a', newline='') as outfile:
+                        csv_writer = csv.writer(outfile)
+                        
+                        for line in infile:
+                            fields = line.strip().split()
+                            first_column = f"{fields[0]}:{fields[1]}-{fields[2]}"
+                            row = [first_column, fields[0], fields[1], fields[2], fields[3], fields[4], fields[5], gene_name]
+                            csv_writer.writerow(row)
+                            
+                    comb = line_csv.split(',')
+                    first = [comb[0], comb[1], comb[2], comb[3], comb[4], comb[5], comb[6]]
+                    combi = first.split(',')
+                    with open('res_ce_all/Annotated_junctions.csv', 'a', newline='') as outfile:
+                        csv_writer = csv.writer(outfile)
+                        csv_writer.writerow([combi[0], combi[1], combi[2], combi[3], combi[4], combi[5], combi[6]])
+                    
+                elif diff_exon_abs==1 :
+                    # THESE ARE CE INTRONIC events
+                    # CE event with difference of one exon
+                    
+                    # Get start and end of dso
+                    usd = us.iloc[:,12].tolist()[0]
+                    usd_abs = abs(usd)
+                    dsd = ds.iloc[:,12].tolist()[0]
+                    dsd_abs = abs(dsd)
+                    
+                    # Record 1 (downstream exon). chr# end_ce+d       end_ce+d_nuc_sz      strand  gene_name
+                    # ADDED TO REMOVE ALL EXONS THAT LIE INSIDE AN INTRON
+                    if (usd_abs<=5 or dsd_abs<=5) :
+                        if strnd=='+' :
+                            if upexonl<60 :
+                                comb = us.split('\t')
+                                upex = [comb[0], comb[7], comb[8], comb[9], comb[4], comb[5], gene_name]
+                                
+                            else :
+                                comb = us.split('\t')
+                                upex = [comb[0], comb[8]-60, comb[8], comb[9], comb[4], comb[5], gene_name]
+                                
+                            use = us.iloc[:,8].tolist()[0]
+                            comb = ds.split('\t')
+                            ce1 = [comb[0], use, comb[7]-1, comb[9], comb[4], comb[5]]
+                            comb1 = ce1.split('\t')
+                            ce = [comb1[0], comb1[1], comb1[2], comb1[9], comb1[4], comb1[5], gene_name]
+                            
+                            if dnexonl<60 :
+                                comb = ds.split('\t')
+                                dsex = [comb[0], comb[7]-1, comb[8], comb[9], comb[4], comb[5], gene_name]
+                                
+                            else :
+                                comb = ds.split('\t')
+                                dsex = [comb[0], comb[8]-1, comb[8]+60-1, comb[9], comb[4], comb[5], gene_name]
+                            
+                            # CE scan region
+                            junc1 = ds.iloc[:,1].tolist()[0]
+                            junc2 = ds.iloc[:,2].tolist()[0]
+                            
+                            # Gave problem with single bp differences
+                            upex2 = us.iloc[:,8].tolist()[0]
+                            dsex1 = ds.iloc[:,7].tolist()[0]
+                            
+                            # This works better
+                            if (usd_abs < dsd_abs) :
+                                comb = ds.split('\t')
+                                ce_scan1 = [comb[0], junc2, comb[7], comb[9], comb[4], comb[5], gene_name]
+                            
+                            else :
+                                comb = us.split('\t')
+                                ce_scan1 = [comb[0], junc1, comb[8], comb[9], comb[4], comb[5], gene_name]
+                            
+                        if strnd=='-' :
+                            if upexonl<60 :
+                                comb = us.split('\t')
+                                upex = [comb[0], comb[7]-1, comb[8], comb[9], comb[4], comb[5], gene_name]
+                                
+                            else :
+                                comb = us.split('\t')
+                                upex = [comb[0], comb[7]-1, comb[7]+60-1, comb[9], comb[4], comb[5], gene_name]
+                            
+                            use = ds.iloc[:,8].tolist()[0]
+                            comb = ds.split('\t')
+                            ce1 = [comb[0], use, comb[7]-1, comb[9], comb[4], comb[5]]
+                            comb1 = ce1.split('\t')
+                            ce = [comb1[0], comb1[1], comb1[2], comb1[9], comb1[4], comb1[5], gene_name]
+                            
+                            if dnexonl<60 :
+                                comb = ds.split('\t')
+                                dsex = [comb[0], comb[7]-1, comb[8], comb[9], comb[4], comb[5], gene_name]
+                                
+                            else :
+                                comb = ds.split('\t')
+                                dsex = [comb[0], comb[8]-60, comb[8], comb[9], comb[4], comb[5], gene_name]
+                            
+                            # CE scan region
+                            junc1 = ds.iloc[:,1].tolist()[0]
+                            junc2 = ds.iloc[:,2].tolist()[0]
+                            upex1 = us.iloc[:,7].tolist()[0]
+                            dsex2 = ds.iloc[:,8].tolist()[0]
+                            
+                            # This works better
+                            if (usd_abs < dsd_abs) :
+                                comb = ds.split('\t')
+                                ce_scan1 = [comb[0], junc1, comb[8], comb[9], comb[4], comb[5], gene_name]
+                            
+                            else :
+                                comb = us.split('\t')
+                                ce_scan1 = [comb[0], junc2, comb[7], comb[9], comb[4], comb[5], gene_name]
+                            
+                        with open(sample, 'r') as infile, open('res_ce_all/IGV_ce_inclusion.csv', 'a', newline='') as outfile:
+                            csv_writer = csv.writer(outfile)
+                            
+                            for line in infile:
+                                fields = line.strip().split()
+                                first_column = f"{fields[0]}:{fields[1]}-{fields[2]}"
+                                row = [first_column, fields[0], fields[1], fields[2], fields[3], fields[4], fields[5], gene_name, TxID]
+                                csv_writer.writerow(row)
+                        
+                        # NOW REMOVE ANY EVENT FOR WHICH START>END
+                        upex_st = upex.iloc[:,1].tolist()[0]
+                        upex_en = upex.iloc[:,2].tolist()[0]
+                        
+                        ce_st = ce.iloc[:,1].tolist()[0]
+                        ce_en = ce.iloc[:,2].tolist()[0]
+                        
+                        dsex_st = dsex.iloc[:,1].tolist()[0]
+                        dsex_en = dsex.iloc[:,2].tolist()[0]
+                        
+                        # Also coe ce boundary range
+                        with open("res_ce_all/ce_all_scan_range_junctions.bed", "a") as f :
+                            f.write(f"{upex}\n")
+                            f.write(f"{ce_scan1}\n")
+                            f.write(f"{dsex}\n")
+                        
+                        with open("res_ce_all/ce_all_scan_range.bed", "a") as f :
+                            f.write(f"{ce_scan1}")
+                        
+                    else :
+                        # BOTH ENDS OF THESE EVENTS LIE INSIDE INTRON
+                        with open("res_ce_all/non_ce_events.txt", "a") as f :
+                            f.write(f"{gene_name} is unknown event type for gene {gene_name}")
+                        
+                        comb = line_csv.split(',')
+                        add = [comb[0], comb[1], comb[2], comb[3], comb[4], comb[5], comb[6]].split(',')
+                        
+                        with open(f"res_ce_all/Annotated_junctions.csv", "a", newline='') as f:
+                            writer = csv.writer(f)
+                            writer.writerow([add[0], add[1], add[2], add[3], add[4], add[5], add[6]])
+                        
+                else :
+                    with open("res_ce_all/non_ce_events.txt", "a") as f :
+                        f.write(f"{gene_name} is unknown event type for gene {gene_name}\n")
+                    
+                    comb = line_csv.split(',')
+                    add = [comb[0], comb[1], comb[2], comb[3], comb[4], comb[5], comb[6]].split(',')
+                    
+                    with open(f"res_ce_all/Annotated_junctions.csv", "a", newline='') as f:
+                        writer = csv.writer(f)
+                        writer.writerow([add[0], add[1], add[2], add[3], add[4], add[5], add[6]])
+                    
+            ########## THIS SECTION WRITES NEW FILE res_ce_all/ce_all_scan_intron.bed to scan whole intron between two exons for probable ce events
+            with open("res_ce_all/ce_all_scan_range_junctions.bed", 'r') as file:
+                nrecrds = sum(1 for line in file)
             
-#             closest = a.closest(b, s=True, D="a", iu=True, d=True, t="first")
-#             ds = closest.to_dataframe(names = [
-#                 "chr_a", "start_a", "end_a", "name_a", "row_line_a", "strand_a",
-#                 "chr_b", "start_b", "end_b", "name_b", "row_line_b", "strand_b", "distance"
-#             ])
-
-#             # Also get distance to upstream exon from current reference and pick start, end and d
-#             closest = a.closest(b, s=True, D="a", id=True, d=True, t="first")
-#             us = closest.to_dataframe(names = [
-#                 "chr_a", "start_a", "end_a", "name_a", "row_line_a", "strand_a",
-#                 "chr_b", "start_b", "end_b", "name_b", "row_line_b", "strand_b", "distance"
-#             ])
-
-#             # Get up/dn exon lengths
-#             upexonl = us.iloc[:,9].tolist()[0]
-#             dnexonl = ds.iloc[:,9].tolist()[0]
-
-#             # Get up and down stream exon numbers
-#             upexon = us.iloc[:,10].tolist()[0]
-#             dnexon = ds.iloc[:,10].tolist()[0]
-
-#             # Get overlap with up/dn exon - 0 means complete overlap which is assumed as exon skip event
-#             dsovlp1 = ds.iloc[:,12].tolist()[0]
-#             usovlp1 = us.iloc[:,12].tolist()[0]
-
-#             # Take absolute values
-#             dsovlp = abs(dsovlp1)
-#             usovlp = abs(usovlp1)
-
-#             diff_exon = int(upexon) - int(dnexon)
-
-#             # Take absolute value
-#             diff_exon_abs = abs(diff_exon)
-
-#             if (upexon==dnexon and upexonl!=dnexonl) : # condition [ $upexonl -ne $dnexonl ] REMOVES EXON_SKIP events
-#                 with open("res_ce_all/ex1_ex2_ce.txt", "a") as f :
-#                     f.write(f"{gene_name} is a CE event")
-#                     f.write(f"ds {ds}")
-#                     f.write(f"us {us}")
-                
-#                 # Get distance to downstream exon (for ties, report first) from current reference and pick start, end and d
-#                 closest = a.closest(b, s=True, D="a", iu=True, d=True, t="first", io=True)
-#                 dsn = closest.to_dataframe(names = [
-#                     "chr_a", "start_a", "end_a", "name_a", "row_line_a", "strand_a",
-#                     "chr_b", "start_b", "end_b", "name_b", "row_line_b", "strand_b", "distance"
-#                 ])
-
-#                 # Also get ds overlap
-#                 closest = a.closest(b, s=True, D="a", iu=True, d=True, t="first")
-#                 dso = closest.to_dataframe(names = [
-#                     "chr_a", "start_a", "end_a", "name_a", "row_line_a", "strand_a",
-#                     "chr_b", "start_b", "end_b", "name_b", "row_line_b", "strand_b", "distance"
-#                 ])
-
-#                 # Get start and end of dso
-#                 dso1 = dso.iloc[:,1].tolist()[0]
-#                 dso2 = dso.iloc[:,8].tolist()[0]
-#                 dsodiff = int(dso2) - int(dso1)
-
-#                 # Also get distance to upstream exon from current reference and pick start, end and d
-#                 closest = a.closest(b, s=True, D="a", id=True, d=True, t="last", io=True)
-#                 usn = closest.to_dataframe(names = [
-#                     "chr_a", "start_a", "end_a", "name_a", "row_line_a", "strand_a",
-#                     "chr_b", "start_b", "end_b", "name_b", "row_line_b", "strand_b", "distance"
-#                 ])
-
-#                 # Also get us overlap
-#                 closest = a.closest(b, s=True, D="a", id=True, d=True, t="last")
-#                 uso = closest.to_dataframe(names = [
-#                     "chr_a", "start_a", "end_a", "name_a", "row_line_a", "strand_a",
-#                     "chr_b", "start_b", "end_b", "name_b", "row_line_b", "strand_b", "distance"
-#                 ])
-
-#                 # Get up/dn exon lengths
-#                 usnexonl = usn.iloc[:,9].tolist()[0]
-#                 dsnexonl = dsn.iloc[:,9].tolist()[0]
-
-#                 with open("res_ce_all/ex1_ex2_ce.txt", "a") as f :
-#                     f.write(f"now dsn {dsn}")
-#                     f.write(f"now usn {usn}")
-#                     f.write(f"dsodiff {dsodiff}")
-                
-#                 if (usnexonl=="." or dsnexonl==".") :
-#                     with open("res_ce_all/problematic_junctions.txt", "a") as f :
-#                         f.write(f"{gene_name} is ce with up exon length {usnexonl} and dsnexonl {dsnexonl} , LEAVING it for now PLEASE MAKE SURE IT IS PROPERLY IDENTIFIED")
-                    
-#                     with open(sample, 'r') as infile, open("res_ce_all/IGV_problematic_junctionscsv", 'a', newline='') as outfile:
-#                         writer = csv.writer(outfile)
-                        
-#                         for line in infile:
-#                             fields = line.strip().split()
-#                             combined_field = f"{fields[0]}:{fields[1]}-{fields[2]}"
-#                             output_fields = [combined_field] + fields + [gene_name]
-#                             writer.writerow(output_fields)
-                        
-#                 else : 
-#                     if strnd=='-' :
-#                         if dsodiff==1 :
-#                             if upexonl<60 :
-#                                 comb = us.split('\t')                                
-#                                 upex = f"{comb[0]}\t{comb[7]+1}\t{comb[8]}\t{comb[9]}\t{comb[4]}\t{comb[5]}\t{gene_name}"
-                            
-#                             else :
-#                                 comb = us.split('\t')                                
-#                                 upex = f"{comb[0]}\t{comb[7]+1}\t{comb[7]+60+1}\t{comb[9]}\t{comb[4]}\t{comb[5]}\t{gene_name}"
-                                
-#                             comb = us.split('\t')                                
-#                             ce = f"{comb[0]}\t{comb[1]+2}\t{comb[7]}\t{comb[9]}\t{comb[4]}\t{comb[5]}\t{gene_name}"
-                            
-#                             if dnexonl<60 :
-#                                 comb = ds.split('\t')                                
-#                                 dsex = f"{comb[0]}\t{comb[1]-60+1}\t{comb[1]+1}\t{comb[9]}\t{comb[4]}\t{comb[5]}\t{gene_name}"
-                                
-#                             else :
-#                                 comb = ds.split('\t')                                
-#                                 dsex = f"{comb[0]}\t{comb[1]-60+1}\t{comb[1]+1}\t{comb[9]}\t{comb[4]}\t{comb[5]}\t{gene_name}"
-                                
-#                         # Also get data for start and stop codons - only take -/+ 60 not the whole exon
-#                         else :
-#                             if upexonl<60 :
-#                                 comb = us.split('\t')                                
-#                                 upex = f"{comb[0]}\t{comb[2]}\t{comb[2]+60}\t{comb[9]}\t{comb[4]}\t{comb[5]}\t{gene_name}"
-                            
-#                             else :
-#                                 comb = us.split('\t')                                
-#                                 upex = f"{comb[0]}\t{comb[2]}\t{comb[3]+60}\t{comb[9]}\t{comb[4]}\t{comb[5]}\t{gene_name}"
-                                
-#                             comb = ds.split('\t')                                
-#                             ce = f"{comb[0]}\t{comb[8]+1}\t{comb[2]-1}\t{comb[9]}\t{comb[4]}\t{comb[5]}\t{gene_name}"
-                            
-#                             if dnexonl<60 :
-#                                 comb = ds.split('\t')                                
-#                                 dsex = f"{comb[0]}\t{comb[7]}\t{comb[8]}\t{comb[9]}\t{comb[4]}\t{comb[5]}\t{gene_name}"
-                                
-#                             else :
-#                                 comb = ds.split('\t')                                
-#                                 dsex = f"{comb[0]}\t{comb[8]-60}\t{comb[8]}\t{comb[9]}\t{comb[4]}\t{comb[5]}\t{gene_name}"
-                                
-#                             # Also get data for start and stop codons - only take -/+ 60 not the whole exon
-#                             junc1 = ds.iloc[:,1].tolist()[0]
-#                             junc2 = ds.iloc[:,2].tolist()[0]
-#                             upex1 = us.iloc[:,7].tolist()[0]
-#                             dsex2 = ds.iloc[:,8].tolist()[0]
-                            
-#                             # This works better
-#                             if usd_abs<dsd_abs :
-#                                 comb = ds.split('\t')
-#                                 ce_scan1 = f"{comb[0]}\t{junc1}\t{comb[8]}\t{comb[9]}\t{comb[4]}\t{comb[5]}\t{gene_name}"
-                                
-#                             else :
-#                                 comb = us.split('\t')
-#                                 ce_scan1 = f"{comb[0]}\t{junc2}\t{comb[7]}\t{comb[9]}\t{comb[4]}\t{comb[5]}\t{gene_name}"
-                                
-#                     else :
-#                         if upexonl<60 :
-#                             comb = us.split('\t')                                
-#                             upex = f"{comb[0]}\t{comb[7]}\t{comb[8]}\t{comb[9]}\t{comb[4]}\t{comb[5]}\t{gene_name}"
-                        
-#                         else :
-#                             comb = us.split('\t')                                
-#                             upex = f"{comb[0]}\t{comb[8]-60}\t{comb[8]}\t{comb[9]}\t{comb[4]}\t{comb[5]}\t{gene_name}"
-                            
-#                         use = us.iloc[:,8].tolist()[0]
-#                         comb = dsn.split('\t')
-#                         ce1 = f"{comb[0]}\t{use}\t{comb[7]-1}\t{comb[9]}\t{comb[4]}\t{comb[5]}\t"
-#                         comb1 = ce1.split('\t')                                
-#                         ce = f"{comb[0]}\t{comb[1]}\t{comb[2]}\t{comb[9]}\t{comb[4]}\t{comb[5]}\t{gene_name}"
-                        
-#                         if dsnexonl<60 :
-#                             comb = dsn.split('\t')                                
-#                             dsex = f"{comb[0]}\t{comb[7]-1}\t{comb[8]}\t{comb[9]}\t{comb[4]}\t{comb[5]}\t{gene_name}"
-                            
-#                         else :
-#                             comb = dsn.split('\t')                                
-#                             dsex = f"{comb[0]}\t{comb[7]-1}\t{comb[7]+60-1}\t{comb[9]}\t{comb[4]}\t{comb[5]}\t{gene_name}"
-                            
-#                         # CE scan region
-#                         junc1 = ds.iloc[:,1].tolist()[0]
-#                         junc2 = ds.iloc[:,2].tolist()[0]
-                        
-#                         # Gave problem with single bp differences
-#                         upex2 = us.iloc[:,8].tolist()[0]
-#                         dsex1 = ds.iloc[:,7].tolist()[0]
-                        
-#                         # This works better
-#                         if usd_abs<dsd_abs :
-#                             comb = ds.split('\t')
-#                             ce_scan1 = f"{comb[0]}\t{junc2}\t{comb[7]}\t{comb[9]}\t{comb[4]}\t{comb[5]}\t{gene_name}"
-                            
-#                         else :
-#                             comb = us.split('\t')
-#                             ce_scan1 = f"{comb[0]}\t{junc1}\t{comb[8]}\t{comb[9]}\t{comb[4]}\t{comb[5]}\t{gene_name}"
-                        
-#                 with open(sample, 'r') as infile, open('res_ce_all/IGV_ce_inclusion.csv', 'a', newline='') as outfile:
-#                     csv_writer = csv.writer(outfile)
-                    
-#                     for line in infile:
-#                         fields = line.strip().split()
-#                         first_column = f"{fields[0]}:{fields[1]}-{fields[2]}"
-#                         row = [first_column, fields[0], fields[1], fields[2], fields[3], fields[4], fields[5], gene_name, TxID]
-#                         csv_writer.writerow(row)
-                        
-#                 # NOW REMOVE ANY EVENT FOR WHICH START>END
-#                 upex_st = upex.iloc[:,1].tolist()[0]
-#                 upex_en = upex.iloc[:,2].tolist()[0]
-                
-#                 ce_st = ce.iloc[:,1].tolist()[0]
-#                 ce_en = ce.iloc[:,2].tolist()[0]
-                
-#                 dsex_st = dsex.iloc[:,1].tolist()[0]
-#                 dsex_en = dsex.iloc[:,2].tolist()[0]
-                
-#                 if (upex_st<upex_en and ce_st<ce_en and dsex_st<dsex_en) :
-#                     # Finally paste three segments to a bed file
-#  					# First remove if any such file exists
-#                     os.remove(f"{gene_name}_nt.bed")
-                    
-#                     with open(f"{gene_name}_nt.bed", "a") as f :
-#                         f.write(f"{upex}\n")
-#                         f.write(f"{ce}\n")
-#                         f.write(f"{dsex}\n")
-                    
-#                     os.remove(f"{gene_name}_nt.bed")
-                    
-#                 # Also coe ce boundary range
-#                 with open("res_ce_all/ce_all_scan_range_junctions.bed", "a") as f :
-#                     f.write(f"{upex}")
-#                     f.write(f"{ce_scan1}")
-#                     f.write(f"{dsex}")
-                
-#                 with open("res_ce_all/ce_all_scan_range.bed", "a") as f :
-#                     f.write(f"{ce_scan1}")
-                
-#             elif (diff_exon_abs==1 and dsovlp==5 and usovlp==5) : # Deals with exon_joining events few bp of
-#                 with open(sample, 'r') as infile, open('res_ce_all/Exon_skip.csv', 'a', newline='') as outfile:
-#                     csv_writer = csv.writer(outfile)
-                    
-#                     for line in infile:
-#                         fields = line.strip().split()
-#                         first_column = f"{fields[0]}:{fields[1]}-{fields[2]}"
-#                         row = [first_column, fields[0], fields[1], fields[2], fields[3], fields[4], fields[5], gene_name]
-#                         csv_writer.writerow(row)
-                        
-#                 comb = line_csv.split(',')
-#                 first = [comb[0], comb[1], comb[2], comb[3], comb[4], comb[5], comb[6]]
-#                 combi = first.split(',')
-#                 with open('res_ce_all/Annotated_junctions.csv', 'a', newline='') as outfile:
-#                     csv_writer = csv.writer(outfile)
-#                     csv_writer.writerow([combi[0], combi[1], combi[2], combi[3], combi[4], combi[5], combi[6]])
-                
-#             elif diff_exon_abs==1 :
-#                 # THESE ARE CE INTRONIC events
-#                 # CE event with difference of one exon
-                
-#                 # Get start and end of dso
-#                 usd = us.iloc[:,12].tolist()[0]
-#                 usd_abs = abs(usd)
-#                 dsd = ds.iloc[:,12].tolist()[0]
-#                 dsd_abs = abs(dsd)
-                
-#                 # Record 1 (downstream exon). chr# end_ce+d       end_ce+d_nuc_sz      strand  gene_name
-#                 # ADDED TO REMOVE ALL EXONS THAT LIE INSIDE AN INTRON
-#                 if (usd_abs<=5 or dsd_abs<=5) :
-#                     if strnd=='+' :
-#                         if upexonl<60 :
-#                             comb = us.split('\t')
-#                             upex = [comb[0], comb[7], comb[8], comb[9], comb[4], comb[5], gene_name]
-                            
-#                         else :
-#                             comb = us.split('\t')
-#                             upex = [comb[0], comb[8]-60, comb[8], comb[9], comb[4], comb[5], gene_name]
-                            
-#                         use = us.iloc[:,8].tolist()[0]
-#                         comb = ds.split('\t')
-#                         ce1 = [comb[0], use, comb[7]-1, comb[9], comb[4], comb[5]]
-#                         comb1 = ce1.split('\t')
-#                         ce = [comb1[0], comb1[1], comb1[2], comb1[9], comb1[4], comb1[5], gene_name]
-                        
-#                         if dnexonl<60 :
-#                             comb = ds.split('\t')
-#                             dsex = [comb[0], comb[7]-1, comb[8], comb[9], comb[4], comb[5], gene_name]
-                            
-#                         else :
-#                             comb = ds.split('\t')
-#                             dsex = [comb[0], comb[8]-1, comb[8]+60-1, comb[9], comb[4], comb[5], gene_name]
-                        
-#                         # CE scan region
-#                         junc1 = ds.iloc[:,1].tolist()[0]
-#                         junc2 = ds.iloc[:,2].tolist()[0]
-                        
-#                         # Gave problem with single bp differences
-#                         upex2 = us.iloc[:,8].tolist()[0]
-#                         dsex1 = ds.iloc[:,7].tolist()[0]
-                        
-#                         # This works better
-#                         if (usd_abs < dsd_abs) :
-#                             comb = ds.split('\t')
-#                             ce_scan1 = [comb[0], junc2, comb[7], comb[9], comb[4], comb[5], gene_name]
-                        
-#                         else :
-#                             comb = us.split('\t')
-#                             ce_scan1 = [comb[0], junc1, comb[8], comb[9], comb[4], comb[5], gene_name]
-                        
-#                     if strnd=='-' :
-#                         if upexonl<60 :
-#                             comb = us.split('\t')
-#                             upex = [comb[0], comb[7]-1, comb[8], comb[9], comb[4], comb[5], gene_name]
-                            
-#                         else :
-#                             comb = us.split('\t')
-#                             upex = [comb[0], comb[7]-1, comb[7]+60-1, comb[9], comb[4], comb[5], gene_name]
-                        
-#                         use = ds.iloc[:,8].tolist()[0]
-#                         comb = ds.split('\t')
-#                         ce1 = [comb[0], use, comb[7]-1, comb[9], comb[4], comb[5]]
-#                         comb1 = ce1.split('\t')
-#                         ce = [comb1[0], comb1[1], comb1[2], comb1[9], comb1[4], comb1[5], gene_name]
-                        
-#                         if dnexonl<60 :
-#                             comb = ds.split('\t')
-#                             dsex = [comb[0], comb[7]-1, comb[8], comb[9], comb[4], comb[5], gene_name]
-                            
-#                         else :
-#                             comb = ds.split('\t')
-#                             dsex = [comb[0], comb[8]-60, comb[8], comb[9], comb[4], comb[5], gene_name]
-                        
-#                         # CE scan region
-#                         junc1 = ds.iloc[:,1].tolist()[0]
-#                         junc2 = ds.iloc[:,2].tolist()[0]
-#                         upex1 = us.iloc[:,7].tolist()[0]
-#                         dsex2 = ds.iloc[:,8].tolist()[0]
-                        
-#                         # This works better
-#                         if (usd_abs < dsd_abs) :
-#                             comb = ds.split('\t')
-#                             ce_scan1 = [comb[0], junc1, comb[8], comb[9], comb[4], comb[5], gene_name]
-                        
-#                         else :
-#                             comb = us.split('\t')
-#                             ce_scan1 = [comb[0], junc2, comb[7], comb[9], comb[4], comb[5], gene_name]
-                        
-#                     with open(sample, 'r') as infile, open('res_ce_all/IGV_ce_inclusion.csv', 'a', newline='') as outfile:
-#                         csv_writer = csv.writer(outfile)
-                        
-#                         for line in infile:
-#                             fields = line.strip().split()
-#                             first_column = f"{fields[0]}:{fields[1]}-{fields[2]}"
-#                             row = [first_column, fields[0], fields[1], fields[2], fields[3], fields[4], fields[5], gene_name, TxID]
-#                             csv_writer.writerow(row)
-                    
-#                     # NOW REMOVE ANY EVENT FOR WHICH START>END
-#                     upex_st = upex.iloc[:,1].tolist()[0]
-#                     upex_en = upex.iloc[:,2].tolist()[0]
-                    
-#                     ce_st = ce.iloc[:,1].tolist()[0]
-#                     ce_en = ce.iloc[:,2].tolist()[0]
-                    
-#                     dsex_st = dsex.iloc[:,1].tolist()[0]
-#                     dsex_en = dsex.iloc[:,2].tolist()[0]
-                    
-#                     # Also coe ce boundary range
-#                     with open("res_ce_all/ce_all_scan_range_junctions.bed", "a") as f :
-#                         f.write(f"{upex}\n")
-#                         f.write(f"{ce_scan1}\n")
-#                         f.write(f"{dsex}\n")
-                    
-#                     with open("res_ce_all/ce_all_scan_range.bed", "a") as f :
-#                         f.write(f"{ce_scan1}")
-                    
-#                 else :
-#                     # BOTH ENDS OF THESE EVENTS LIE INSIDE INTRON
-#                     with open("res_ce_all/non_ce_events.txt", "a") as f :
-#                         f.write(f"{gene_name} is unknown event type for gene {gene_name}")
-                    
-#                     comb = line_csv.split(',')
-#                     add = [comb[0], comb[1], comb[2], comb[3], comb[4], comb[5], comb[6]].split(',')
-                    
-#                     with open(f"res_ce_all/Annotated_junctions.csv", "a", newline='') as f:
-#                         writer = csv.writer(f)
-#                         writer.writerow([add[0], add[1], add[2], add[3], add[4], add[5], add[6]])
-                    
-#             else :
-#                 with open("res_ce_all/non_ce_events.txt", "a") as f :
-#                     f.write(f"{gene_name} is unknown event type for gene {gene_name}\n")
-                
-#                 comb = line_csv.split(',')
-#                 add = [comb[0], comb[1], comb[2], comb[3], comb[4], comb[5], comb[6]].split(',')
-                
-#                 with open(f"res_ce_all/Annotated_junctions.csv", "a", newline='') as f:
-#                     writer = csv.writer(f)
-#                     writer.writerow([add[0], add[1], add[2], add[3], add[4], add[5], add[6]])
-                
-#         ########## THIS SECTION WRITES NEW FILE res_ce_all/ce_all_scan_intron.bed to scan whole intron between two exons for probable ce events
-#         with open("res_ce_all/ce_all_scan_range_junctions.bed", 'r') as file:
-#             nrecrds = sum(1 for line in file)
-        
-#         with open("res_ce_all/ce_all_scan_range_junctions.bed", 'r') as file:
-#             all_data = [line.strip() for line in file]
-        
-#         i = 0
-#         while i<nrecrds :
-#             line11 = all_data[i]
-#             line12 = all_data[i+1]
-#             line13 = all_data[i+2]
-#             i = i + 3
-#             strand = line11.split('\t')[5]
+            with open("res_ce_all/ce_all_scan_range_junctions.bed", 'r') as file:
+                all_data = [line.strip() for line in file]
             
-#             if strand=='+' :
-#                 comb = [line11, line13].split('\t')
-#                 with open("res_ce_all/ce_all_scan_intron.bed", "a") as f :
-#                     f.write([comb[0], comb[2], comb[8], comb[10], comb[11], comb[12], comb[13]])
+            i = 0
+            while i<nrecrds :
+                line11 = all_data[i]
+                line12 = all_data[i+1]
+                line13 = all_data[i+2]
+                i = i + 3
+                strand = line11.split('\t')[5]
                 
-#             elif strand=='-' :
-#                 comb = [line13, line11].split('\t')
-#                 with open("res_ce_all/ce_all_scan_intron.bed", "a") as f :
-#                     f.write([comb[0], comb[2], comb[8], comb[10], comb[11], comb[12], comb[13]])
-            
-#         ################## END SECTION WRITES NEW FILE res_ce_all/ce_all_scan_intron.bed
-#         # Also copy for coverage calculations and avoid intronic_range calculations
-#         with open("res_ce_all/ce_all_scan_range.bed", 'r') as infile, open("res_ce_all/ce_all_scan_unique_range.bed", 'a', newline='') as outfile:
-#             csv_writer = csv.writer(outfile)
-#             for line in infile:
-#                 csv_writer.writerow(line)
+                if strand=='+' :
+                    comb = [line11, line13].split('\t')
+                    with open("res_ce_all/ce_all_scan_intron.bed", "a") as f :
+                        f.write([comb[0], comb[2], comb[8], comb[10], comb[11], comb[12], comb[13]])
+                    
+                elif strand=='-' :
+                    comb = [line13, line11].split('\t')
+                    with open("res_ce_all/ce_all_scan_intron.bed", "a") as f :
+                        f.write([comb[0], comb[2], comb[8], comb[10], comb[11], comb[12], comb[13]])
+                
+            ################## END SECTION WRITES NEW FILE res_ce_all/ce_all_scan_intron.bed
+            # Also copy for coverage calculations and avoid intronic_range calculations
+            with open("res_ce_all/ce_all_scan_range.bed", 'r') as infile, open("res_ce_all/ce_all_scan_unique_range.bed", 'a', newline='') as outfile:
+                csv_writer = csv.writer(outfile)
+                for line in infile:
+                    csv_writer.writerow(line)
         
 # CRYPTICS SECTION ENDS HERE
 
@@ -1373,303 +1396,303 @@ if arg1==4 or arg1==5 :
 # Step 3. Now calculate coverages for each ce-range from all TDP samples and aggregate them for each junction
 # Flag for step 3
 # FILES NEEDED FOR THIS STEP: res_ce_all/ce_all_scan_unique_range.bed, bam_files/*.bam, bam_beds/*.bed for all samples in bam_files folder
-# coverages_bed_files_create_flg = 0
+coverages_bed_files_create_flg = 0
 
-# if arg1==4 or arg1==5 :
-#     print("NOW STARTED COVERAGE CALCULATIONS, TAKES LONG TIME OFTEN HOURS/DAYS FOR > 200 EVENTS")
+if arg1==4 or arg1==5 :
+    print("NOW STARTED COVERAGE CALCULATIONS, TAKES LONG TIME OFTEN HOURS/DAYS FOR > 200 EVENTS")
     
-#     with open("res_ce_all/Summary_stats.txt", "a") as f :
-#         f.write("NOW STARTED COVERAGE CALCULATIONS, TAKES LONG TIME OFTEN HOURS/DAYS FOR > 200 EVENTS\n")
+    with open("res_ce_all/Summary_stats.txt", "a") as f :
+        f.write("NOW STARTED COVERAGE CALCULATIONS, TAKES LONG TIME OFTEN HOURS/DAYS FOR > 200 EVENTS\n")
     
-#     bamsamples_tdp = []
-#     with open("all_bams.tsv", 'r') as file:
-#         for line in file:
-#             columns = line.strip().split('\t')
-#             if len(columns) > 2 and re.search(r'TDP43', columns[2]) :
-#                 filename = columns[1]
-#                 basename = filename.split('/')[-1]
-#                 name_without_ext = basename.split('.')[0]
-#                 bamsamples_tdp.append(name_without_ext)
+    bamsamples_tdp = []
+    with open("all_bams.tsv", 'r') as file:
+        for line in file:
+            columns = line.strip().split('\t')
+            if len(columns) > 2 and re.search(r'TDP43', columns[2]) :
+                filename = columns[1]
+                basename = filename.split('/')[-1]
+                name_without_ext = basename.split('.')[0]
+                bamsamples_tdp.append(name_without_ext)
                 
-#                 if bamsamples_tdp :
-#                     os.makedirs("coverages",exist_ok=True)
-#                     i = 1 # Counter to use for calculations
-#                     last_genename = ""
+                if bamsamples_tdp :
+                    os.makedirs("coverages",exist_ok=True)
+                    i = 1 # Counter to use for calculations
+                    last_genename = ""
                     
-#                     with open('res_ce_all/ce_all_scan_intron.bed', 'r') as file : # col2 col3 col4 col5 col6 col7
-#                         for line in file:
-#                             line = line.rstrip('\n')
+                    with open('res_ce_all/ce_all_scan_intron.bed', 'r') as file : # col2 col3 col4 col5 col6 col7
+                        for line in file:
+                            line = line.rstrip('\n')
                             
-#                             # Now do calculations fot this ce across all replicates
-#                             # Invert the range if it is not already
-#                             genename = line[6]
+                            # Now do calculations fot this ce across all replicates
+                            # Invert the range if it is not already
+                            genename = line[6]
                             
-#                             if last_genename==genename :
-#                                 i = i + 1
-#                                 last_genename = genename
+                            if last_genename==genename :
+                                i = i + 1
+                                last_genename = genename
                                 
-#                             else :
-#                                 i = 1
-#                                 last_genename = genename
+                            else :
+                                i = 1
+                                last_genename = genename
                             
-#                             #########
-#                             chrm_n = line[0]
-#                             chrm_start = line[1]
-#                             chrm_end = line[2]
-#                             fnm_tdp = f"{chrm_n}_{chrm_start}_{chrm_end}_{genename}.cov.bed"
+                            #########
+                            chrm_n = line[0]
+                            chrm_start = line[1]
+                            chrm_end = line[2]
+                            fnm_tdp = f"{chrm_n}_{chrm_start}_{chrm_end}_{genename}.cov.bed"
                             
-#                             print(f"fnm_tdp {fnm_tdp}")
-#                             if chrm_start<chrm_end :
-#                                 comb = line.split('\t')
-#                                 with open("temp_coord.bed", "w") as f :
-#                                     f.write([comb[0], comb[1], comb[2], comb[3], comb[4], comb[5], comb[6]])
+                            print(f"fnm_tdp {fnm_tdp}")
+                            if chrm_start<chrm_end :
+                                comb = line.split('\t')
+                                with open("temp_coord.bed", "w") as f :
+                                    f.write([comb[0], comb[1], comb[2], comb[3], comb[4], comb[5], comb[6]])
                                 
-#                             else :
-#                                 comb = line.split('\t')
-#                                 with open("temp_coord.bed", "w") as f :
-#                                     f.write([comb[0], comb[2], comb[1], comb[3], comb[4], comb[5], comb[6]])
+                            else :
+                                comb = line.split('\t')
+                                with open("temp_coord.bed", "w") as f :
+                                    f.write([comb[0], comb[2], comb[1], comb[3], comb[4], comb[5], comb[6]])
                                 
-#                             # And now for TDP43
-#                             print("coverage calculations for tdp sampels for:")
-#                             with open("temp_coord.bed", 'r') as file :
-#                                 for line in file:
-#                                     print(line, end='')
+                            # And now for TDP43
+                            print("coverage calculations for tdp sampels for:")
+                            with open("temp_coord.bed", 'r') as file :
+                                for line in file:
+                                    print(line, end='')
                             
-#                             for bamsamp in bamsamples_tdp :
-#                                 a = pybedtools.BedTool("temp_coord.bed")
-#                                 b = pybedtools.BedTool(f"bam_beds/{bamsamp}-sorted.bam.bed")
-#                                 result = a.coverage(b, g=f"bam_beds/{bamsamp}.chromosomes.txt", d=True, sorted=True)
-#                                 result.saveas(f"temp_coord_{bamsamp}_tdp.bed.cov")
+                            for bamsamp in bamsamples_tdp :
+                                a = pybedtools.BedTool("temp_coord.bed")
+                                b = pybedtools.BedTool(f"bam_beds/{bamsamp}-sorted.bam.bed")
+                                result = a.coverage(b, g=f"bam_beds/{bamsamp}.chromosomes.txt", d=True, sorted=True)
+                                result.saveas(f"temp_coord_{bamsamp}_tdp.bed.cov")
                             
-#                             # Finally sum all coverages across replicates for this ce
-#                             samples1 = ""
+                            # Finally sum all coverages across replicates for this ce
+                            samples1 = ""
                             
-#                             for bamsamp1 in bamsamples_tdp :
-#                                 samples1 += f" temp_coord_{bamsamp1}_tdp.bed.cov"
+                            for bamsamp1 in bamsamples_tdp :
+                                samples1 += f" temp_coord_{bamsamp1}_tdp.bed.cov"
                             
-#                             print(f"got all coverage files for tdp {samples1}")
-#                             samples2 = samples1.split()
+                            print(f"got all coverage files for tdp {samples1}")
+                            samples2 = samples1.split()
                             
-#                             dfs = [pd.read_csv(file, sep='\t', header=None) for file in samples2]
-#                             combined_df = pd.concat(dfs, axis=1)
-#                             numFiles = len(samples2)
-#                             results = []
+                            dfs = [pd.read_csv(file, sep='\t', header=None) for file in samples2]
+                            combined_df = pd.concat(dfs, axis=1)
+                            numFiles = len(samples2)
+                            results = []
                             
-#                             for index, row in combined_df.iterrows() :
-#                                 row_data = row.iloc[:len(row) // numFiles]
-#                                 sum_value = row[len(row) // numFiles:].sum()
+                            for index, row in combined_df.iterrows() :
+                                row_data = row.iloc[:len(row) // numFiles]
+                                sum_value = row[len(row) // numFiles:].sum()
                                 
-#                                 result_line = '\t'.join(row_data.astype(str)) + '\t' + str(sum_value)
-#                                 results.append(result_line)
+                                result_line = '\t'.join(row_data.astype(str)) + '\t' + str(sum_value)
+                                results.append(result_line)
                             
-#                             with open(f"coverages/{fnm_tdp}", 'w') as f:
-#                                 f.write('\n'.join(results))
+                            with open(f"coverages/{fnm_tdp}", 'w') as f:
+                                f.write('\n'.join(results))
                             
-#                             # Also remove temp_coord_ for each sample done
-#                             for bamsamp in bamsamples_tdp :
-#                                 if os.path.exists(f"temp_coord_{bamsamp}_tdp.bed.cov"):
-#                                     os.remove(f"temp_coord_{bamsamp}_tdp.bed.cov")
+                            # Also remove temp_coord_ for each sample done
+                            for bamsamp in bamsamples_tdp :
+                                if os.path.exists(f"temp_coord_{bamsamp}_tdp.bed.cov"):
+                                    os.remove(f"temp_coord_{bamsamp}_tdp.bed.cov")
                                 
-#                 else :
-#                     print("I did not get any BAM files from all_bams.tsv (from column 2), Please make sure that col3 contains string TDP43 for KD samples, ESITING")
-#                     with open("res_ce_all/Summary_stats.txt", "a") as f :
-#                         f.write("I did not get any BAM files from all_bams.tsv (from column 2), Please make sure that col3 contains string TDP43 for KD samples, ESITING\n")
+                else :
+                    print("I did not get any BAM files from all_bams.tsv (from column 2), Please make sure that col3 contains string TDP43 for KD samples, ESITING")
+                    with open("res_ce_all/Summary_stats.txt", "a") as f :
+                        f.write("I did not get any BAM files from all_bams.tsv (from column 2), Please make sure that col3 contains string TDP43 for KD samples, ESITING\n")
                     
-#                     sys.exit(1)
+                    sys.exit(1)
                 
 
 
 
 
 
-# # CE IDENTIFICATION STARTS HERE
+# CE IDENTIFICATION STARTS HERE
 
-# # Step 4. using majiq_coverages_automateV1.R script identify final ce_extension_coord.bed and ce_extension_coord.bed files
-# fact = 3
+# Step 4. using majiq_coverages_automateV1.R script identify final ce_extension_coord.bed and ce_extension_coord.bed files
+fact = 3
 
-# with open(inpfile, 'r') as file:
-#     total_splicing_events = sum(1 for line in file)
+with open(inpfile, 'r') as file:
+    total_splicing_events = sum(1 for line in file)
 
-# unknow_events = 0
+unknow_events = 0
 
-# if os.path.exists("res_ce_all/Annotated_junctions.csv") :
-#     with open("res_ce_all/Annotated_junctions.csv", 'r') as file:
-#         unknow_events = sum(1 for line in file)
+if os.path.exists("res_ce_all/Annotated_junctions.csv") :
+    with open("res_ce_all/Annotated_junctions.csv", 'r') as file:
+        unknow_events = sum(1 for line in file)
     
-# not_found = 0
+not_found = 0
 
-# if os.path.exists("EnsDB_tx_not_found.csv") :
-#     with open("EnsDB_tx_not_found.csv", 'r') as file:
-#         not_found = sum(1 for line in file)
+if os.path.exists("EnsDB_tx_not_found.csv") :
+    with open("EnsDB_tx_not_found.csv", 'r') as file:
+        not_found = sum(1 for line in file)
 
-# problematic = 0
+problematic = 0
 
-# if os.path.exists("res_ce_all/IGV_problematic_junctions.csv") :
-#     with open("res_ce_all/IGV_problematic_junctions.csv", 'r') as file:
-#         problematic = sum(1 for line in file)
+if os.path.exists("res_ce_all/IGV_problematic_junctions.csv") :
+    with open("res_ce_all/IGV_problematic_junctions.csv", 'r') as file:
+        problematic = sum(1 for line in file)
         
-# unseccesful_r1 = 0
+unseccesful_r1 = 0
 
-# if os.path.exists("res_ce_all/skipped_ce.csv") :
-#     with open("res_ce_all/skipped_ce.csv", 'r') as file:
-#         unseccesful_r1 = sum(1 for line in file)
+if os.path.exists("res_ce_all/skipped_ce.csv") :
+    with open("res_ce_all/skipped_ce.csv", 'r') as file:
+        unseccesful_r1 = sum(1 for line in file)
 
-# unseccesful_r = unseccesful_r1/3
+unseccesful_r = unseccesful_r1/3
 
-# with open("res_ce_all/Summary_stats.txt", "a") as f :
-#     f.write(f"Total splicing events read are: {total_splicing_events}\n")
-#     f.write(f"Out of these {total_splicing_events} total events\n")
-#     f.write(f"Events not found in EnsDB are: {not_found}, please see EnsDB_tx_not_found.csv file\n")
-#     f.write(f"Events that are not CE: {unknow_events} , please see res_ce_all/non_ce_events.txt and res_ce_all/Annotated_junctions.csv file\n")
-#     f.write(f"Events that are somewhat problematic: {problematic} , please see res_ce_all/problematic_junctions.txt and res_ce_all/IGV_problematic_junctions.csv files\n")
+with open("res_ce_all/Summary_stats.txt", "a") as f :
+    f.write(f"Total splicing events read are: {total_splicing_events}\n")
+    f.write(f"Out of these {total_splicing_events} total events\n")
+    f.write(f"Events not found in EnsDB are: {not_found}, please see EnsDB_tx_not_found.csv file\n")
+    f.write(f"Events that are not CE: {unknow_events} , please see res_ce_all/non_ce_events.txt and res_ce_all/Annotated_junctions.csv file\n")
+    f.write(f"Events that are somewhat problematic: {problematic} , please see res_ce_all/problematic_junctions.txt and res_ce_all/IGV_problematic_junctions.csv files\n")
 
-# ce_boundary_events = total_splicing_events - not_found - unknow_events - problematic
+ce_boundary_events = total_splicing_events - not_found - unknow_events - problematic
 
-# with open("res_ce_all/Summary_stats.txt", "a") as f :
-#     f.write("#######################################\n")
-
-
+with open("res_ce_all/Summary_stats.txt", "a") as f :
+    f.write("#######################################\n")
 
 
 
 
-# if arg1==4 or arg1==5 :
-#     with open("res_ce_all/Summary_stats.txt", "a") as f :
-#         f.write(f"Now starting ce_boundary calculations for a remaining total of: {ce_boundary_events} events, BY INVOKING Auto_CoverV4_layered_intronV3.R SCRIPT\n")
+
+
+if arg1==4 or arg1==5 :
+    with open("res_ce_all/Summary_stats.txt", "a") as f :
+        f.write(f"Now starting ce_boundary calculations for a remaining total of: {ce_boundary_events} events, BY INVOKING Auto_CoverV4_layered_intronV3.R SCRIPT\n")
     
-#     print("IDENTIFYING CE BOUNDARIES BY CALLING Auto_CoverV4_layered_intronV3.R script")
+    print("IDENTIFYING CE BOUNDARIES BY CALLING Auto_CoverV4_layered_intronV3.R script")
     
-#     command = [
-#         "python",
-#         "Auto_CoverV4_layered_intronV3.py",
-#         "res_ce_all/IGV_ce_inclusion.csv",
-#         "res_ce_all/ce_all_scan_range_junctions.bed",
-#         ".6",
-#         "res_ce_all/ce_all_scan_intron.bed"
-#     ]
+    command = [
+        "python",
+        "Auto_CoverV4_layered_intronV3.py",
+        "res_ce_all/IGV_ce_inclusion.csv",
+        "res_ce_all/ce_all_scan_range_junctions.bed",
+        ".6",
+        "res_ce_all/ce_all_scan_intron.bed"
+    ]
 
-#     result = subprocess.run(command, capture_output=True, text=True)
-#     print(result.stdout)
+    result = subprocess.run(command, capture_output=True, text=True)
+    print(result.stdout)
     
-#     print("BACK FROM CE_BOUNDARY CALCULATIONS")
+    print("BACK FROM CE_BOUNDARY CALCULATIONS")
     
-#     with open("res_ce_all/Summary_stats.txt", "a") as f :
-#         f.write("################################################\n")
+    with open("res_ce_all/Summary_stats.txt", "a") as f :
+        f.write("################################################\n")
     
-#     # Step 4 ENDS
-#     # Step 5. Finally identify nt and AA sequences
-#     # Get nt and aa for ce boundaries
+    # Step 4 ENDS
+    # Step 5. Finally identify nt and AA sequences
+    # Get nt and aa for ce boundaries
     
-#     # First remove duplicates from ce' boundary coordinates
-# 	# NEW CODE STARTS HERE
-#     nrecrds = 0
-#     nrecrdst = 0
+    # First remove duplicates from ce' boundary coordinates
+	# NEW CODE STARTS HERE
+    nrecrds = 0
+    nrecrdst = 0
     
-#     if os.access("res_ce_all/ce_inclusion_coord.bed",os.F_OK) :
-#         with open("res_ce_all/ce_inclusion_coord.bed", 'r') as file:
-#             nrecrds = sum(1 for line in file)
-#         nrecrdst = nrecrds/3
+    if os.access("res_ce_all/ce_inclusion_coord.bed",os.F_OK) :
+        with open("res_ce_all/ce_inclusion_coord.bed", 'r') as file:
+            nrecrds = sum(1 for line in file)
+        nrecrdst = nrecrds/3
     
-#     if nrecrds!=0 :
-#         with open("res_ce_all/Summary_stats.txt", "a") as f :
-#             f.write(f"Back From R Session, Now checking FOR DUPLICATES for a total of ce_inclusion events: {nrecrdst}\n")
+    if nrecrds!=0 :
+        with open("res_ce_all/Summary_stats.txt", "a") as f :
+            f.write(f"Back From R Session, Now checking FOR DUPLICATES for a total of ce_inclusion events: {nrecrdst}\n")
         
-#         with open("res_ce_all/ce_inclusion_coord.bed", 'r') as file:
-#             all_data = [line.strip() for line in file]
+        with open("res_ce_all/ce_inclusion_coord.bed", 'r') as file:
+            all_data = [line.strip() for line in file]
         
-#         # Also read ce_inclusion_coord_sashimi.bed to get TxID
-#         with open("res_ce_all/ce_inclusion_coord_sashimi.bed", 'r') as file:
-#             sashimi_data = [line.strip() for line in file]
+        # Also read ce_inclusion_coord_sashimi.bed to get TxID
+        with open("res_ce_all/ce_inclusion_coord_sashimi.bed", 'r') as file:
+            sashimi_data = [line.strip() for line in file]
         
-#         # Also read csv file
-#         with open("res_ce_all/IGV_R_returned_ce_inclusion.csv", 'r') as file:
-#             csv_data = [line.strip() for line in file]
+        # Also read csv file
+        with open("res_ce_all/IGV_R_returned_ce_inclusion.csv", 'r') as file:
+            csv_data = [line.strip() for line in file]
         
-#         csvi = 0
-#         i = 0
+        csvi = 0
+        i = 0
         
-#         while i<nrecrds :
-#             line11 = all_data[i]
-#             line12 = all_data[i+1]
-#             line13 = all_data[i+2]
+        while i<nrecrds :
+            line11 = all_data[i]
+            line12 = all_data[i+1]
+            line13 = all_data[i+2]
             
-#             # TxID
-# 			# For sashimi
-#             lines1 = sashimi_data[i]
-#             lines2 = sashimi_data[i+1]
-#             lines3 = sashimi_data[i+2]
+            # TxID
+			# For sashimi
+            lines1 = sashimi_data[i]
+            lines2 = sashimi_data[i+1]
+            lines3 = sashimi_data[i+2]
             
-#             csv_ln = csv_data[csvi]
-#             csvi = csvi + 1
-#             i = i + 3
-#             j = i
+            csv_ln = csv_data[csvi]
+            csvi = csvi + 1
+            i = i + 3
+            j = i
             
-#             # Now go through rest of the data
-#             flg = 0
+            # Now go through rest of the data
+            flg = 0
             
-#             while j<nrecrds :
-#                 line21 = all_data[j]
-#                 line22 = all_data[j+1]
-#                 line23 = all_data[j+2]
+            while j<nrecrds :
+                line21 = all_data[j]
+                line22 = all_data[j+1]
+                line23 = all_data[j+2]
                 
-#                 if (line11==line21 and line12==line22 and line13==line23) :
-#                     flg = 1
+                if (line11==line21 and line12==line22 and line13==line23) :
+                    flg = 1
                 
-#                 j = j + 3
+                j = j + 3
                 
-#             if flg==0 :
-#                 comb11 = line11.split('\t')
-#                 comb12 = line12.split('\t')
-#                 comb13 = line13.split('\t')
+            if flg==0 :
+                comb11 = line11.split('\t')
+                comb12 = line12.split('\t')
+                comb13 = line13.split('\t')
                 
-#                 with open("res_ce_all/ce_inclusion_coord_uniq.bed", "a") as f :
-#                     f.write(f"{comb11[0]}, {comb11[1]}, {comb11[2]}, {comb11[3]}, {comb11[4]}, {comb11[5]}, {comb11[6]}\n")
-#                     f.write(f"{comb12[0]}, {comb12[1]}, {comb12[2]}, {comb12[3]}, {comb12[4]}, {comb12[5]}, {comb12[6]}\n")
-#                     f.write(f"{comb13[0]}, {comb13[1]}, {comb13[2]}, {comb13[3]}, {comb13[4]}, {comb13[5]}, {comb13[6]}\n")
+                with open("res_ce_all/ce_inclusion_coord_uniq.bed", "a") as f :
+                    f.write(f"{comb11[0]}, {comb11[1]}, {comb11[2]}, {comb11[3]}, {comb11[4]}, {comb11[5]}, {comb11[6]}\n")
+                    f.write(f"{comb12[0]}, {comb12[1]}, {comb12[2]}, {comb12[3]}, {comb12[4]}, {comb12[5]}, {comb12[6]}\n")
+                    f.write(f"{comb13[0]}, {comb13[1]}, {comb13[2]}, {comb13[3]}, {comb13[4]}, {comb13[5]}, {comb13[6]}\n")
                     
-#                 # Also save bed file for sashimi plots
-#                 comb1 = lines1.split('\t')
-#                 comb2 = lines2.split('\t')
-#                 comb3 = lines3.split('\t')
+                # Also save bed file for sashimi plots
+                comb1 = lines1.split('\t')
+                comb2 = lines2.split('\t')
+                comb3 = lines3.split('\t')
                 
-#                 with open("res_ce_all/ce_inclusion_coord_uniq_sashimi.bed", "a") as f :
-#                     f.write(f"{comb1[0]}, {comb1[1]}, {comb1[2]}, {comb1[3]}, {comb1[4]}, {comb1[5]}, {comb1[6]}, {comb1[7]}\n")
-#                     f.write(f"{comb2[0]}, {comb2[1]}, {comb2[2]}, {comb2[3]}, {comb2[4]}, {comb2[5]}, {comb2[6]}, {comb2[7]}\n")
+                with open("res_ce_all/ce_inclusion_coord_uniq_sashimi.bed", "a") as f :
+                    f.write(f"{comb1[0]}, {comb1[1]}, {comb1[2]}, {comb1[3]}, {comb1[4]}, {comb1[5]}, {comb1[6]}, {comb1[7]}\n")
+                    f.write(f"{comb2[0]}, {comb2[1]}, {comb2[2]}, {comb2[3]}, {comb2[4]}, {comb2[5]}, {comb2[6]}, {comb2[7]}\n")
                 
-#                 # Also SAVING CE coordinates
-#                 with open("res_ce_all/ce_inclusion_coord_only.bed", "a") as f :
-#                     f.write(f"{comb2[0]}, {comb2[1]}, {comb2[2]}, {comb2[2]-comb2[1]}, {comb2[4]}, {comb2[5]}, {comb2[6]}, {comb2[7]}\n")
+                # Also SAVING CE coordinates
+                with open("res_ce_all/ce_inclusion_coord_only.bed", "a") as f :
+                    f.write(f"{comb2[0]}, {comb2[1]}, {comb2[2]}, {comb2[2]-comb2[1]}, {comb2[4]}, {comb2[5]}, {comb2[6]}, {comb2[7]}\n")
                 
-#                 with open("res_ce_all/ce_inclusion_coord_uniq_sashimi.bed", "a") as f :
-#                     f.write(f"{comb3[0]}, {comb3[1]}, {comb3[2]}, {comb3[3]}, {comb3[4]}, {comb3[5]}, {comb3[6]}, {comb3[7]}\n")
+                with open("res_ce_all/ce_inclusion_coord_uniq_sashimi.bed", "a") as f :
+                    f.write(f"{comb3[0]}, {comb3[1]}, {comb3[2]}, {comb3[3]}, {comb3[4]}, {comb3[5]}, {comb3[6]}, {comb3[7]}\n")
                 
-#                 # Also save csv file
-#                 with open("res_ce_all/CE_inclusion.csv", "a", newline='') as f:
-#                     writer = csv.writer(f)
-#                     writer.writerow(csv_ln)
+                # Also save csv file
+                with open("res_ce_all/CE_inclusion.csv", "a", newline='') as f:
+                    writer = csv.writer(f)
+                    writer.writerow(csv_ln)
                 
-#             else :
-#                 with open("res_ce_all/ce_inclusion_coord_repeated.bed", "a") as f :
-#                     f.write(f"{comb11[0]}, {comb11[1]}, {comb11[2]}, {comb11[3]}, {comb11[4]}, {comb11[5]}, {comb11[6]}\n")
-#                     f.write(f"{comb12[0]}, {comb12[1]}, {comb12[2]}, {comb12[3]}, {comb12[4]}, {comb12[5]}, {comb12[6]}\n")
-#                     f.write(f"{comb13[0]}, {comb13[1]}, {comb13[2]}, {comb13[3]}, {comb13[4]}, {comb13[5]}, {comb13[6]}\n")
+            else :
+                with open("res_ce_all/ce_inclusion_coord_repeated.bed", "a") as f :
+                    f.write(f"{comb11[0]}, {comb11[1]}, {comb11[2]}, {comb11[3]}, {comb11[4]}, {comb11[5]}, {comb11[6]}\n")
+                    f.write(f"{comb12[0]}, {comb12[1]}, {comb12[2]}, {comb12[3]}, {comb12[4]}, {comb12[5]}, {comb12[6]}\n")
+                    f.write(f"{comb13[0]}, {comb13[1]}, {comb13[2]}, {comb13[3]}, {comb13[4]}, {comb13[5]}, {comb13[6]}\n")
                 
-#         with open("res_ce_all/ce_inclusion_coord_uniq.bed", 'r') as file:
-#             nrecrds_uniqt = sum(1 for line in file)
+        with open("res_ce_all/ce_inclusion_coord_uniq.bed", 'r') as file:
+            nrecrds_uniqt = sum(1 for line in file)
         
-#         nrecrds_uniq = nrecrds_uniqt/3
-#         repeated_ce_boundary_events = nrecrdst - nrecrds_uniq
+        nrecrds_uniq = nrecrds_uniqt/3
+        repeated_ce_boundary_events = nrecrdst - nrecrds_uniq
         
-#         with open("res_ce_all/Summary_stats.txt", "a") as f :
-#             f.write(f"Total unique ce_inclusion events are: {nrecrds_uniq}, please see res_ce_all/ce_inclusion_coord_uniq.bed and res_ce_all/CE_inclusion.csv\n")
-#             f.write(f"Total repeated ce_inclusion events are: {repeated_ce_boundary_events}, please see res_ce_all/ce_inclusion_coord_repeated.bed\n")
+        with open("res_ce_all/Summary_stats.txt", "a") as f :
+            f.write(f"Total unique ce_inclusion events are: {nrecrds_uniq}, please see res_ce_all/ce_inclusion_coord_uniq.bed and res_ce_all/CE_inclusion.csv\n")
+            f.write(f"Total repeated ce_inclusion events are: {repeated_ce_boundary_events}, please see res_ce_all/ce_inclusion_coord_repeated.bed\n")
         
-#         print(f"total repeated ce_inclusion events were {repeated_ce_boundary_events}")
+        print(f"total repeated ce_inclusion events were {repeated_ce_boundary_events}")
         
-#     else :
-#         with open("res_ce_all/Summary_stats.txt", "a") as f :
-#             f.write(f"Back From R Session, total ce_inclusion events: {nrecrdst}\n")
-        
+    else :
+        with open("res_ce_all/Summary_stats.txt", "a") as f :
+            f.write(f"Back From R Session, total ce_inclusion events: {nrecrdst}\n")
+
 
 
 
