@@ -716,171 +716,171 @@ if arg1==3 or arg1==5 :
 
 
 if arg1==4 or arg1==5 :
-#     if os.access(arg2,os.F_OK) :
-#         print(arg2)
-#         splicing_events_file = arg2.split('.')[0]
-#         print(splicing_events_file)
-#         selected_events = pd.read_csv(arg2, delimiter=',', header=None)
-#         sorted_selected_events = selected_events.sort_values(by=selected_events.columns[4])
-#         sorted_selected_events.to_csv("sorted_selected_events.csv", index=False, header=False)
+    if os.access(arg2,os.F_OK) :
+        print(arg2)
+        splicing_events_file = arg2.split('.')[0]
+        print(splicing_events_file)
+        selected_events = pd.read_csv(arg2, delimiter=',', header=None)
+        sorted_selected_events = selected_events.sort_values(by=selected_events.columns[4])
+        sorted_selected_events.to_csv("sorted_selected_events.csv", index=False, header=False)
         
-#     else :
-#         print("NO SPLICING_EVENTS csv file is provided, ABORTING!!!!")
-#         print("PLEASE PROVIDE SPLICING_EVENTS csv file  'bash pgp_0.sh flag splicing_events.csv' and RERUN")
-#         sys.exit(1)
+    else :
+        print("NO SPLICING_EVENTS csv file is provided, ABORTING!!!!")
+        print("PLEASE PROVIDE SPLICING_EVENTS csv file  'bash pgp_0.sh flag splicing_events.csv' and RERUN")
+        sys.exit(1)
         
-#     # EVENTS CSV FILE CLEANING STARTS HERE
-#     step00_flg = 1
+    # EVENTS CSV FILE CLEANING STARTS HERE
+    step00_flg = 1
     
-#     if step00_flg==1 :
-#         print("Now CLEANING INPUT FILE FOR DUPLICATES (EVENTS WITH SAME CHR#, START AND END) AND STAR > END OR START==END EVENTS- WILL TAKE AROUND 30 MINUTES")
-#         if os.path.exists("file_clean_report.txt"):
-#             os.remove("file_clean_report.txt")
+    if step00_flg==1 :
+        print("Now CLEANING INPUT FILE FOR DUPLICATES (EVENTS WITH SAME CHR#, START AND END) AND STAR > END OR START==END EVENTS- WILL TAKE AROUND 30 MINUTES")
+        if os.path.exists("file_clean_report.txt"):
+            os.remove("file_clean_report.txt")
         
-#         # Get total records
-#         with open(f"sorted_{splicing_events_file}.csv", 'r') as file :
-#             t_recrds = sum(1 for line in file)
+        # Get total records
+        with open(f"sorted_{splicing_events_file}.csv", 'r') as file :
+            t_recrds = sum(1 for line in file)
         
-#         with open("file_clean_report.txt", "a") as f :
-#             f.write(f"original file has {t_recrds} records")
+        with open("file_clean_report.txt", "a") as f :
+            f.write(f"original file has {t_recrds} records")
         
-#         # Delete if already exist
-#         if os.path.exists(f"clean_{splicing_events_file}.csv"):
-#             os.remove(f"clean_{splicing_events_file}.csv")
+        # Delete if already exist
+        if os.path.exists(f"clean_{splicing_events_file}.csv"):
+            os.remove(f"clean_{splicing_events_file}.csv")
         
-#         with open(f"sorted_{arg2}", 'r') as file:
-#             all_splicing_events = file.read().splitlines() # For saving gene_ids as well to generate sashimi compatible csv file
+        with open(f"sorted_{arg2}", 'r') as file:
+            all_splicing_events = file.read().splitlines() # For saving gene_ids as well to generate sashimi compatible csv file
 
-#         i = 0
-#         dups = 0
+        i = 0
+        dups = 0
         
-#         while i<t_recrds :
-#             line = all_splicing_events[i]
-#             chr = line.split(',')[0]
-#             start = line.split(',')[1]
-#             end = line.split(',')[2]
-#             gene_id = line.split(',')[5]
-#             lastline = i
-#             i = i + 1
+        while i<t_recrds :
+            line = all_splicing_events[i]
+            chr = line.split(',')[0]
+            start = line.split(',')[1]
+            end = line.split(',')[2]
+            gene_id = line.split(',')[5]
+            lastline = i
+            i = i + 1
             
-#             # Now go through each record
-#             j = i
+            # Now go through each record
+            j = i
             
-#             # Now go through rest of the data
-#             flg = 0
+            # Now go through rest of the data
+            flg = 0
             
-#             while j<t_recrds :
-#                 nextline = j + 1
-#                 nline = all_splicing_events[j]
-#                 nchr = nline.split(',')[0]
-#                 nstart = nline.split(',')[1]
-#                 nend = nline.split(',')[2]
-#                 ngene_id = nline.split(',')[5]
+            while j<t_recrds :
+                nextline = j + 1
+                nline = all_splicing_events[j]
+                nchr = nline.split(',')[0]
+                nstart = nline.split(',')[1]
+                nend = nline.split(',')[2]
+                ngene_id = nline.split(',')[5]
                 
-#                 if (chr==nchr and start==nstart and end==nend and gene_id==ngene_id) :
-#                     with open("file_clean_report.txt", "a") as f :
-#                         f.write(f"Line {i} - {line} - has same start: {start} and end: {end} as line {nextline} - {nline} -, so ignoring\n")
+                if (chr==nchr and start==nstart and end==nend and gene_id==ngene_id) :
+                    with open("file_clean_report.txt", "a") as f :
+                        f.write(f"Line {i} - {line} - has same start: {start} and end: {end} as line {nextline} - {nline} -, so ignoring\n")
                     
-#                     dups = dups + 1
-#                     flg = 1
+                    dups = dups + 1
+                    flg = 1
                     
-#                 j = j + 1
+                j = j + 1
                 
-#             if (flg==0 and start<end) :
-#                 # ALSO CHECK IF START < END
-#                 if start<end :
-#                     with open(f"clean_{splicing_events_file}.csv", "a") as f :
-#                         f.write(f"{line}\n")
+            if (flg==0 and start<end) :
+                # ALSO CHECK IF START < END
+                if start<end :
+                    with open(f"clean_{splicing_events_file}.csv", "a") as f :
+                        f.write(f"{line}\n")
                     
-#                 else :
-#                     with open("file_clean_report.txt", "a") as f :
-#                         f.write(f"Line {i} has problem with start: {start} and end: {end}")
+                else :
+                    with open("file_clean_report.txt", "a") as f :
+                        f.write(f"Line {i} has problem with start: {start} and end: {end}")
                     
-#                     dups = dups + 1
+                    dups = dups + 1
                     
-#         with open(f"clean_{splicing_events_file}.csv", 'r') as file :
-#             c_records = sum(1 for line in file)
+        with open(f"clean_{splicing_events_file}.csv", 'r') as file :
+            c_records = sum(1 for line in file)
         
-#         print(" ")
-#         print(" ")
-#         print("DONE WITH CLEANING EVENTS FILE")
+        print(" ")
+        print(" ")
+        print("DONE WITH CLEANING EVENTS FILE")
         
-#         with open("file_clean_report.txt", "a") as f :
-#             f.write(f"CLEANED FILE clean_{splicing_events_file}.csv HAS {c_records} RECORDS\n")
+        with open("file_clean_report.txt", "a") as f :
+            f.write(f"CLEANED FILE clean_{splicing_events_file}.csv HAS {c_records} RECORDS\n")
         
-#         print(f"PLEASE CHECK file_clean_report.txt FILE FOR CLEANING PROCESSES AND clean_{splicing_events_file}.csv FOR RESULTING CLEAN FILE")
+        print(f"PLEASE CHECK file_clean_report.txt FILE FOR CLEANING PROCESSES AND clean_{splicing_events_file}.csv FOR RESULTING CLEAN FILE")
         
-#         # Also add this information to Summart_stats.txt
-#         with open("Summary_stats.txt", "a") as f :
-#             f.write("******** START CLEANING REPORT ********\n")
-#             f.write(f"ORIGINAL FILE HAS:  {t_recrds} RECORDS\n")
-#             f.write(f"AFTER CLEANING, (REMOVING DUPLICATES (EVENTS WITH SAME CHR#, START AND END) AND STAR > END OR START==END EVENTS), FOUND {dups} events (Please see file_clean_report.txt file)\n")
-#             f.write(f"Finally CLEANED FILE clean_{splicing_events_file}.csv HAS {c_records} RECORDS for further processing\n")
-#             f.write("******** END CLEANING REPORT ********\n")
+        # Also add this information to Summart_stats.txt
+        with open("Summary_stats.txt", "a") as f :
+            f.write("******** START CLEANING REPORT ********\n")
+            f.write(f"ORIGINAL FILE HAS:  {t_recrds} RECORDS\n")
+            f.write(f"AFTER CLEANING, (REMOVING DUPLICATES (EVENTS WITH SAME CHR#, START AND END) AND STAR > END OR START==END EVENTS), FOUND {dups} events (Please see file_clean_report.txt file)\n")
+            f.write(f"Finally CLEANED FILE clean_{splicing_events_file}.csv HAS {c_records} RECORDS for further processing\n")
+            f.write("******** END CLEANING REPORT ********\n")
         
-# # Step 2. Generate intronic_range and ce__all_scan_range_junctions.bed and ce_all_scan_range.bed files
-# if arg1==4 or arg1==5 :
-#     with open("Summary_stats.txt", "a") as f :
-#         f.write("############### NOW STARTING EVENTS TYPE IDENTIFICATION, PLEASE MAKE SURE THAT bed files for all bams are present in bam_beds #########\n")
+# Step 2. Generate intronic_range and ce__all_scan_range_junctions.bed and ce_all_scan_range.bed files
+if arg1==4 or arg1==5 :
+    with open("Summary_stats.txt", "a") as f :
+        f.write("############### NOW STARTING EVENTS TYPE IDENTIFICATION, PLEASE MAKE SURE THAT bed files for all bams are present in bam_beds #########\n")
     
-#     if arg1==5 :
-#         if os.path.isfile(f"clean_{splicing_events_file}.csv") :
-#             inpfile = f"clean_{splicing_events_file}.csv"
+    if arg1==5 :
+        if os.path.isfile(f"clean_{splicing_events_file}.csv") :
+            inpfile = f"clean_{splicing_events_file}.csv"
         
-#         else :
-#             print(f"FOUND EMPTY clean_{splicing_events_file}.csv SPLICING EVENTS FILE, PLEAES FIX THE PROBLEM AND RERUN")
-#             with open("Summary_stats.txt", "a") as f :
-#                 f.write(f"FOUND EMPTY clean_{splicing_events_file}.csv SPLICING EVENTS FILE, PLEAES FIX THE PROBLEM AND RERUN\n")
+        else :
+            print(f"FOUND EMPTY clean_{splicing_events_file}.csv SPLICING EVENTS FILE, PLEAES FIX THE PROBLEM AND RERUN")
+            with open("Summary_stats.txt", "a") as f :
+                f.write(f"FOUND EMPTY clean_{splicing_events_file}.csv SPLICING EVENTS FILE, PLEAES FIX THE PROBLEM AND RERUN\n")
             
-#             print("EXITING NOW")
+            print("EXITING NOW")
             
-#     else :
-#         inpfile = f"clean_{splicing_events_file}.csv"
+    else :
+        inpfile = f"clean_{splicing_events_file}.csv"
         
-#     # Flag to run this section
-#     cryptics_flg = 1
+    # Flag to run this section
+    cryptics_flg = 1
     
-#     if cryptics_flg==1 :
-#         with open("Summary_stats.txt", "a") as f :
-#             f.write("############### NOW STARTING CE IDENTIFICATION #########\n")
+    if cryptics_flg==1 :
+        with open("Summary_stats.txt", "a") as f :
+            f.write("############### NOW STARTING CE IDENTIFICATION #########\n")
         
-#         print("############### NOW STARTING CE IDENTIFICATION #########")
+        print("############### NOW STARTING CE IDENTIFICATION #########")
         
-#         os.makedirs("res_ce_all",exist_ok=True)
-#         os.makedirs("event_bedfiles",exist_ok=True)
+        os.makedirs("res_ce_all",exist_ok=True)
+        os.makedirs("event_bedfiles",exist_ok=True)
         
-#         if os.access("events_to_tx_mapping_valid.csv",os.F_OK):
-#             os.remove("events_to_tx_mapping_valid.csv")
+        if os.access("events_to_tx_mapping_valid.csv",os.F_OK):
+            os.remove("events_to_tx_mapping_valid.csv")
         
-#         if os.access("events_tx_mapping_invalid.csv",os.F_OK):
-#             os.remove("events_tx_mapping_invalid.csv")
+        if os.access("events_tx_mapping_invalid.csv",os.F_OK):
+            os.remove("events_tx_mapping_invalid.csv")
         
-#         ######## IR SECTION
-# 		###### END IR SECTION
+        ######## IR SECTION
+		###### END IR SECTION
         
-#         print("CLEARING UP res_ce_all folder from previous run if any. SASHIMI FOLDERS WILL ONLY BE DELETED BEFORE CREATING NEW SASHIMI PLOTS.")
-#         with open("Summary_stats.txt", "a") as f :
-#             f.write("CLEARING UP res_ce_all folder from previous run if any. SASHIMI FOLDERS WILL ONLY BE DELETED BEFORE CREATING NEW SASHIMI PLOTS.\n")
+        print("CLEARING UP res_ce_all folder from previous run if any. SASHIMI FOLDERS WILL ONLY BE DELETED BEFORE CREATING NEW SASHIMI PLOTS.")
+        with open("Summary_stats.txt", "a") as f :
+            f.write("CLEARING UP res_ce_all folder from previous run if any. SASHIMI FOLDERS WILL ONLY BE DELETED BEFORE CREATING NEW SASHIMI PLOTS.\n")
         
-#         if len(os.listdir("res_ce_all/"))!=0 :
-#             for f in glob.glob("res_ce_all/*.*") :
-#                 os.remove(f)
+        if len(os.listdir("res_ce_all/"))!=0 :
+            for f in glob.glob("res_ce_all/*.*") :
+                os.remove(f)
         
-#         destination_path = os.path.join("res_ce_all", "Summary_stats.txt")
-#         shutil.move("Summary_stats.txt", destination_path)
+        destination_path = os.path.join("res_ce_all", "Summary_stats.txt")
+        shutil.move("Summary_stats.txt", destination_path)
         
-#         events_bed_create_flg = 1
+        events_bed_create_flg = 1
         
-#         if events_bed_create_flg==1 :
-#             if len(os.listdir("event_bedfiles/"))!=0 :
-#                 for f in glob.glob("event_bedfiles/*.*") :
-#                     os.remove(f)
+        if events_bed_create_flg==1 :
+            if len(os.listdir("event_bedfiles/"))!=0 :
+                for f in glob.glob("event_bedfiles/*.*") :
+                    os.remove(f)
             
-#             if os.access("EnsDB_tx_not_found.csv",os.F_OK):
-#                 os.remove("EnsDB_tx_not_found.csv")
+            if os.access("EnsDB_tx_not_found.csv",os.F_OK):
+                os.remove("EnsDB_tx_not_found.csv")
             
-#             with open("res_ce_all/Summary_stats.txt", "a") as f :
-#                 f.write("CALLING TxEnsDB103_layeredV6.R to generate bed files\n")
+            with open("res_ce_all/Summary_stats.txt", "a") as f :
+                f.write("CALLING TxEnsDB103_layeredV6.R to generate bed files\n")
 
             # gtf_file = "gencode.v38.annotation.gtf"
             
@@ -899,7 +899,7 @@ if arg1==4 or arg1==5 :
             # else:
             #     edb = gffutils.FeatureDB(edb_file, keep_order=True)
 
-            # print("CALLING TxEnsDB103_layeredV6.R to generate bed files")
+            print("CALLING TxEnsDB103_layeredV6.R to generate bed files")
             
             # command = [
             #     "python",
