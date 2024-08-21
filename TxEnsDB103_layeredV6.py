@@ -20,6 +20,8 @@ import genomicranges as gr
 import pandas as pd
 from concurrent.futures import ThreadPoolExecutor
 import gffutils
+import os
+import subprocess
 
 # Also load gtf file fron V86
 # Get object of EnsDBV99
@@ -39,137 +41,34 @@ edb = gffutils.FeatureDB(edb_file, keep_order=True)
 
 
 
+gtf_file = "Homo_sapiens.GRCh38.103.chr.sorted_new.gtf"
 
+r_command = f"""
+library(AnnotationHub)
+library(GenomicFeatures)
+library(ensembldb)
 
-def calculate_transcript_lengths_with_utrs(edb):
-    transcripts = edb.features_of_type('transcript')
-    
-    transcript_lengths = []
-    for transcript in transcripts:
-        length = transcript.end - transcript.start + 1
-        
-        # Get UTRs for the current transcript
-        utr5_length = 0
-        utr3_length = 0
-        for feature in edb.children(transcript.id, featuretype=('five_prime_UTR', 'three_prime_UTR')):
-            if feature.featuretype == 'five_prime_UTR':
-                utr5_length += feature.end - feature.start + 1
-            elif feature.featuretype == 'three_prime_UTR':
-                utr3_length += feature.end - feature.start + 1
-        
-        transcript_lengths.append({
-            'transcript_id': transcript.id,
-            'length': length,
-            'utr5_length': utr5_length,
-            'utr3_length': utr3_length
-        })
-    
-    return pd.DataFrame(transcript_lengths)
+ah <- AnnotationHub()
+edb <- ensembldb::EnsDb('{gtf_file}')
 
-# Calculate transcript lengths including UTRs
-tx_lens = calculate_transcript_lengths_with_utrs(edb)
-print(tx_lens.head())
+tx_lens <- transcriptLengths(edb, with.utr5_len = TRUE, with.utr3_len = TRUE)
+
+write.csv(tx_lens, 'transcript_lengths.csv', row.names = FALSE)
+"""
+
+process = subprocess.run(["Rscript", "-e", r_command], capture_output=True, text=True)
+print(process.stdout)
+print(process.stderr)
+
+if os.path.exists("transcript_lengths.csv"):
+    tx_lens_df = pd.read_csv("transcript_lengths.csv")
+    print(tx_lens_df.head())
+else:
+    print("transcript_lengths.csv not found")
 
 
 
 
-
-# def check_transcript_annotations(file_path):
-#     try:
-#         df = pd.read_csv(file_path, sep=r'\s+', comment='#', header=None,
-#                          names=['seqname', 'source', 'feature', 'start', 'end', 'score', 'strand', 'frame', 'attribute'],
-#                          dtype=str, low_memory=False, on_bad_lines='skip', encoding='utf-8')
-#     except UnicodeDecodeError:
-#         df = pd.read_csv(file_path, sep=r'\s+', comment='#', header=None,
-#                          names=['seqname', 'source', 'feature', 'start', 'end', 'score', 'strand', 'frame', 'attribute'],
-#                          dtype=str, low_memory=False, on_bad_lines='skip', encoding='ISO-8859-1')
-
-#     print(df.head())
-#     print(df.dtypes)
-
-#     transcripts = df[df['feature'] == 'transcript']
-#     utrs = df[df['feature'] == 'UTR']
-#     cds = df[df['feature'] == 'CDS']
-
-#     transcript_ids = set(transcripts['attribute'].str.extract('ID=([^;]+)')[0].unique())
-#     utr_ids = set(utrs['attribute'].str.extract('transcript_id=([^;]+)')[0].unique())
-#     cds_ids = set(cds['attribute'].str.extract('transcript_id=([^;]+)')[0].unique())
-
-#     missing_utr = transcript_ids - utr_ids
-#     missing_cds = transcript_ids - cds_ids
-
-#     print(f"Nombre total de transcrits : {len(transcript_ids)}")
-#     print(f"Nombre de transcrits sans UTRs : {len(missing_utr)}")
-#     print(f"Nombre de transcrits sans CDS : {len(missing_cds)}")
-
-#     print("\nTranscrits sans UTRs :")
-#     print(missing_utr)
-
-#     print("\nTranscrits sans CDS :")
-#     print(missing_cds)
-
-# if __name__ == "__main__":
-#     args = sys.argv[1:]
-#     edb_file = sys.argv[4]
-#     edb = gffutils.FeatureDB(edb_file, keep_order=True)
-#     check_transcript_annotations(edb_file)
-
-
-
-
-
-
-# # Also get Tx lengths to remove 5'utr
-
-# def transcript_lengths(db):
-#     transcript_lengths = {}
-    
-#     for transcript in db.features_of_type('transcript', order_by='start') :
-#         exons = list(db.children(transcript, featuretype='exon', order_by='start'))
-#         utrs = list(db.children(transcript, featuretype='UTR', order_by='start'))
-#         cds = list(db.children(transcript, featuretype='CDS', order_by='start'))
-        
-#         print("############ test 1 ############\n")
-#         print("exons : ",exons)
-#         print("utrs : ",utrs)
-#         print("cds : ",cds)
-
-#         utr5s = [utr for utr in utrs if utr.end < cds[0].start] if cds else []
-#         utr3s = [utr for utr in utrs if utr.start > cds[-1].end] if cds else []
-        
-#         print("############ test 2 ############\n")
-#         print("utr5s : ",utr5s)
-#         print("utr3s : ",utr3s)
-        
-#         print("############ test 3 ############\n")
-#         for utr in utrs[:5] :
-#             print("utr.start : ",utr.start)
-#             print("utr.end : ",utr.end)
-#             print("cds[0].start : ",cds[0].start)
-#             print("cds[-1].end : ",cds[-1].end)
-        
-#         exon_length = sum([exon.end - exon.start + 1 for exon in exons])
-#         utr5_length = sum([utr.end - utr.start + 1 for utr in utr5s])
-#         utr3_length = sum([utr.end - utr.start + 1 for utr in utr3s])
-        
-#         total_length = exon_length + utr5_length + utr3_length
-        
-#         transcript_lengths[transcript.id] = {
-#             'exon_length': exon_length,
-#             'utr5_length': utr5_length,
-#             'utr3_length': utr3_length,
-#             'total_length': total_length
-#         }
-    
-#     return transcript_lengths
-
-# tx_lengths = transcript_lengths(edb)
-
-# ########################################
-# # Afficher quelques exemples
-# for tx_id, lengths in list(tx_lengths.items())[:5]:
-#     print(f"Transcript: {tx_id}, Exon length: {lengths['exon_length']}, UTR5 length: {lengths['utr5_length']}, UTR3 length: {lengths['utr3_length']}, Total length: {lengths['total_length']}")
-# ########################################
 
 # GeneIDField = 6
 
@@ -330,8 +229,8 @@ print(tx_lens.head())
 #                 Tx_name = Tx_list.loc[Tx_list['V2'].str.contains(genes_data.iloc['gene_id']), 'V1'].values
                 
 #         if ("Tx_name" in globals() and len(Tx_name)>0):                   
-#             filtered_transcripts = [edb.transcript_by_id(tx_id) for tx_id in Tx_name if edb.transcript_by_id(tx_id) is not None]
-#             tl1 = {transcript.id: len(transcript.sequence) for transcript in filtered_transcripts if transcript.sequence}
+            # filtered_transcripts = [edb.transcript_by_id(tx_id) for tx_id in Tx_name if edb.transcript_by_id(tx_id) is not None]
+            # tl1 = {transcript.id: len(transcript.sequence) for transcript in filtered_transcripts if transcript.sequence}
 #             # Make sure that we have transcript in EnsDB
             
 #             if len(tl1)>0 :
@@ -358,6 +257,13 @@ print(tx_lens.head())
 #                     Tx_str = 'iPSC'
 #                     Tx_flg = 1
         
-#         if (Tx_flg==0 and len(pd.merge(appr_anno, genes_data, left_on='V2', right_on='gene_id')['V3']))
+        # if (Tx_flg==0 and len(pd.merge(appr_anno, genes_data, left_on='V2', right_on='gene_id')['V3'])>0) :
+        #     Tx_name = appr_anno.loc[genes_data["gene_id"].isin(appr_anno["V2"]), "V3"].tolist()
+
+        #     filtered_transcripts = [edb.transcript_by_id(tx_id) for tx_id in Tx_name if edb.transcript_by_id(tx_id) is not None]
+        #     tltt = {transcript.id: len(transcript.sequence) for transcript in filtered_transcripts if transcript.sequence}
+
+        #     # As APPRIS has multiple P1 Txs for some genes (like RALYL), make sure that the one with maximum exons and highest Tx length (in bp) is selected
+
 
 ########## FIN TxEnsDB103_layeredV6.R code en Pyhton ##########
