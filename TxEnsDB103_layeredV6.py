@@ -49,7 +49,7 @@ library(GenomicFeatures)
 library(ensembldb)
 
 ah <- AnnotationHub()
-edb <- ensembldb::EnsDb('{gtf_file}')
+edb <- ensembldb::EnsDb('{edb_file}')
 
 tx_lens <- transcriptLengths(edb, with.utr5_len = TRUE, with.utr3_len = TRUE)
 
