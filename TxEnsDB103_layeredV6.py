@@ -41,17 +41,35 @@ edb = gffutils.FeatureDB(edb_file, keep_order=True)
 
 
 
-def check_transcript_annotations(file_path):
-    try:
-        df = pd.read_csv(file_path, sep=r'\s+', comment='#', header=None, 
-                         names=['seqname', 'source', 'feature', 'start', 'end', 'score', 'strand', 'frame', 'attribute'],
-                         dtype=str, low_memory=False, on_bad_lines='skip', encoding='utf-8')
-        print(df.head())
-        print(df.dtypes)
-    except Exception as e:
-        print(f"Erreur lors de la lecture du fichier : {e}")
+def calculate_transcript_lengths_with_utrs(edb):
+    transcripts = edb.features_of_type('transcript')
+    
+    transcript_lengths = []
+    for transcript in transcripts:
+        length = transcript.end - transcript.start + 1
+        
+        # Get UTRs for the current transcript
+        utr5_length = 0
+        utr3_length = 0
+        for feature in edb.children(transcript.id, featuretype=('five_prime_UTR', 'three_prime_UTR')):
+            if feature.featuretype == 'five_prime_UTR':
+                utr5_length += feature.end - feature.start + 1
+            elif feature.featuretype == 'three_prime_UTR':
+                utr3_length += feature.end - feature.start + 1
+        
+        transcript_lengths.append({
+            'transcript_id': transcript.id,
+            'length': length,
+            'utr5_length': utr5_length,
+            'utr3_length': utr3_length
+        })
+    
+    return pd.DataFrame(transcript_lengths)
 
-check_transcript_annotations(edb_file)
+# Calculate transcript lengths including UTRs
+tx_lens = calculate_transcript_lengths_with_utrs(edb)
+print(tx_lens.head())
+
 
 
 
