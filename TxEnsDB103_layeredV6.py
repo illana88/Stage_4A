@@ -51,7 +51,6 @@ appr_anno1.columns = ['V1', 'V2', 'V3', 'V4', 'V5']
 
 # Select only PRINCIPAL.1 ISOFORMS
 appr_anno = appr_anno1[appr_anno1['V5'].str.contains("PRINCIPAL:1")] #APPRIS has multiple P1 Tx for a gene- e.g RALYL
-print("appr_anno : ", appr_anno)
 
 if os.access("all_tx_events.csv",os.F_OK):
     # Delete file if it exists
@@ -73,7 +72,7 @@ with open(args[2],"a") as fichier :
     fichier.write('                                 \n')
     fichier.write(f"Starting From TxEnsDB103_layeredV6.R: --------------- Processing file: {args[0]} with: {SpliceData.shape[0]} events to generate each event .bed files in event_bedfiles/ folder: \n")
 
-print("Started Generating BED files for Splicing Events in folder event_bedfiles/ from File: {args[0]}")
+print(f"Started Generating BED files for Splicing Events in folder event_bedfiles/ from File: {args[0]}")
 
 trackj = 1
 temp_gene = ""
@@ -89,8 +88,6 @@ df_notfound = pd.DataFrame({
     'junc_type': pd.Series(dtype='str')
 })
 
-print("df_notfound : ", df_notfound)
-
 df_zeroutr = pd.DataFrame({
     'seqnames': pd.Series(dtype='str'),
     'start': pd.Series(dtype='int'),
@@ -99,8 +96,6 @@ df_zeroutr = pd.DataFrame({
     'genename': pd.Series(dtype='str'),
     'junc_type': pd.Series(dtype='str')
 })
-
-print("df_zeroutr : ", df_zeroutr)
 
 repeated_entries = 0
 iPSC_events = 0
@@ -114,45 +109,39 @@ probable_noise_events = 0
 probable_noncoding_events = 0
 utr5_events = 0
 
-# # Get gene name and gene_id (from granges filter) using event coordinates
-# def filter_genes_for_row(i):
-#     chromosome = SpliceData.iloc[i, 0]
-#     start = SpliceData.iloc[i, 1]
-#     end = SpliceData.iloc[i, 2]
-#     strand = SpliceData.iloc[i, 3]
+print("################################################################")
 
-#     gr_range = gr.GRanges(
-#         seqnames=[chromosome],
-#         ranges=[(start, end)],
-#         strand=[strand]
-#     )
+# Get gene name and gene_id (from granges filter) using event coordinates
+import genomicranges as gr
+from concurrent.futures import ThreadPoolExecutor
 
-#     genes = list(edb.features_of_type('gene'))
-#     genes_data = {
-#         'seqnames': [gene.chrom for gene in genes],
-#         'ranges': [(gene.start, gene.end) for gene in genes],
-#         'strand': [gene.strand for gene in genes]
-#     }
+def filter_genes_for_row(i):
+    chromosome = SpliceData.iloc[i, 0][3:]
+    start = SpliceData.iloc[i, 1]
+    end = SpliceData.iloc[i, 2]
+    strand = SpliceData.iloc[i, 3]
 
-#     gr_genes = gr.GRanges(
-#         seqnames=genes_data['seqnames'],
-#         ranges=genes_data['ranges'],
-#         strand=genes_data['strand']
-#     )
+    gr_range = gr.GRanges(
+        seqnames=[chromosome],
+        ranges=[(start, end)],
+        strand=[strand]
+    )
 
-#     filtered_genes = gr_range.intersect(gr_genes, which="any")
+    filtered_genes = edb.features_of_type(
+        feature_type="gene",
+        granges=gr_range
+    )
 
-#     return filtered_genes
+    return filtered_genes
 
-
-# def parallel_filter_transcripts():
-#     with ThreadPoolExecutor() as executor:
-#         futures = [executor.submit(filter_genes_for_row, i) for i in range(len(SpliceData))]
-#         results = [future.result() for future in futures]
+def parallel_filter_transcripts():
+    with ThreadPoolExecutor() as executor:
+        futures = [executor.submit(filter_genes_for_row, i) for i in range(len(SpliceData))]
+        results = [future.result() for future in futures]
     
-#     return results
+    return results
 
-# gn = parallel_filter_transcripts()
+gn = parallel_filter_transcripts()
 
 # for i in range(SpliceData.shape[0]) :
 #     # Step 0 - get transcripts for each gene (MAJIQ only reports for some)
