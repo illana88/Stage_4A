@@ -36,39 +36,33 @@ import subprocess
 
 # Read bed file from MAJIQ
 args = sys.argv[1:]
-edb_file = sys.argv[4]
-edb = gffutils.FeatureDB(edb_file, keep_order=True)
 
+import sqlite3
 
+conn = sqlite3.connect('local_edb.sqlite')
 
-gtf_file = "Homo_sapiens.GRCh38.103.chr.sorted_new.gtf"
+edb = pd.read_sql_query("SELECT * FROM transcripts", conn)
+print(edb.head())
+
 
 r_command = f"""
-library(AnnotationHub)
-library(GenomicFeatures)
 library(ensembldb)
 
-ah <- AnnotationHub()
-edb <- ensembldb::EnsDb('{edb_file}')
-
-tx_lens <- transcriptLengths(edb, with.utr5_len = TRUE, with.utr3_len = TRUE)
-
-write.csv(tx_lens, 'transcript_lengths.csv', row.names = FALSE)
+edb <- loadDb("local_edb.sqlite")
+tx_lens = transcriptLengths(edb,with.utr5_len = TRUE,with.utr3_len = TRUE)
+write.csv(tx_lens, "transcript_lengths.csv", row.names = FALSE)
 """
 
 process = subprocess.run(["Rscript", "-e", r_command], capture_output=True, text=True)
 print(process.stdout)
 print(process.stderr)
 
-if os.path.exists("transcript_lengths.csv"):
-    tx_lens_df = pd.read_csv("transcript_lengths.csv")
-    print(tx_lens_df.head())
-else:
-    print("transcript_lengths.csv not found")
+tx_lens = pd.read_csv("transcript_lengths.csv")
+print(tx_lens.head())
 
 
 
-
+conn.close()
 
 # GeneIDField = 6
 
