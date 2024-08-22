@@ -899,10 +899,8 @@ if arg1==4 or arg1==5 :
             # else:
             #     edb = gffutils.FeatureDB(edb_file, keep_order=True)
 
-            import rpy2.robjects as ro
-            from rpy2.rinterface_lib import ri2py
 
-            r_code = """
+            r_command = """
             library(AnnotationHub)
             library(ensembldb)
 
@@ -918,18 +916,10 @@ if arg1==4 or arg1==5 :
             }
             """
 
-            ro.r(r_code)
 
-            import os
-            if os.path.exists("local_edb.sqlite"):
-                print("La base de données EnsDb a été sauvegardée avec succès dans 'local_edb.sqlite'.")
-            else:
-                print("Erreur : Le fichier SQLite n'a pas été créé.")
-
-
-            # process = subprocess.run(["Rscript", "-e", r_command], capture_output=True, text=True)
-            # print(process.stdout)
-            # print(process.stderr)
+            process = subprocess.run(["Rscript", "-e", r_command], capture_output=True, text=True)
+            print(process.stdout)
+            print(process.stderr)
 
             print("CALLING TxEnsDB103_layeredV6.R to generate bed files")
             
