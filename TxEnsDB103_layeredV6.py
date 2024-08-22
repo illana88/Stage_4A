@@ -22,6 +22,7 @@ import gffutils
 import os
 import subprocess
 import sqlite3
+import rpy2.robjects as ro
 
 # Also load gtf file fron V86
 # Get object of EnsDBV99
@@ -111,37 +112,30 @@ utr5_events = 0
 
 print("################################################################")
 
-# Get gene name and gene_id (from granges filter) using event coordinates
-import genomicranges as gr
-from concurrent.futures import ThreadPoolExecutor
+r_code = """
+        library(parallel)
+        library(GenomicRanges)
+        library(ensembldb)
 
-def filter_genes_for_row(i):
-    chromosome = SpliceData.iloc[i, 0][3:]
-    start = SpliceData.iloc[i, 1]
-    end = SpliceData.iloc[i, 2]
-    strand = SpliceData.iloc[i, 3]
+        filter_genes_for_row <- function(i) {
+        grf <- GRangesFilter(GRanges(
+            seqnames = substr(SpliceData[i, 1], 4, nchar(as.character(SpliceData[i, 1]))),
+            ranges = IRanges(SpliceData[i, 2], SpliceData[i, 3]),
+            strand = SpliceData[i, 4]
+        ), type = "any")
+        
+        gn <- genes(edb, filter = grf)
+        return(gn)
+        }
 
-    gr_range = gr.GRanges(
-        seqnames=[chromosome],
-        ranges=[(start, end)],
-        strand=[strand]
-    )
+        num_cores <- detectCores()
 
-    filtered_genes = edb.features_of_type(
-        feature_type="gene",
-        granges=gr_range
-    )
+        gn_list <- mclapply(1:nrow(SpliceData), filter_genes_for_row, mc.cores = num_cores)
 
-    return filtered_genes
+        gn_combined <- do.call(c, gn_list)
+        """
 
-def parallel_filter_transcripts():
-    with ThreadPoolExecutor() as executor:
-        futures = [executor.submit(filter_genes_for_row, i) for i in range(len(SpliceData))]
-        results = [future.result() for future in futures]
-    
-    return results
-
-gn = parallel_filter_transcripts()
+ro.r(r_code)
 
 # for i in range(SpliceData.shape[0]) :
 #     # Step 0 - get transcripts for each gene (MAJIQ only reports for some)
