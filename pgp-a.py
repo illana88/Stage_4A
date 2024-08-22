@@ -926,12 +926,6 @@ if arg1==4 or arg1==5 :
             else:
                 print("Erreur : Le fichier SQLite n'a pas été créé.")
 
-
-
-            # process = subprocess.run(["Rscript", "-e", r_command], capture_output=True, text=True)
-            # print(process.stdout)
-            # print(process.stderr)
-
             print("CALLING TxEnsDB103_layeredV6.R to generate bed files")
             
             command = [
