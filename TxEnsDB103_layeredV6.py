@@ -23,6 +23,7 @@ import os
 import subprocess
 import sqlite3
 import rpy2.robjects as ro
+from rpy2.robjects import pandas2ri
 
 # Also load gtf file fron V86
 # Get object of EnsDBV99
@@ -39,7 +40,9 @@ args = sys.argv[1:]
 GeneIDField = 6
 
 # Read Peaks File
+pandas2ri.activate()
 SpliceData = pd.read_csv(args[0], header=None)
+ro.globalenv['SpliceData'] = SpliceData
 
 # Also read Tx list
 Tx_list = pd.read_csv(args[1], header=None)
