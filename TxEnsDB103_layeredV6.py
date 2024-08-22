@@ -16,7 +16,7 @@ for name in list(globals().keys()):
 # USE EnsDB V99 from Annotation hub
         
 import sys
-import genomicranges as gr
+# import genomicranges as gr
 import pandas as pd
 from concurrent.futures import ThreadPoolExecutor
 import gffutils
@@ -26,58 +26,25 @@ import subprocess
 # Also load gtf file fron V86
 # Get object of EnsDBV99
 
-# gtf_file = "Homo_sapiens.GRCh38.103.chr.sorted_new.gtf"
-# edb_file = gtf_file + ".db"
-
-# if not os.path.exists(edb_file):
-#     edb = gffutils.create_db(gtf_file, dbfn=edb_file, force=True, keep_order=True, merge_strategy="merge", sort_attribute_values=True)
-# else:
-#     edb = gffutils.FeatureDB(edb_file, keep_order=True)
-
 # Read bed file from MAJIQ
 args = sys.argv[1:]
 
+
+
+
 import sqlite3
+conn = sqlite3.connect("transcript_lengths.db")
 
-conn = sqlite3.connect('local_edb.sqlite')
+tx_lens_df = pd.read_sql_query("SELECT * FROM transcripts", conn)
 
-# edb = pd.read_sql_query("SELECT * FROM transcripts", conn)
-# print(edb.head())
-
-
-
-cur = conn.cursor()
-
-cur.execute("SELECT name FROM sqlite_master WHERE type='table';")
-tables = cur.fetchall()
-
-print("Tables disponibles:")
-for table in tables:
-    print(table[0])
-
-
-
-
-# r_command = f"""
-# library(ensembldb)
-
-# edb <- loadDb("local_edb.sqlite")
-# dbListTables(edb@dbconn)
-
-# tx_lens = transcriptLengths(edb,with.utr5_len = TRUE,with.utr3_len = TRUE)
-# write.csv(tx_lens, "transcript_lengths.csv", row.names = FALSE)
-# """
-
-# process = subprocess.run(["Rscript", "-e", r_command], capture_output=True, text=True)
-# print(process.stdout)
-# print(process.stderr)
-
-# tx_lens = pd.read_csv("transcript_lengths.csv")
-# print(tx_lens.head())
-
-
+print(tx_lens_df.head())
 
 conn.close()
+
+
+
+
+
 
 # GeneIDField = 6
 
