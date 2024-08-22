@@ -41,14 +41,16 @@ import sqlite3
 
 conn = sqlite3.connect('local_edb.sqlite')
 
-edb = pd.read_sql_query("SELECT * FROM transcripts", conn)
-print(edb.head())
+# edb = pd.read_sql_query("SELECT * FROM transcripts", conn)
+# print(edb.head())
 
 
 r_command = f"""
 library(ensembldb)
 
 edb <- loadDb("local_edb.sqlite")
+dbListTables(edb@dbconn)
+
 tx_lens = transcriptLengths(edb,with.utr5_len = TRUE,with.utr3_len = TRUE)
 write.csv(tx_lens, "transcript_lengths.csv", row.names = FALSE)
 """
