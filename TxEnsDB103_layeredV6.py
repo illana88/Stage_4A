@@ -139,12 +139,16 @@ print("################################################################")
 #         """
 
 r_code = """
-for (i in 1:dim(SpliceData)[1])
-{
-grf <- GRangesFilter(GRanges(substr(SpliceData[i,1],4,nchar(as.character(SpliceData[i,1]))), ranges = IRanges(SpliceData[i,2], SpliceData[i,3]),strand = SpliceData[i,4]), type = "any")
-gn <- genes(edb, filter = grf)
-}
-"""
+        library(GenomicRanges)
+        library(IRanges)
+        library(ensembldb)
+
+        for (i in 1:dim(SpliceData)[1])
+        {
+        grf <- GRangesFilter(GRanges(substr(SpliceData[i,1],4,nchar(as.character(SpliceData[i,1]))), ranges = IRanges(SpliceData[i,2], SpliceData[i,3]),strand = SpliceData[i,4]), type = "any")
+        gn <- genes(edb, filter = grf)
+        }
+        """
 
 ro.r(r_code)
 
