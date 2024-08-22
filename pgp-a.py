@@ -882,7 +882,7 @@ if arg1==4 or arg1==5 :
 #             with open("res_ce_all/Summary_stats.txt", "a") as f :
 #                 f.write("CALLING TxEnsDB103_layeredV6.R to generate bed files\n")
 
-            gtf_file = "gencode.v38.annotation.gtf"
+            gtf_file = "Homo_sapiens.GRCh38.103.chr.sorted_new.gtf"
             
             os.makedirs("database", exist_ok=True)
             edb_file = os.path.join("database", gtf_file + ".db")
