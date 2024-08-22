@@ -905,17 +905,17 @@ if arg1==4 or arg1==5 :
             r_code = """
             library(AnnotationHub)
             library(ensembldb)
+            library(DBI)
+            library(RSQLite)
 
             ah <- AnnotationHub()
             edb <- query(ah, c("EnsDb", "Hsapiens", "103"))[[1]]
 
-            print(class(edb))
+            tx_lens <- transcriptLengths(edb, with.utr5_len = TRUE, with.utr3_len = TRUE)
 
-            if (inherits(edb, "EnsDb")) {
-                saveDb(edb, file = "local_edb.sqlite")
-            } else {
-                stop("L'objet n'est pas de type EnsDb")
-            }
+            conn <- dbConnect(RSQLite::SQLite(), "transcript_lengths.db")
+            dbWriteTable(conn, "transcripts", tx_lens)
+            dbDisconnect(conn)
             """
 
             ro.r(r_code)
