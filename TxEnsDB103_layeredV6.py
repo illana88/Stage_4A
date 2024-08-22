@@ -16,7 +16,6 @@ for name in list(globals().keys()):
 # USE EnsDB V99 from Annotation hub
         
 import sys
-# import genomicranges as gr
 import pandas as pd
 from concurrent.futures import ThreadPoolExecutor
 import gffutils
@@ -33,13 +32,16 @@ args = sys.argv[1:]
 
 
 import sqlite3
+
 conn = sqlite3.connect("transcript_lengths.db")
-
-tx_lens_df = pd.read_sql_query("SELECT * FROM transcripts", conn)
-
-print(tx_lens_df.head())
-
+cursor = conn.cursor()
+cursor.execute("SELECT * FROM transcripts")
+rows = cursor.fetchall()
 conn.close()
+
+for row in rows[:5]:
+    print(row)
+
 
 
 
