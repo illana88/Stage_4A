@@ -18,6 +18,7 @@ import pybedtools
 import pysam
 import shutil
 import gffutils
+import rpy2.robjects as ro
 
 if os.access("Summary_stats.txt",os.F_OK):
     os.remove(("Summary_stats.txt"))
@@ -882,26 +883,6 @@ if arg1==4 or arg1==5 :
 #             with open("res_ce_all/Summary_stats.txt", "a") as f :
 #                 f.write("CALLING TxEnsDB103_layeredV6.R to generate bed files\n")
 
-            # gtf_file = "Homo_sapiens.GRCh38.103.chr.sorted_new.gtf"
-            
-            # os.makedirs("database", exist_ok=True)
-            # edb_file = os.path.join("database", gtf_file + ".db")
-            
-            # if not os.path.exists(edb_file):
-            #     edb = gffutils.create_db(gtf_file,
-            #                              dbfn=edb_file,
-            #                              force=True,
-            #                              keep_order=True,
-            #                              merge_strategy="merge",
-            #                              sort_attribute_values=True,
-            #                              disable_infer_genes=True,
-            #                              disable_infer_transcripts=True)
-            # else:
-            #     edb = gffutils.FeatureDB(edb_file, keep_order=True)
-
-
-            # import rpy2.robjects as ro
-
             # r_code = """
             # library(AnnotationHub)
             # library(ensembldb)
@@ -920,12 +901,6 @@ if arg1==4 or arg1==5 :
 
             # ro.r(r_code)
 
-            # import os
-            # if os.path.exists("local_edb.sqlite"):
-            #     print("La base de données EnsDb a été sauvegardée avec succès dans 'local_edb.sqlite'.")
-            # else:
-            #     print("Erreur : Le fichier SQLite n'a pas été créé.")
-
             print("CALLING TxEnsDB103_layeredV6.R to generate bed files")
             
             command = [
@@ -933,14 +908,12 @@ if arg1==4 or arg1==5 :
                 "TxEnsDB103_layeredV6.py",
                 "sorted_selected_events.csv",
                 "principal_txs.csv",
-                "temp_all_events_sashimi/FINAL_STATS_ALL_SASHIMIS.txt" #, edb_file
+                "temp_all_events_sashimi/FINAL_STATS_ALL_SASHIMIS.txt"
             ]
             
             result = subprocess.run(command, capture_output=True, text=True)
             print(result.stdout)
             print(result.stderr)
-
-            print("Sorti de TxEnsDB103_layeredV6 !!!!!!!!")
 
             # command = [
             #     "R",

@@ -21,46 +21,36 @@ from concurrent.futures import ThreadPoolExecutor
 import gffutils
 import os
 import subprocess
+import sqlite3
 
 # Also load gtf file fron V86
 # Get object of EnsDBV99
 
-# Read bed file from MAJIQ
-args = sys.argv[1:]
-
-
-
-
-import sqlite3
-
 conn = sqlite3.connect("transcript_lengths.db")
 cursor = conn.cursor()
 cursor.execute("SELECT * FROM transcripts")
-rows = cursor.fetchall()
+edb = cursor.fetchall()
 conn.close()
 
-for row in rows[:5]:
-    print(row)
+# Read bed file from MAJIQ
+args = sys.argv[1:]
 
+GeneIDField = 6
 
+# Read Peaks File
+SpliceData = pd.read_csv(args[0], header=None)
+SpliceData.head()
 
+# Also read Tx list
+Tx_list = pd.read_csv(args[1], header=None)
+Tx_list.head()
 
+# Also read appris annoation data to get principal 1 isoform
+appr_anno1 = pd.read_csv("GRCh38_appris_data.principal.txt", sep="\t", header=None)
+appr_anno1.head()
 
-
-
-# GeneIDField = 6
-
-# # Read Peaks File
-# SpliceData = pd.read_csv(args[0], header=None)
-
-# # # Also read Tx list
-# Tx_list = pd.read_csv(args[1], header=None)
-
-# # Also read appris annoation data to get principal 1 isoform
-# appr_anno1 = pd.read_csv("GRCh38_appris_data.principal.txt", sep="\t", header=None)
-
-# # V1 - hugo_symbol, V2 - ENSG_ID, V3 - TX_ID, V4 - , V2 - PRINCIPAL/ALTERNATE
-# appr_anno1.columns = ['V1', 'V2', 'V3', 'V4', 'V5']
+# V1 - hugo_symbol, V2 - ENSG_ID, V3 - TX_ID, V4 - , V2 - PRINCIPAL/ALTERNATE
+appr_anno1.columns = ['V1', 'V2', 'V3', 'V4', 'V5']
 
 # # Select only PRINCIPAL.1 ISOFORMS
 # appr_anno = appr_anno1[appr_anno1['V5'].str.contains("PRINCIPAL:1")] #APPRIS has multiple P1 Tx for a gene- e.g RALYL
