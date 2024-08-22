@@ -82,8 +82,8 @@ tx_lengths = []
 
 df_notfound = pd.DataFrame({
     'seqnames': pd.Series(dtype='str'),
-    'start': pd.Series(dtype='numeric'),
-    'end': pd.Series(dtype='numeric'),
+    'start': pd.Series(dtype='int'),
+    'end': pd.Series(dtype='int'),
     'strand': pd.Series(dtype='str'),
     'genename': pd.Series(dtype='str'),
     'junc_type': pd.Series(dtype='str')
@@ -93,8 +93,8 @@ print("df_notfound : ", df_notfound)
 
 df_zeroutr = pd.DataFrame({
     'seqnames': pd.Series(dtype='str'),
-    'start': pd.Series(dtype='numeric'),
-    'end': pd.Series(dtype='numeric'),
+    'start': pd.Series(dtype='int'),
+    'end': pd.Series(dtype='int'),
     'strand': pd.Series(dtype='str'),
     'genename': pd.Series(dtype='str'),
     'junc_type': pd.Series(dtype='str')
