@@ -45,22 +45,35 @@ conn = sqlite3.connect('local_edb.sqlite')
 # print(edb.head())
 
 
-r_command = f"""
-library(ensembldb)
 
-edb <- loadDb("local_edb.sqlite")
-dbListTables(edb@dbconn)
+cur = conn.cursor()
 
-tx_lens = transcriptLengths(edb,with.utr5_len = TRUE,with.utr3_len = TRUE)
-write.csv(tx_lens, "transcript_lengths.csv", row.names = FALSE)
-"""
+cur.execute("SELECT name FROM sqlite_master WHERE type='table';")
+tables = cur.fetchall()
 
-process = subprocess.run(["Rscript", "-e", r_command], capture_output=True, text=True)
-print(process.stdout)
-print(process.stderr)
+print("Tables disponibles:")
+for table in tables:
+    print(table[0])
 
-tx_lens = pd.read_csv("transcript_lengths.csv")
-print(tx_lens.head())
+
+
+
+# r_command = f"""
+# library(ensembldb)
+
+# edb <- loadDb("local_edb.sqlite")
+# dbListTables(edb@dbconn)
+
+# tx_lens = transcriptLengths(edb,with.utr5_len = TRUE,with.utr3_len = TRUE)
+# write.csv(tx_lens, "transcript_lengths.csv", row.names = FALSE)
+# """
+
+# process = subprocess.run(["Rscript", "-e", r_command], capture_output=True, text=True)
+# print(process.stdout)
+# print(process.stderr)
+
+# tx_lens = pd.read_csv("transcript_lengths.csv")
+# print(tx_lens.head())
 
 
 
