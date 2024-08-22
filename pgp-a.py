@@ -900,31 +900,31 @@ if arg1==4 or arg1==5 :
             #     edb = gffutils.FeatureDB(edb_file, keep_order=True)
 
 
-            import rpy2.robjects as ro
+            # import rpy2.robjects as ro
 
-            r_code = """
-            library(AnnotationHub)
-            library(ensembldb)
-            library(DBI)
-            library(RSQLite)
+            # r_code = """
+            # library(AnnotationHub)
+            # library(ensembldb)
+            # library(DBI)
+            # library(RSQLite)
 
-            ah <- AnnotationHub()
-            edb <- query(ah, c("EnsDb", "Hsapiens", "103"))[[1]]
+            # ah <- AnnotationHub()
+            # edb <- query(ah, c("EnsDb", "Hsapiens", "103"))[[1]]
 
-            tx_lens <- transcriptLengths(edb, with.utr5_len = TRUE, with.utr3_len = TRUE)
+            # tx_lens <- transcriptLengths(edb, with.utr5_len = TRUE, with.utr3_len = TRUE)
 
-            conn <- dbConnect(RSQLite::SQLite(), "transcript_lengths.db")
-            dbWriteTable(conn, "transcripts", tx_lens)
-            dbDisconnect(conn)
-            """
+            # conn <- dbConnect(RSQLite::SQLite(), "transcript_lengths.db")
+            # dbWriteTable(conn, "transcripts", tx_lens)
+            # dbDisconnect(conn)
+            # """
 
-            ro.r(r_code)
+            # ro.r(r_code)
 
-            import os
-            if os.path.exists("local_edb.sqlite"):
-                print("La base de données EnsDb a été sauvegardée avec succès dans 'local_edb.sqlite'.")
-            else:
-                print("Erreur : Le fichier SQLite n'a pas été créé.")
+            # import os
+            # if os.path.exists("local_edb.sqlite"):
+            #     print("La base de données EnsDb a été sauvegardée avec succès dans 'local_edb.sqlite'.")
+            # else:
+            #     print("Erreur : Le fichier SQLite n'a pas été créé.")
 
             print("CALLING TxEnsDB103_layeredV6.R to generate bed files")
             
