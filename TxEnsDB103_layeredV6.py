@@ -75,40 +75,44 @@ with open(args[2],"a") as fichier :
 
 print("Started Generating BED files for Splicing Events in folder event_bedfiles/ from File: {args[0]}")
 
-# trackj = 1
-# temp_gene = ""
-# current_gene = ""
-# tx_lengths = []
+trackj = 1
+temp_gene = ""
+current_gene = ""
+tx_lengths = []
 
-# df_notfound = pd.DataFrame({
-#     'seqnames': pd.Series(dtype='str'),
-#     'start': pd.Series(dtype='numeric'),
-#     'end': pd.Series(dtype='numeric'),
-#     'strand': pd.Series(dtype='str'),
-#     'genename': pd.Series(dtype='str'),
-#     'junc_type': pd.Series(dtype='str')
-# })
+df_notfound = pd.DataFrame({
+    'seqnames': pd.Series(dtype='str'),
+    'start': pd.Series(dtype='numeric'),
+    'end': pd.Series(dtype='numeric'),
+    'strand': pd.Series(dtype='str'),
+    'genename': pd.Series(dtype='str'),
+    'junc_type': pd.Series(dtype='str')
+})
 
-# df_zeroutr = pd.DataFrame({
-#     'seqnames': pd.Series(dtype='str'),
-#     'start': pd.Series(dtype='numeric'),
-#     'end': pd.Series(dtype='numeric'),
-#     'strand': pd.Series(dtype='str'),
-#     'genename': pd.Series(dtype='str'),
-#     'junc_type': pd.Series(dtype='str')
-# })
+print("df_notfound : ", df_notfound)
 
-# repeated_entries = 0
-# iPSC_events = 0
-# appris_events = 0
-# principalTx_events = 0
-# events_xTx = 0
-# Tx_str = 0 # 0 for iPSC, 1 for APPRIS and 2 for EnsDB
-# Tx_valid = 0
-# Total_Events = SpliceData.shape[0]
-# probable_noise_events = 0
-# probable_noncoding_events = 0
-# utr5_events = 0
+df_zeroutr = pd.DataFrame({
+    'seqnames': pd.Series(dtype='str'),
+    'start': pd.Series(dtype='numeric'),
+    'end': pd.Series(dtype='numeric'),
+    'strand': pd.Series(dtype='str'),
+    'genename': pd.Series(dtype='str'),
+    'junc_type': pd.Series(dtype='str')
+})
+
+print("df_zeroutr : ", df_zeroutr)
+
+repeated_entries = 0
+iPSC_events = 0
+appris_events = 0
+principalTx_events = 0
+events_xTx = 0
+Tx_str = 0 # 0 for iPSC, 1 for APPRIS and 2 for EnsDB
+Tx_valid = 0
+Total_Events = SpliceData.shape[0]
+probable_noise_events = 0
+probable_noncoding_events = 0
+utr5_events = 0
 
 # # Get gene name and gene_id (from granges filter) using event coordinates
 # def filter_genes_for_row(i):
