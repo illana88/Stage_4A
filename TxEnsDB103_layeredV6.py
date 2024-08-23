@@ -22,13 +22,15 @@ import gffutils
 import os
 import subprocess
 
+args = sys.argv[1:]
 
 import rpy2.robjects as ro
 from rpy2.robjects import r
 
-r['load']('edb.RData')
-edb = r['edb']
+ro.r(f'load("{args[3]}")')
+edb = ro.globalenv['edb']
 
+# Utiliser l'objet 'edb'
 print(edb)
 
 # Also load gtf file fron V86
