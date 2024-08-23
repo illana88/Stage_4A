@@ -21,9 +21,15 @@ from concurrent.futures import ThreadPoolExecutor
 import gffutils
 import os
 import subprocess
-import sqlite3
+
+
 import rpy2.robjects as ro
-from rpy2.robjects import pandas2ri
+from rpy2.robjects import r
+
+r['load']('edb.RData')
+edb = r['edb']
+
+print(edb)
 
 # Also load gtf file fron V86
 # Get object of EnsDBV99
@@ -152,19 +158,19 @@ from rpy2.robjects import pandas2ri
 #         gn_combined <- do.call(c, gn_list)
 #         """
 
-r_code = """
-        library(GenomicRanges)
-        library(IRanges)
-        library(ensembldb)
+# r_code = """
+#         library(GenomicRanges)
+#         library(IRanges)
+#         library(ensembldb)
 
-        for (i in 1:dim(SpliceData)[1])
-        {
-        grf <- GRangesFilter(GRanges(substr(SpliceData[i,1],4,nchar(as.character(SpliceData[i,1]))), ranges = IRanges(SpliceData[i,2], SpliceData[i,3]),strand = SpliceData[i,4]), type = "any")
-        gn <- genes(edb, filter = grf)
-        }
-        """
+#         for (i in 1:dim(SpliceData)[1])
+#         {
+#         grf <- GRangesFilter(GRanges(substr(SpliceData[i,1],4,nchar(as.character(SpliceData[i,1]))), ranges = IRanges(SpliceData[i,2], SpliceData[i,3]),strand = SpliceData[i,4]), type = "any")
+#         gn <- genes(edb, filter = grf)
+#         }
+#         """
 
-ro.r(r_code)
+# ro.r(r_code)
 
 # for i in range(SpliceData.shape[0]) :
 #     # Step 0 - get transcripts for each gene (MAJIQ only reports for some)
@@ -239,18 +245,18 @@ ro.r(r_code)
 #                     Tx_str = 'iPSC'
 #                     Tx_flg = 1
         
-        if (Tx_flg==0 and len(pd.merge(appr_anno, genes_data, left_on='V2', right_on='gene_id')['V3'])>0) :
-            Tx_name = appr_anno.loc[genes_data["gene_id"].isin(appr_anno["V2"]), "V3"].tolist()
+        # if (Tx_flg==0 and len(pd.merge(appr_anno, genes_data, left_on='V2', right_on='gene_id')['V3'])>0) :
+        #     Tx_name = appr_anno.loc[genes_data["gene_id"].isin(appr_anno["V2"]), "V3"].tolist()
 
-            filtered_transcripts = [edb.transcript_by_id(tx_id) for tx_id in Tx_name if edb.transcript_by_id(tx_id) is not None]
-            tltt = {transcript.id: len(transcript.sequence) for transcript in filtered_transcripts if transcript.sequence}
+        #     filtered_transcripts = [edb.transcript_by_id(tx_id) for tx_id in Tx_name if edb.transcript_by_id(tx_id) is not None]
+        #     tltt = {transcript.id: len(transcript.sequence) for transcript in filtered_transcripts if transcript.sequence}
 
-            # As APPRIS has multiple P1 Txs for some genes (like RALYL), make sure that the one with maximum exons and highest Tx length (in bp) is selected
-            if len(tltt)>0 :
-                # If multiple P1 Txs, then select the one with highet num of exons and largest size (in bp) and encapsulates event
-                tflg = 0
+        #     # As APPRIS has multiple P1 Txs for some genes (like RALYL), make sure that the one with maximum exons and highest Tx length (in bp) is selected
+        #     if len(tltt)>0 :
+        #         # If multiple P1 Txs, then select the one with highet num of exons and largest size (in bp) and encapsulates event
+        #         tflg = 0
 
-                for ti in range(len(tltt)) :
+        #         for ti in range(len(tltt)) :
 
 
 ########## FIN TxEnsDB103_layeredV6.R code en Pyhton ##########

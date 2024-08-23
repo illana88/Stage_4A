@@ -925,17 +925,13 @@ if arg1==4 or arg1==5 :
             library(GenomicFeatures)
             library(Repitools)
             library(ensembldb)
+            
             ah <- AnnotationHub()
             edb <- query(ah, c("EnsDb", "Hsapiens", "103"))[[1]]
+            save(edb, file="edb.RData")
             ''')
 
-            # Importer l'objet 'edb' depuis R
             edb = ro.globalenv['edb']
-
-            # Vous pouvez maintenant utiliser l'objet 'edb' en Python
-
-            # Exemple: afficher les détails de l'objet 'edb'
-            print(edb)
 
 
 
@@ -947,7 +943,8 @@ if arg1==4 or arg1==5 :
                 "TxEnsDB103_layeredV6.py",
                 "sorted_selected_events.csv",
                 "principal_txs.csv",
-                "temp_all_events_sashimi/FINAL_STATS_ALL_SASHIMIS.txt"
+                "temp_all_events_sashimi/FINAL_STATS_ALL_SASHIMIS.txt",
+                "edb.RData"
             ]
             
             result = subprocess.run(command, capture_output=True, text=True)
