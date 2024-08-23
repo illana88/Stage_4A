@@ -883,23 +883,24 @@ if arg1==4 or arg1==5 :
 #             with open("res_ce_all/Summary_stats.txt", "a") as f :
 #                 f.write("CALLING TxEnsDB103_layeredV6.R to generate bed files\n")
 
-            # r_code = """
-            # library(AnnotationHub)
-            # library(ensembldb)
-            # library(DBI)
-            # library(RSQLite)
+            r_code = """
+            library(AnnotationHub)
+            library(ensembldb)
+            library(DBI)
+            library(RSQLite)
 
-            # ah <- AnnotationHub()
-            # edb <- query(ah, c("EnsDb", "Hsapiens", "103"))[[1]]
+            ah <- AnnotationHub()
+            edb <- query(ah, c("EnsDb", "Hsapiens", "103"))[[1]]
 
-            # tx_lens <- transcriptLengths(edb, with.utr5_len = TRUE, with.utr3_len = TRUE)
+            edb_file <- "local_edb.sqlite"
+            conn <- dbConnect(RSQLite::SQLite(), edb_file)
+            saveDb(edb, conn)
+            dbDisconnect(conn)
 
-            # conn <- dbConnect(RSQLite::SQLite(), "transcript_lengths.db")
-            # dbWriteTable(conn, "transcripts", tx_lens)
-            # dbDisconnect(conn)
-            # """
+            save(edb, file = "local_edb.RData")
+            """
 
-            # ro.r(r_code)
+            ro.r(r_code)
 
             print("CALLING TxEnsDB103_layeredV6.R to generate bed files")
             

@@ -27,12 +27,26 @@ from rpy2.robjects import pandas2ri
 
 # Also load gtf file fron V86
 # Get object of EnsDBV99
+pandas2ri.activate()
 
-conn = sqlite3.connect("transcript_lengths.db")
-cursor = conn.cursor()
-cursor.execute("SELECT * FROM transcripts")
-edb = cursor.fetchall()
+conn = sqlite3.connect("local_edb.sqlite")
+transcripts_df = pd.read_sql_query("SELECT * FROM transcripts", conn)
 conn.close()
+
+
+
+
+r_code = """
+load("local_edb.RData")
+# Now `edb` is loaded and available for use
+print(class(edb))  # To verify it is loaded correctly
+"""
+
+ro.r(r_code)
+
+
+
+
 
 # Read bed file from MAJIQ
 args = sys.argv[1:]
@@ -40,7 +54,6 @@ args = sys.argv[1:]
 GeneIDField = 6
 
 # Read Peaks File
-pandas2ri.activate()
 SpliceData = pd.read_csv(args[0], header=None)
 ro.globalenv['SpliceData'] = SpliceData
 
