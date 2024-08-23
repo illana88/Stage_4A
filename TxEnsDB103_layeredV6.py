@@ -28,6 +28,8 @@ args = sys.argv[1:]
 ro.r('load("edb.RData")')
 edb = ro.globalenv['edb']
 
+print(edb)
+
 
 # Also load gtf file fron V86
 # Get object of EnsDBV99
