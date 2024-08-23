@@ -885,6 +885,7 @@ if arg1==4 or arg1==5 :
 
             r_code = """
             library(AnnotationHub)
+            library(AnnotationDbi)
             library(ensembldb)
             library(DBI)
             library(RSQLite)
