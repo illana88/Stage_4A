@@ -20,39 +20,16 @@ import pandas as pd
 from concurrent.futures import ThreadPoolExecutor
 import gffutils
 import os
-import subprocess
 import rpy2.robjects as ro
-
-args = sys.argv[1:]
 
 ro.r('load("edb.RData")')
 edb = ro.globalenv['edb']
 
-print(edb)
+print(ro.globalenv['edb'])
 
 
 # Also load gtf file fron V86
 # Get object of EnsDBV99
-
-# pandas2ri.activate()
-
-# conn = sqlite3.connect("local_edb.sqlite")
-# transcripts_df = pd.read_sql_query("SELECT * FROM transcripts", conn)
-# conn.close()
-
-
-
-
-# r_code = """
-# load("local_edb.RData")
-# # Now `edb` is loaded and available for use
-# print(class(edb))  # To verify it is loaded correctly
-# """
-
-# ro.r(r_code)
-
-
-
 
 
 # # Read bed file from MAJIQ
