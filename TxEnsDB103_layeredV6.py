@@ -21,17 +21,13 @@ from concurrent.futures import ThreadPoolExecutor
 import gffutils
 import os
 import subprocess
+import rpy2.robjects as ro
 
 args = sys.argv[1:]
 
-import rpy2.robjects as ro
-from rpy2.robjects import r
-
-ro.r(f'load("{args[3]}")')
+ro.r('load("edb.RData")')
 edb = ro.globalenv['edb']
 
-# Utiliser l'objet 'edb'
-print(edb)
 
 # Also load gtf file fron V86
 # Get object of EnsDBV99
