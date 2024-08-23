@@ -883,28 +883,62 @@ if arg1==4 or arg1==5 :
 #             with open("res_ce_all/Summary_stats.txt", "a") as f :
 #                 f.write("CALLING TxEnsDB103_layeredV6.R to generate bed files\n")
 
-            r_code = """
-            library(AnnotationHub)
-            library(AnnotationDbi)
-            library(ensembldb)
-            library(DBI)
-            library(RSQLite)
+            # r_code = """
+            # library(AnnotationHub)
+            # library(AnnotationDbi)
+            # library(ensembldb)
+            # library(DBI)
+            # library(RSQLite)
 
+            # ah <- AnnotationHub()
+            # edb <- query(ah, c("EnsDb", "Hsapiens", "103"))[[1]]
+            
+            # genes_df <- genes(edb)
+
+            # conn <- dbConnect(RSQLite::SQLite(), "edb.db")
+            # dbWriteTable(conn, "genes", genes_df)
+            # dbDisconnect(conn)
+            # """
+
+            # ro.r(r_code)
+
+
+
+            import rpy2.robjects as ro
+            import rpy2.rinterface_lib.callbacks
+            from rpy2.robjects.packages import importr
+
+            # Configurer la gestion des messages de R
+            rpy2.rinterface_lib.callbacks.logger.setLevel('INFO')
+
+            # Importer les packages R nécessaires
+            base = importr('base')
+            utils = importr('utils')
+            AnnotationHub = importr('AnnotationHub')
+            GenomicFeatures = importr('GenomicFeatures')
+            Repitools = importr('Repitools')
+            ensembldb = importr('ensembldb')
+
+            # Exécuter le code R pour obtenir l'objet 'edb'
+            ro.r('''
+            library(AnnotationHub)
+            library(GenomicFeatures)
+            library(Repitools)
+            library(ensembldb)
             ah <- AnnotationHub()
             edb <- query(ah, c("EnsDb", "Hsapiens", "103"))[[1]]
+            ''')
 
-            print(class(edb))
+            # Importer l'objet 'edb' depuis R
+            edb = ro.globalenv['edb']
+
+            # Vous pouvez maintenant utiliser l'objet 'edb' en Python
+
+            # Exemple: afficher les détails de l'objet 'edb'
+            print(edb)
 
 
-            edb_file <- "local_edb.sqlite"
-            conn <- dbConnect(RSQLite::SQLite(), edb_file)
-            saveDb(edb, conn)
-            dbDisconnect(conn)
 
-            save(edb, file = "local_edb.RData")
-            """
-
-            ro.r(r_code)
 
             print("CALLING TxEnsDB103_layeredV6.R to generate bed files")
             
