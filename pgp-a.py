@@ -892,6 +892,9 @@ if arg1==4 or arg1==5 :
             ah <- AnnotationHub()
             edb <- query(ah, c("EnsDb", "Hsapiens", "103"))[[1]]
 
+            print(class(edb))
+
+
             edb_file <- "local_edb.sqlite"
             conn <- dbConnect(RSQLite::SQLite(), edb_file)
             saveDb(edb, conn)
