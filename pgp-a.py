@@ -883,25 +883,6 @@ if arg1==4 or arg1==5 :
 #             with open("res_ce_all/Summary_stats.txt", "a") as f :
 #                 f.write("CALLING TxEnsDB103_layeredV6.R to generate bed files\n")
 
-            # r_code = """
-            # library(AnnotationHub)
-            # library(AnnotationDbi)
-            # library(ensembldb)
-            # library(DBI)
-            # library(RSQLite)
-
-            # ah <- AnnotationHub()
-            # edb <- query(ah, c("EnsDb", "Hsapiens", "103"))[[1]]
-            
-            # genes_df <- genes(edb)
-
-            # conn <- dbConnect(RSQLite::SQLite(), "edb.db")
-            # dbWriteTable(conn, "genes", genes_df)
-            # dbDisconnect(conn)
-            # """
-
-            # ro.r(r_code)
-
 
 
             
@@ -930,9 +911,13 @@ if arg1==4 or arg1==5 :
             ah <- AnnotationHub()
             edb <- query(ah, c("EnsDb", "Hsapiens", "103"))[[1]]
             save(edb, file="edb.RData")
+
+            # Convertir en dataframe
+            df_edb <- as.data.frame(edb)
             ''')
 
-
+            df_edb = ro.r['df_edb']
+            df_edb = pd.DataFrame(df_edb)
 
             print("CALLING TxEnsDB103_layeredV6.R to generate bed files")
             
