@@ -167,7 +167,7 @@ r_code = """
         library(IRanges)
         library(ensembldb)
 
-        load("edb.RData")
+        load("~/Programme/proteogenomic-pipeline_py/pgp-a/edb.RData")
         ls()
 
         for (i in 1:dim(SpliceData)[1])
