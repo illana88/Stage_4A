@@ -28,6 +28,63 @@ pandas2ri.activate()
 
 # Also load gtf file fron V86
 # Get object of EnsDBV99
+
+import rpy2.robjects as ro
+import rpy2.rinterface_lib.callbacks
+from rpy2.robjects.packages import importr
+
+rpy2.rinterface_lib.callbacks.logger.setLevel('INFO')
+
+base = importr('base')
+utils = importr('utils')
+AnnotationHub = importr('AnnotationHub')
+GenomicFeatures = importr('GenomicFeatures')
+Repitools = importr('Repitools')
+ensembldb = importr('ensembldb')
+
+ro.r('''
+library(AnnotationHub)
+library(GenomicFeatures)
+library(Repitools)
+library(ensembldb)
+
+ah <- AnnotationHub()
+edb <- query(ah, c("EnsDb", "Hsapiens", "103"))[[1]]
+save(edb, file="edb.RData")
+
+genes_df <- as.data.frame(genes(edb))
+exons_df <- as.data.frame(exons(edb))
+transcripts_df <- as.data.frame(transcripts(edb))
+
+convert_list_columns_to_char <- function(df) {
+df[] <- lapply(df, function(x) {
+if (is.list(x)) {
+sapply(x, function(y) paste(y, collapse = "; "))
+} else {
+x
+}
+})
+return(df)
+}
+
+genes_df <- convert_list_columns_to_char(genes_df)
+exons_df <- convert_list_columns_to_char(exons_df)
+transcripts_df <- convert_list_columns_to_char(transcripts_df)
+
+genes_df$type <- "gene"
+exons_df$type <- "exon"
+transcripts_df$type <- "transcript"
+
+common_columns <- union(union(names(genes_df), names(exons_df)), names(transcripts_df))
+genes_df[setdiff(common_columns, names(genes_df))] <- NA
+exons_df[setdiff(common_columns, names(exons_df))] <- NA
+transcripts_df[setdiff(common_columns, names(transcripts_df))] <- NA
+
+combined_df <- rbind(genes_df, exons_df, transcripts_df)
+
+write.csv(combined_df, file="combined_genes_exons_transcripts.csv", row.names=FALSE)
+''')
+
 pd.set_option('display.max_columns', None)
 edb = pd.read_csv("combined_genes_exons_transcripts.csv", low_memory=False)
 
@@ -162,29 +219,20 @@ print("################################################################")
 #         gn_combined <- do.call(c, gn_list)
 #         """
 
-# r_code = """
-#         library(GenomicRanges)
-#         library(IRanges)
-#         library(ensembldb)
-
-#         load("~/Programme/proteogenomic-pipeline_py/pgp-a/edb.RData")
-#         ls()
-
-#         for (i in 1:dim(SpliceData)[1])
-#         {
-#         grf <- GRangesFilter(GRanges(substr(SpliceData[i,1],4,nchar(as.character(SpliceData[i,1]))), ranges = IRanges(SpliceData[i,2], SpliceData[i,3]),strand = SpliceData[i,4]), type = "any")
-#         gn <- genes(edb, filter = grf)
-#         }
-#         """
-
 r_code = """
-tryCatch({
-    load("edb.RData")
-    ls()
-}, error = function(e) {
-    cat("Erreur lors du chargement du fichier RData :", e$message, "\n")
-})
-"""
+        library(GenomicRanges)
+        library(IRanges)
+        library(ensembldb)
+
+        load("~/Programme/proteogenomic-pipeline_py/pgp-a/edb.RData")
+        ls()
+
+        for (i in 1:dim(SpliceData)[1])
+        {
+        grf <- GRangesFilter(GRanges(substr(SpliceData[i,1],4,nchar(as.character(SpliceData[i,1]))), ranges = IRanges(SpliceData[i,2], SpliceData[i,3]),strand = SpliceData[i,4]), type = "any")
+        gn <- genes(edb, filter = grf)
+        }
+        """
 
 ro.r(r_code)
 
