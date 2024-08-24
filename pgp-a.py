@@ -890,10 +890,8 @@ if arg1==4 or arg1==5 :
             import rpy2.rinterface_lib.callbacks
             from rpy2.robjects.packages import importr
 
-            # Configurer la gestion des messages de R
             rpy2.rinterface_lib.callbacks.logger.setLevel('INFO')
 
-            # Importer les packages R nécessaires
             base = importr('base')
             utils = importr('utils')
             AnnotationHub = importr('AnnotationHub')
@@ -901,7 +899,6 @@ if arg1==4 or arg1==5 :
             Repitools = importr('Repitools')
             ensembldb = importr('ensembldb')
 
-            # Exécuter le code R pour obtenir l'objet 'edb'
             ro.r('''
             library(AnnotationHub)
             library(GenomicFeatures)
@@ -914,10 +911,10 @@ if arg1==4 or arg1==5 :
 
             # Convertir en dataframe
             df_edb <- as.data.frame(edb)
-            ''')
 
-            df_edb = ro.r['df_edb']
-            df_edb = pd.DataFrame(df_edb)
+            # Enregistrer le dataframe en CSV
+            write.csv(df_edb, file="edb.csv", row.names=FALSE)
+            ''')
 
             print("CALLING TxEnsDB103_layeredV6.R to generate bed files")
             
