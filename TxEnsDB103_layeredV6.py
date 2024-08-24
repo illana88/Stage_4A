@@ -55,7 +55,9 @@ dtype_dict = {
     'tx_cds_seq_start': str
 }
 
-print("col 17 : ", edb.iloc[585317:585328,17])
+print("col 18 : ", edb.iloc[:,18])
+print("col 19 : ", edb.iloc[:,19])
+print("col 20 : ", edb.iloc[:,20])
 
 print(edb.columns)
 
