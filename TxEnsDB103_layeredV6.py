@@ -38,12 +38,14 @@ dtype_dict = {
     'col7': str,
     'col8': str,
     'col9': str,
-    'col10': str
+    'col10': str,
+    'col11': str,
+    'col12': int
 }
 
-print("col 11 : ", edb.iloc[:,11])
-print("col 12 : ", edb.iloc[:,12])
-print("col 13 : ", edb.iloc[:,13])
+print("col 0 : ", edb.iloc[:,0])
+print("col 1 : ", edb.iloc[:,1])
+print("col 2 : ", edb.iloc[:,2])
 
 print(edb.columns)
 
