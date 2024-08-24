@@ -910,16 +910,42 @@ if arg1==4 or arg1==5 :
             save(edb, file="edb.RData")
 
             genes_df <- as.data.frame(genes(edb))
-                 
-            genes_df[] <- lapply(genes_df, function(x) {
-            if (is.list(x)) {
+            exons_df <- as.data.frame(exons(edb))
+            transcripts_df <- as.data.frame(transcripts(edb))
+
+            # Fonction pour convertir les colonnes de type 'list' en caractères
+            convert_list_columns_to_char <- function(df) {
+            df[] <- lapply(df, function(x) {
+                if (is.list(x)) {
                 sapply(x, function(y) paste(y, collapse = "; "))
-            } else {
+                } else {
                 x
-            }
+                }
             })
-                 
-            write.csv(genes_df, file="genes_edb.csv", row.names=FALSE)
+            return(df)
+            }
+
+            # Convertir les colonnes de type 'list' pour chaque dataframe
+            genes_df <- convert_list_columns_to_char(genes_df)
+            exons_df <- convert_list_columns_to_char(exons_df)
+            transcripts_df <- convert_list_columns_to_char(transcripts_df)
+
+            # Ajouter une colonne pour identifier le type de données
+            genes_df$type <- "gene"
+            exons_df$type <- "exon"
+            transcripts_df$type <- "transcript"
+
+            # Ajouter des colonnes pour normaliser les noms des colonnes entre les dataframes
+            common_columns <- union(union(names(genes_df), names(exons_df)), names(transcripts_df))
+            genes_df[setdiff(common_columns, names(genes_df))] <- NA
+            exons_df[setdiff(common_columns, names(exons_df))] <- NA
+            transcripts_df[setdiff(common_columns, names(transcripts_df))] <- NA
+
+            # Combiner les trois dataframes en un seul
+            combined_df <- rbind(genes_df, exons_df, transcripts_df)
+
+            # Enregistrer le dataframe combiné en CSV
+            write.csv(combined_df, file="combined_genes_exons_transcripts.csv", row.names=FALSE)
             ''')
 
             print("CALLING TxEnsDB103_layeredV6.R to generate bed files")
