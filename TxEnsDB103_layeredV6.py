@@ -29,20 +29,23 @@ ro.r('load("edb.RData")')
 # Also load gtf file fron V86
 # Get object of EnsDBV99
 
-edb = pd.read_csv("combined_genes_exons_transcripts.csv")
-
-print(edb.columns)
+edb = pd.read_csv("combined_genes_exons_transcripts.csv", low_memory=False)
 
 dtype_dict = {
     'col0': str,
     'col5': str,
     'col6': str,
-    'col7': str
+    'col7': str,
+    'col8': str,
+    'col9': str,
+    'col10': str
 }
 
-print("col 8 : ", edb.iloc[:,8])
-print("col 9 : ", edb.iloc[:,9])
-print("col 10 : ", edb.iloc[:,10])
+print("col 11 : ", edb.iloc[:,11])
+print("col 12 : ", edb.iloc[:,12])
+print("col 13 : ", edb.iloc[:,13])
+
+print(edb.columns)
 
 # Read bed file from MAJIQ
 args = sys.argv[1:]
