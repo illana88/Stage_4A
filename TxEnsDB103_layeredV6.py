@@ -52,12 +52,14 @@ dtype_dict = {
     'tx_cds_seq_start': str,
     'tx_cds_seq_end': str,
     'tx_support_level': str,
+    'tx_id_version': str,
+    'tx_id_version': str,
+    'tx_id_version': str,
     'tx_id_version': str
 }
 
 print("col 21 : ", edb.iloc[:,21])
 print("col 22 : ", edb.iloc[:,22])
-print("col 23 : ", edb.iloc[:,23])
 
 print(edb.columns)
 
