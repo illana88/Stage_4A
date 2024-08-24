@@ -24,7 +24,7 @@ import rpy2.robjects as ro
 from rpy2.robjects import pandas2ri
 
 pandas2ri.activate()
-ro.r('load("edb.RData")')
+# ro.r('load("edb.RData")')
 
 # Also load gtf file fron V86
 # Get object of EnsDBV99
@@ -135,30 +135,32 @@ probable_noise_events = 0
 probable_noncoding_events = 0
 utr5_events = 0
 
-# print("################################################################")
+print("################################################################")
 
-# r_code = """
-#         library(parallel)
-#         library(GenomicRanges)
-#         library(ensembldb)
+r_code = """
+        library(parallel)
+        library(GenomicRanges)
+        library(ensembldb)
 
-#         filter_genes_for_row <- function(i) {
-#         grf <- GRangesFilter(GRanges(
-#             seqnames = substr(SpliceData[i, 1], 4, nchar(as.character(SpliceData[i, 1]))),
-#             ranges = IRanges(SpliceData[i, 2], SpliceData[i, 3]),
-#             strand = SpliceData[i, 4]
-#         ), type = "any")
+        load("edb.RData")
+
+        filter_genes_for_row <- function(i) {
+        grf <- GRangesFilter(GRanges(
+            seqnames = substr(SpliceData[i, 1], 4, nchar(as.character(SpliceData[i, 1]))),
+            ranges = IRanges(SpliceData[i, 2], SpliceData[i, 3]),
+            strand = SpliceData[i, 4]
+        ), type = "any")
         
-#         gn <- genes(edb, filter = grf)
-#         return(gn)
-#         }
+        gn <- genes(edb, filter = grf)
+        return(gn)
+        }
 
-#         num_cores <- detectCores()
+        num_cores <- detectCores()
 
-#         gn_list <- mclapply(1:nrow(SpliceData), filter_genes_for_row, mc.cores = num_cores)
+        gn_list <- mclapply(1:nrow(SpliceData), filter_genes_for_row, mc.cores = num_cores)
 
-#         gn_combined <- do.call(c, gn_list)
-#         """
+        gn_combined <- do.call(c, gn_list)
+        """
 
 # r_code = """
 #         library(GenomicRanges)
@@ -172,7 +174,11 @@ utr5_events = 0
 #         }
 #         """
 
-# ro.r(r_code)
+ro.r(r_code)
+
+
+
+
 
 # for i in range(SpliceData.shape[0]) :
 #     # Step 0 - get transcripts for each gene (MAJIQ only reports for some)
