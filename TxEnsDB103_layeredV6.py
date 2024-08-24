@@ -162,20 +162,29 @@ print("################################################################")
 #         gn_combined <- do.call(c, gn_list)
 #         """
 
+# r_code = """
+#         library(GenomicRanges)
+#         library(IRanges)
+#         library(ensembldb)
+
+#         load("~/Programme/proteogenomic-pipeline_py/pgp-a/edb.RData")
+#         ls()
+
+#         for (i in 1:dim(SpliceData)[1])
+#         {
+#         grf <- GRangesFilter(GRanges(substr(SpliceData[i,1],4,nchar(as.character(SpliceData[i,1]))), ranges = IRanges(SpliceData[i,2], SpliceData[i,3]),strand = SpliceData[i,4]), type = "any")
+#         gn <- genes(edb, filter = grf)
+#         }
+#         """
+
 r_code = """
-        library(GenomicRanges)
-        library(IRanges)
-        library(ensembldb)
-
-        load("~/Programme/proteogenomic-pipeline_py/pgp-a/edb.RData")
-        ls()
-
-        for (i in 1:dim(SpliceData)[1])
-        {
-        grf <- GRangesFilter(GRanges(substr(SpliceData[i,1],4,nchar(as.character(SpliceData[i,1]))), ranges = IRanges(SpliceData[i,2], SpliceData[i,3]),strand = SpliceData[i,4]), type = "any")
-        gn <- genes(edb, filter = grf)
-        }
-        """
+tryCatch({
+    load("edb.RData")
+    ls()
+}, error = function(e) {
+    cat("Erreur lors du chargement du fichier RData :", e$message, "\n")
+})
+"""
 
 ro.r(r_code)
 
