@@ -54,7 +54,6 @@ dtype_dict = {
     'tx_support_level': str,
     'tx_id_version': str,
     'tx_id_version': str,
-    'tx_id_version': str,
     'tx_id_version': str
 }
 
