@@ -41,15 +41,15 @@ dtype_dict = {
     'gene_name': str,
     'gene_biotype': str,
     'seq_coord_system': str,
-    'col9': str,
-    'col10': str,
-    'col11': str,
+    'description': str,
+    'gene_id_version': str,
+    'symbol': str,
     'col12': int
 }
 
-print("col 9 : ", edb.iloc[:,9])
-print("col 10 : ", edb.iloc[:,10])
-print("col 11 : ", edb.iloc[:,11])
+print("col 12 : ", edb.iloc[:,12])
+print("col 13 : ", edb.iloc[:,13])
+print("col 14 : ", edb.iloc[:,14])
 
 print(edb.columns)
 
