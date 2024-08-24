@@ -53,14 +53,9 @@ dtype_dict = {
     'tx_cds_seq_end': str,
     'tx_support_level': str,
     'tx_id_version': str,
-    'tx_id_version': str,
-    'tx_id_version': str
+    'gc_content': float,
+    'tx_name': str
 }
-
-print("col 21 : ", edb.iloc[:,21])
-print("col 22 : ", edb.iloc[:,22])
-
-print(edb.columns)
 
 # Read bed file from MAJIQ
 args = sys.argv[1:]
