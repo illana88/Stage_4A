@@ -32,9 +32,12 @@ ro.r('load("edb.RData")')
 edb = pd.read_csv("combined_genes_exons_transcripts.csv", low_memory=False)
 
 dtype_dict = {
-    'col0': str,
-    'col1': int,
-    'col2': int,
+    'seqnames': str,
+    'start': int,
+    'end': int,
+    'width': int,
+    'strand': str,
+    'gene_id': str,
     'col5': str,
     'col6': str,
     'col7': str,
@@ -45,9 +48,9 @@ dtype_dict = {
     'col12': int
 }
 
-print("col 3 : ", edb.iloc[:,3])
-print("col 4 : ", edb.iloc[:,4])
-print("col 5 : ", edb.iloc[:,5])
+print("col 6 : ", edb.iloc[:,6])
+print("col 7 : ", edb.iloc[:,7])
+print("col 8 : ", edb.iloc[:,8])
 
 print(edb.columns)
 
