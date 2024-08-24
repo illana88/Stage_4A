@@ -23,12 +23,12 @@ import os
 import rpy2.robjects as ro
 
 ro.r('load("edb.RData")')
-edb = ro.globalenv['edb']
-
 
 # Also load gtf file fron V86
 # Get object of EnsDBV99
 
+edb = pd.read_csv("combined_genes_exons_transcripts.csv")
+print(edb.head())
 
 # # Read bed file from MAJIQ
 # args = sys.argv[1:]
