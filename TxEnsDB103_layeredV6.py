@@ -28,85 +28,84 @@ ro.r('load("edb.RData")')
 # Get object of EnsDBV99
 
 edb = pd.read_csv("combined_genes_exons_transcripts.csv")
-print(edb.head())
 
-# # Read bed file from MAJIQ
-# args = sys.argv[1:]
+# Read bed file from MAJIQ
+args = sys.argv[1:]
 
-# GeneIDField = 6
+GeneIDField = 6
 
-# # Read Peaks File
-# SpliceData = pd.read_csv(args[0], header=None)
-# ro.globalenv['SpliceData'] = SpliceData
+# Read Peaks File
+SpliceData = pd.read_csv(args[0], header=None)
+ro.globalenv['SpliceData'] = SpliceData
 
-# # Also read Tx list
-# Tx_list = pd.read_csv(args[1], header=None)
+# Also read Tx list
+Tx_list = pd.read_csv(args[1], header=None)
 
-# # Also read appris annoation data to get principal 1 isoform
-# appr_anno1 = pd.read_csv("GRCh38_appris_data.principal.txt", sep="\t", header=None)
+# Also read appris annoation data to get principal 1 isoform
+appr_anno1 = pd.read_csv("GRCh38_appris_data.principal.txt", sep="\t", header=None)
 
-# # V1 - hugo_symbol, V2 - ENSG_ID, V3 - TX_ID, V4 - , V2 - PRINCIPAL/ALTERNATE
-# appr_anno1.columns = ['V1', 'V2', 'V3', 'V4', 'V5']
+# V1 - hugo_symbol, V2 - ENSG_ID, V3 - TX_ID, V4 - , V2 - PRINCIPAL/ALTERNATE
+appr_anno1.columns = ['V1', 'V2', 'V3', 'V4', 'V5']
 
-# # Select only PRINCIPAL.1 ISOFORMS
-# appr_anno = appr_anno1[appr_anno1['V5'].str.contains("PRINCIPAL:1")] #APPRIS has multiple P1 Tx for a gene- e.g RALYL
+# Select only PRINCIPAL.1 ISOFORMS
+appr_anno = appr_anno1[appr_anno1['V5'].str.contains("PRINCIPAL:1")] #APPRIS has multiple P1 Tx for a gene- e.g RALYL
 
-# if os.access("all_tx_events.csv",os.F_OK):
-#     # Delete file if it exists
-#     os.remove(("all_tx_events.csv"))
+if os.access("all_tx_events.csv",os.F_OK):
+    # Delete file if it exists
+    os.remove(("all_tx_events.csv"))
     
-# if os.access("all_events_bed_sashimi.tab",os.F_OK):
-#     # Delete file if it exists
-#     os.remove(("all_events_bed_sashimi.tab"))
+if os.access("all_events_bed_sashimi.tab",os.F_OK):
+    # Delete file if it exists
+    os.remove(("all_events_bed_sashimi.tab"))
     
-# if os.access("events_to_tx_mapping_valid.csv",os.F_OK):
-#     # Delete file if it exists
-#     os.remove(("events_to_tx_mapping_valid.csv"))
+if os.access("events_to_tx_mapping_valid.csv",os.F_OK):
+    # Delete file if it exists
+    os.remove(("events_to_tx_mapping_valid.csv"))
     
-# if os.access("events_to_tx_mapping_invalid.csv",os.F_OK):
-#     # Delete file if it exists
-#     os.remove(("events_to_tx_mapping_invalid.csv"))
+if os.access("events_to_tx_mapping_invalid.csv",os.F_OK):
+    # Delete file if it exists
+    os.remove(("events_to_tx_mapping_invalid.csv"))
 
-# with open(args[2],"a") as fichier :
-#     fichier.write('                                 \n')
-#     fichier.write(f"Starting From TxEnsDB103_layeredV6.R: --------------- Processing file: {args[0]} with: {SpliceData.shape[0]} events to generate each event .bed files in event_bedfiles/ folder: \n")
+with open(args[2],"a") as fichier :
+    fichier.write('                                 \n')
+    fichier.write(f"Starting From TxEnsDB103_layeredV6.R: --------------- Processing file: {args[0]} with: {SpliceData.shape[0]} events to generate each event .bed files in event_bedfiles/ folder: \n")
 
-# print(f"Started Generating BED files for Splicing Events in folder event_bedfiles/ from File: {args[0]}")
+print(f"Started Generating BED files for Splicing Events in folder event_bedfiles/ from File: {args[0]}")
 
-# trackj = 1
-# temp_gene = ""
-# current_gene = ""
-# tx_lengths = []
+trackj = 1
+temp_gene = ""
+current_gene = ""
+tx_lengths = []
 
-# df_notfound = pd.DataFrame({
-#     'seqnames': pd.Series(dtype='str'),
-#     'start': pd.Series(dtype='int'),
-#     'end': pd.Series(dtype='int'),
-#     'strand': pd.Series(dtype='str'),
-#     'genename': pd.Series(dtype='str'),
-#     'junc_type': pd.Series(dtype='str')
-# })
+df_notfound = pd.DataFrame({
+    'seqnames': pd.Series(dtype='str'),
+    'start': pd.Series(dtype='int'),
+    'end': pd.Series(dtype='int'),
+    'strand': pd.Series(dtype='str'),
+    'genename': pd.Series(dtype='str'),
+    'junc_type': pd.Series(dtype='str')
+})
 
-# df_zeroutr = pd.DataFrame({
-#     'seqnames': pd.Series(dtype='str'),
-#     'start': pd.Series(dtype='int'),
-#     'end': pd.Series(dtype='int'),
-#     'strand': pd.Series(dtype='str'),
-#     'genename': pd.Series(dtype='str'),
-#     'junc_type': pd.Series(dtype='str')
-# })
+df_zeroutr = pd.DataFrame({
+    'seqnames': pd.Series(dtype='str'),
+    'start': pd.Series(dtype='int'),
+    'end': pd.Series(dtype='int'),
+    'strand': pd.Series(dtype='str'),
+    'genename': pd.Series(dtype='str'),
+    'junc_type': pd.Series(dtype='str')
+})
 
-# repeated_entries = 0
-# iPSC_events = 0
-# appris_events = 0
-# principalTx_events = 0
-# events_xTx = 0
-# Tx_str = 0 # 0 for iPSC, 1 for APPRIS and 2 for EnsDB
-# Tx_valid = 0
-# Total_Events = SpliceData.shape[0]
-# probable_noise_events = 0
-# probable_noncoding_events = 0
-# utr5_events = 0
+repeated_entries = 0
+iPSC_events = 0
+appris_events = 0
+principalTx_events = 0
+events_xTx = 0
+Tx_str = 0 # 0 for iPSC, 1 for APPRIS and 2 for EnsDB
+Tx_valid = 0
+Total_Events = SpliceData.shape[0]
+probable_noise_events = 0
+probable_noncoding_events = 0
+utr5_events = 0
 
 # print("################################################################")
 
