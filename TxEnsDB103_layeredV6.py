@@ -137,42 +137,44 @@ utr5_events = 0
 
 print("################################################################")
 
+# r_code = """
+#         library(parallel)
+#         library(GenomicRanges)
+#         library(ensembldb)
+
+#         load("edb.RData")
+
+#         filter_genes_for_row <- function(i) {
+#         grf <- GRangesFilter(GRanges(
+#             seqnames = substr(SpliceData[i, 1], 4, nchar(as.character(SpliceData[i, 1]))),
+#             ranges = IRanges(SpliceData[i, 2], SpliceData[i, 3]),
+#             strand = SpliceData[i, 4]
+#         ), type = "any")
+        
+#         gn <- genes(edb, filter = grf)
+#         return(gn)
+#         }
+
+#         num_cores <- detectCores()
+
+#         gn_list <- mclapply(1:nrow(SpliceData), filter_genes_for_row, mc.cores = num_cores)
+
+#         gn_combined <- do.call(c, gn_list)
+#         """
+
 r_code = """
-        library(parallel)
         library(GenomicRanges)
+        library(IRanges)
         library(ensembldb)
 
         load("edb.RData")
 
-        filter_genes_for_row <- function(i) {
-        grf <- GRangesFilter(GRanges(
-            seqnames = substr(SpliceData[i, 1], 4, nchar(as.character(SpliceData[i, 1]))),
-            ranges = IRanges(SpliceData[i, 2], SpliceData[i, 3]),
-            strand = SpliceData[i, 4]
-        ), type = "any")
-        
+        for (i in 1:dim(SpliceData)[1])
+        {
+        grf <- GRangesFilter(GRanges(substr(SpliceData[i,1],4,nchar(as.character(SpliceData[i,1]))), ranges = IRanges(SpliceData[i,2], SpliceData[i,3]),strand = SpliceData[i,4]), type = "any")
         gn <- genes(edb, filter = grf)
-        return(gn)
         }
-
-        num_cores <- detectCores()
-
-        gn_list <- mclapply(1:nrow(SpliceData), filter_genes_for_row, mc.cores = num_cores)
-
-        gn_combined <- do.call(c, gn_list)
         """
-
-# r_code = """
-#         library(GenomicRanges)
-#         library(IRanges)
-#         library(ensembldb)
-
-#         for (i in 1:dim(SpliceData)[1])
-#         {
-#         grf <- GRangesFilter(GRanges(substr(SpliceData[i,1],4,nchar(as.character(SpliceData[i,1]))), ranges = IRanges(SpliceData[i,2], SpliceData[i,3]),strand = SpliceData[i,4]), type = "any")
-#         gn <- genes(edb, filter = grf)
-#         }
-#         """
 
 ro.r(r_code)
 
