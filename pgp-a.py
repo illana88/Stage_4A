@@ -910,6 +910,15 @@ if arg1==4 or arg1==5 :
             save(edb, file="edb.RData")
 
             genes_df <- as.data.frame(genes(edb))
+                 
+            genes_df[] <- lapply(genes_df, function(x) {
+            if (is.list(x)) {
+                sapply(x, function(y) paste(y, collapse = "; "))
+            } else {
+                x
+            }
+            })
+                 
             write.csv(genes_df, file="genes_edb.csv", row.names=FALSE)
             ''')
 
