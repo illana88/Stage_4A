@@ -44,12 +44,17 @@ dtype_dict = {
     'description': str,
     'gene_id_version': str,
     'symbol': str,
-    'col12': int
+    'entrezid': int,
+    'type': int,
+    'exon_id': int,
+    'exon_id': int,
+    'exon_id': int,
+    'exon_id': int
 }
 
-print("col 12 : ", edb.iloc[:,12])
-print("col 13 : ", edb.iloc[:,13])
-print("col 14 : ", edb.iloc[:,14])
+print("col 15 : ", edb.iloc[:,15])
+print("col 16 : ", edb.iloc[:,16])
+print("col 17 : ", edb.iloc[:,17])
 
 print(edb.columns)
 
