@@ -28,7 +28,7 @@ ro.r('load("edb.RData")')
 
 # Also load gtf file fron V86
 # Get object of EnsDBV99
-
+pd.set_option('display.max_columns', None)
 edb = pd.read_csv("combined_genes_exons_transcripts.csv", low_memory=False)
 
 dtype_dict = {
@@ -47,9 +47,12 @@ dtype_dict = {
     'entrezid': int,
     'type': int,
     'exon_id': int,
-    'exon_id': int,
-    'exon_id': int,
-    'exon_id': int
+    'tx_id': str,
+    'tx_biotype': str,
+    'tx_cds_seq_start': str,
+    'tx_cds_seq_start': str,
+    'tx_cds_seq_start': str,
+    'tx_cds_seq_start': str
 }
 
 print("col 15 : ", edb.iloc[:,15])
