@@ -21,7 +21,9 @@ from concurrent.futures import ThreadPoolExecutor
 import gffutils
 import os
 import rpy2.robjects as ro
+from rpy2.robjects import pandas2ri
 
+pandas2ri.activate()
 ro.r('load("edb.RData")')
 
 # Also load gtf file fron V86
