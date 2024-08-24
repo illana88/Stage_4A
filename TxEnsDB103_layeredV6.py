@@ -50,14 +50,14 @@ dtype_dict = {
     'tx_id': str,
     'tx_biotype': str,
     'tx_cds_seq_start': str,
-    'tx_cds_seq_start': str,
-    'tx_cds_seq_start': str,
-    'tx_cds_seq_start': str
+    'tx_cds_seq_end': str,
+    'tx_support_level': str,
+    'tx_id_version': str
 }
 
-print("col 18 : ", edb.iloc[:,18])
-print("col 19 : ", edb.iloc[:,19])
-print("col 20 : ", edb.iloc[:,20])
+print("col 21 : ", edb.iloc[:,21])
+print("col 22 : ", edb.iloc[:,22])
+print("col 23 : ", edb.iloc[:,23])
 
 print(edb.columns)
 
