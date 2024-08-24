@@ -168,6 +168,7 @@ r_code = """
         library(ensembldb)
 
         load("edb.RData")
+        ls()
 
         for (i in 1:dim(SpliceData)[1])
         {
