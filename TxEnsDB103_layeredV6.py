@@ -25,12 +25,6 @@ import rpy2.robjects as ro
 ro.r('load("edb.RData")')
 edb = ro.globalenv['edb']
 
-df = ro.r('as.data.frame(edb)')
-df = pd.DataFrame.from_records(df)
-
-# Afficher le DataFrame avec pandas
-print(df)
-
 
 # Also load gtf file fron V86
 # Get object of EnsDBV99
