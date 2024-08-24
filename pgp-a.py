@@ -909,11 +909,8 @@ if arg1==4 or arg1==5 :
             edb <- query(ah, c("EnsDb", "Hsapiens", "103"))[[1]]
             save(edb, file="edb.RData")
 
-            # Convertir en dataframe
-            df_edb <- as.data.frame(edb)
-
-            # Enregistrer le dataframe en CSV
-            write.csv(df_edb, file="edb.csv", row.names=FALSE)
+            genes_df <- as.data.frame(genes(edb))
+            write.csv(genes_df, file="genes_edb.csv", row.names=FALSE)
             ''')
 
             print("CALLING TxEnsDB103_layeredV6.R to generate bed files")
