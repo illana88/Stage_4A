@@ -31,9 +31,7 @@ ro.r('load("edb.RData")')
 
 edb = pd.read_csv("combined_genes_exons_transcripts.csv")
 
-print("col 0 : ", edb.iloc[:5,0])
-print("col 5 : ", edb.iloc[:5,5])
-print("col 6 : ", edb.iloc[:5,6])
+print("col 0 : ", edb.iloc[:,0])
 
 # Read bed file from MAJIQ
 args = sys.argv[1:]
