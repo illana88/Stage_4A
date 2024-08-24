@@ -33,6 +33,8 @@ edb = pd.read_csv("combined_genes_exons_transcripts.csv", low_memory=False)
 
 dtype_dict = {
     'col0': str,
+    'col1': int,
+    'col2': int,
     'col5': str,
     'col6': str,
     'col7': str,
@@ -43,9 +45,9 @@ dtype_dict = {
     'col12': int
 }
 
-print("col 0 : ", edb.iloc[:,0])
-print("col 1 : ", edb.iloc[:,1])
-print("col 2 : ", edb.iloc[:,2])
+print("col 3 : ", edb.iloc[:,3])
+print("col 4 : ", edb.iloc[:,4])
+print("col 5 : ", edb.iloc[:,5])
 
 print(edb.columns)
 
