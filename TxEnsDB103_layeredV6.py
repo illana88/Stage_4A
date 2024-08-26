@@ -50,7 +50,6 @@ library(ensembldb)
 
 ah <- AnnotationHub()
 edb <- query(ah, c("EnsDb", "Hsapiens", "103"))[[1]]
-save(edb, file="edb.RData")
 
 genes_df <- as.data.frame(genes(edb))
 exons_df <- as.data.frame(exons(edb))
@@ -83,6 +82,7 @@ transcripts_df[setdiff(common_columns, names(transcripts_df))] <- NA
 combined_df <- rbind(genes_df, exons_df, transcripts_df)
 
 write.csv(combined_df, file="combined_genes_exons_transcripts.csv", row.names=FALSE)
+save(edb, file="edb.RData")
 ''')
 
 pd.set_option('display.max_columns', None)
@@ -224,7 +224,7 @@ r_code = """
         library(IRanges)
         library(ensembldb)
 
-        load("~/Programme/proteogenomic-pipeline_py/pgp-a/edb.RData")
+        load("edb.RData")
         ls()
 
         for (i in 1:dim(SpliceData)[1])
