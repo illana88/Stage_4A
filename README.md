@@ -1,4 +1,6 @@
 # Pour exécuter le pipeline original
+Lien du pipeline original : https://github.com/NIH-CARD/proteogenomic-pipeline
+<br>
 Pour commencer, il faut installer conda (par exemple via ce lien : https://docs.anaconda.com/free/miniconda/miniconda-other-installer-links/), puis créer l'environnement comme indiqué sur le pipeline original. Enfin, exéctuer les commandes suivantes :  
 conda config --add channels bioconda  
 conda config --add channels conda-forge  
@@ -135,8 +137,12 @@ python3 pgp-a.py
 ```
 
 Puis la ligne suivante va apparaître :  
-```python
-Option :
-```
- 
+'Option : '  
+ <br>
 Il faudra alors indiquer l'entier correspondant à l'option que l'on souhaite exécuter (de 0 à 5).  
+<br>
+De plus, si on exécute les options 1, 2, 3, 4, ou 5, il apparaîtra la ligne suivante :  
+'protein : '  
+<br>
+Il faudra ici indiquer le nom de la protéine que l'on souhaite étudier (par exemple : 'TDP43').  
+
