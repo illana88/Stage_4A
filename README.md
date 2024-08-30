@@ -19,7 +19,7 @@ Les fichiers nécessaires à l'exécution de cette partie sont les suivant (à a
 - TxEnsDB103_layeredV6.R  
 
 ### Option 0
-```python
-def hello_world():
-    print("Hello, World!")
+```bash
+bash pgp-a.sh 0 > pgp-a-0.txt 2> pgp-a-0.error.txt
+```
 
