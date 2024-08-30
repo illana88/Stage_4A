@@ -1,4 +1,8 @@
 # Pour exécuter le pipeline original
+Pour commencer, il faut installer conda (par exemple via ce lien : https://docs.anaconda.com/free/miniconda/miniconda-other-installer-links/), puis créer l'environnement comme indiqué sur le pipeline original. Enfin, exéctuer les commandes suivantes :  
+conda config --add channels bioconda  
+conda config --add channels conda-forge  
+
 ## Partie A
 Les fichiers nécessaires à l'exécution de cette partie sont les suivant (à avoir dans le dossier 'pgp-a') :  
 - abundant_tx.R  
