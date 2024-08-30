@@ -19,4 +19,7 @@ Les fichiers nécessaires à l'exécution de cette partie sont les suivant (à a
 - TxEnsDB103_layeredV6.R  
 
 ### Option 0
-Voici un exemple de code en ligne : `printf("Hello, World!");`
+```python
+def hello_world():
+    print("Hello, World!")
+
