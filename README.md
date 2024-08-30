@@ -72,3 +72,27 @@ On peut exécuter la commande suivante (entre 10 et 15 jours de temps d'exécuti
 bash pgp-a.sh 4 selected_events.csv > pgp-a-4.txt 2> pgp-a-4.error.txt
 ```
 
+
+## Partie B
+Les fichiers nécessaires à l'exécution de cette partie sont les suivant (à avoir dans le dossier 'pgp-b') :  
+- all_bams.tsv  
+- Auto_CoverV4_layered_intronV3.R
+- CE_inclusion.csv !!!!!!!!!!!!!!!!!  
+- check_aaV4_allFrames.R  
+- clean_selected_events.csv !!!!!!!!!!!!!!!!!  
+- esV5_layered_CDSV3.sh  
+- gencode.v38.annotation.gtf  
+- get_orf_cds.R  
+- ggsashimi_txV3.py
+- GRCh38_appris_data.principal.txt
+- GRCh38.p13.genome.fa
+- Homo_sapiens.GRCh38.103.gtf
+- merge_sashimis.py
+- palette.txt
+- pgp_b_ce_ir.sh
+- pgp_b.sh
+- principal_txs.csv !!!!!!!!!!!!!!!!
+- run_sashimiV1.sh
+- selected_events.csv
+- TxEnsDB103_layeredV6.R
+  
