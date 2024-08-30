@@ -77,9 +77,9 @@ bash pgp-a.sh 4 selected_events.csv > pgp-a-4.txt 2> pgp-a-4.error.txt
 Les fichiers nécessaires à l'exécution de cette partie sont les suivant (à avoir dans le dossier 'pgp-b') :  
 - all_bams.tsv  
 - Auto_CoverV4_layered_intronV3.R
-- CE_inclusion.csv !!!!!!!!!!!!!!!!!  
+- CE_inclusion.csv (à récupérer dans la partie A après exécution)  
 - check_aaV4_allFrames.R  
-- clean_selected_events.csv !!!!!!!!!!!!!!!!!  
+- clean_selected_events.csv (à récupérer dans la partie A après exécution)  
 - esV5_layered_CDSV3.sh  
 - gencode.v38.annotation.gtf  
 - get_orf_cds.R  
@@ -91,7 +91,7 @@ Les fichiers nécessaires à l'exécution de cette partie sont les suivant (à a
 - palette.txt
 - pgp_b_ce_ir.sh
 - pgp_b.sh
-- principal_txs.csv !!!!!!!!!!!!!!!!
+- principal_txs.csv (à récupérer dans la partie A après exécution)
 - run_sashimiV1.sh
 - selected_events.csv
 - TxEnsDB103_layeredV6.R
