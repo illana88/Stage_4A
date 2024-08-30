@@ -113,7 +113,7 @@ bash pgp_b.sh sorted_selected_events.csv > pgp_b_es.txt 2>pgp_b_es.error.txt
 <br><br><br><br>
 
 # Pour exécuter mon pipeline
-On commence de la même manière que précédemment en installant l'environnement conda et en s'assurant que la version de R sur cet environnement est bien '4.3.3'.  
+On commence de la même manière que précédemment en installant l'environnement conda et en s'assurant que la version de R sur cet environnement soit bien '4.3.3'.  
 
 ## Partie A
 Les fichiers nécessaires à l'exécution de cette partie sont les suivant (à avoir dans le dossier 'pgp-a') :  
@@ -146,3 +146,11 @@ De plus, si on exécute les options 0, 2, 3, 4, ou 5, il apparaîtra la ligne su
 <br>
 Il faudra ici indiquer le nom de la protéine que l'on souhaite étudier (par exemple : 'TDP43').  
 
+### Vérifications
+La partie A a entièrement été retranscrite en python (tous les fichiers de code), et a été testée en grande partie (toutes les options sauf la fin de l'option 4 ainsi que la fin du fichier TxEnsDB103_layeredV6.py - chercher en ctrl+F "##### Teste jusqu'ici et tout fonctionne #####").  
+<br>
+Il y a dans la fin de l'option 4 des appels à des variables nommées "usd_abs" ainsi que "dsd_abs" qui ne sont pas définies (j'ai simplement suivi le code du pipeline original, donc c'est peut-être une erreur ou pas le bon nom des variables).  
+
+<br><br>
+
+## Partie B
