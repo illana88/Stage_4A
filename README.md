@@ -96,3 +96,12 @@ Les fichiers nécessaires à l'exécution de cette partie sont les suivant (à a
 - selected_events.csv
 - TxEnsDB103_layeredV6.R
   
+### Première exécution
+On peut exécuter la commande suivante :  
+```bash
+bash pgp_b.sh selected_events.csv > pgp_b_es.txt 2>pgp_b_es.error.txt
+```
+Ou :
+```bash
+bash pgp_b.sh sorted_selected_events.csv > pgp_b_es.txt 2>pgp_b_es.error.txt
+```
