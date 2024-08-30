@@ -72,6 +72,7 @@ On peut exécuter la commande suivante (entre 10 et 15 jours de temps d'exécuti
 bash pgp-a.sh 4 selected_events.csv > pgp-a-4.txt 2> pgp-a-4.error.txt
 ```
 
+<br><br>
 
 ## Partie B
 Les fichiers nécessaires à l'exécution de cette partie sont les suivant (à avoir dans le dossier 'pgp-b') :  
@@ -106,7 +107,7 @@ Ou :
 bash pgp_b.sh sorted_selected_events.csv > pgp_b_es.txt 2>pgp_b_es.error.txt
 ```
 
-<br><br><br>
+<br><br><br><br>
 
 # Pour exécuter mon pipeline
 On commence de la même manière que précédemment en installant l'environnement conda et en s'assurant que la version de R sur cet environnement est bien '4.3.3'.  
