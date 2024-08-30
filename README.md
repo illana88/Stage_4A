@@ -106,11 +106,8 @@ Ou :
 bash pgp_b.sh sorted_selected_events.csv > pgp_b_es.txt 2>pgp_b_es.error.txt
 ```
 
+<br><br><br>
 
-
-
-
-          
 # Pour exécuter mon pipeline
 On commence de la même manière que précédemment en installant l'environnement conda et en s'assurant que la version de R sur cet environnement est bien '4.3.3'.  
 
