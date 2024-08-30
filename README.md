@@ -18,8 +18,13 @@ Les fichiers nécessaires à l'exécution de cette partie sont les suivant (à a
 - selected_events.csv  
 - TxEnsDB103_layeredV6.R  
 
-### Option 0
+### Option 0  
 ```bash
 bash pgp-a.sh 0 > pgp-a-0.txt 2> pgp-a-0.error.txt
+```
+
+### Option 1  
+```bash
+bash pgp-a.sh 1 selected_events.csv > pgp-a-1.txt 2> pgp-a-1.error.txt
 ```
 
