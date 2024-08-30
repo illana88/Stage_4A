@@ -61,9 +61,14 @@ bash pgp-a.sh 2 selected_events.csv > pgp-a-2.txt 2> pgp-a-2.error.txt
 ```
 
 ### Option 3
-On peut exécuter la commande suivante :  
+On peut exécuter la commande suivante (environ 45min de temps d'exécution) :  
 ```bash
 bash pgp-a.sh 3 > pgp-a-3.txt 2> pgp-a-3.error.txt
 ```
 
 ### Option 4
+On peut exécuter la commande suivante (entre 10 et 15 jours de temps d'exécution) :  
+```bash
+bash pgp-a.sh 4 selected_events.csv > pgp-a-4.txt 2> pgp-a-4.error.txt
+```
+
