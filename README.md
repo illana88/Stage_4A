@@ -39,10 +39,14 @@ Et enfin :
 BiocManager::install("GenomicRanges")
 BiocManager::install("GenomeInfoDB")
 ```
-- Suppression des gènes TNNI3 et DNAAF3 de LGR 432 dans le fichier ”principal txs.csv”
-- Dans Tx_EnsDB103_layeredV6.R, remplacer les '\n\t+' et les '\n +' par des '\n'
-- Exécuter Tx_EnsDB103_layeredV6.R directement dans le terminal (20 lignes par 20 lignes)
 
+- Suppression des gènes TNNI3 et DNAAF3 de LGR 432 dans le fichier ”principal txs.csv” (en s'aidant de la commande suivante :)
+```bash
+grep -w -v TNNI3 principal_txs.csv
+```
+  
+- Dans Tx_EnsDB103_layeredV6.R, remplacer les '\n\t+' et les '\n +' par des '\n' (utiliser BBEdit par exemple)
+- Exécuter Tx_EnsDB103_layeredV6.R directement dans le terminal (20 lignes par 20 lignes)
 
 
 
