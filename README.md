@@ -48,8 +48,8 @@ grep -w -v TNNI3 principal_txs.csv
 - Dans Tx_EnsDB103_layeredV6.R, remplacer les '\n\t+' et les '\n +' par des '\n' (utiliser BBEdit par exemple)
 - Exécuter Tx_EnsDB103_layeredV6.R directement dans le terminal (20 lignes par 20 lignes)
 
-
-
+  
+Pour finir, on peut exécuter la commande suivante :  
 ```bash
 bash pgp-a.sh 1 selected_events.csv > pgp-a-1.txt 2> pgp-a-1.error.txt
 ```
