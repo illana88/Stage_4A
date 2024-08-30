@@ -24,6 +24,28 @@ bash pgp-a.sh 0 > pgp-a-0.txt 2> pgp-a-0.error.txt
 ```
 
 ### Option 1  
+Dans cette option, il y avoir plusieurs points à revoir par rapport au pipeline original :  
+- Installation des librairies suivantes (lancer R dans l'environnement conda) : BiocManager, RCurl, GenomeInfoDB,
+et GenomicRanges à l'aide des commandes suivantes :
+```R  
+install.packages("BiocManager")
+```
+Puis :  
+```bash
+conda install -c r r-devtools r-bitops r-rcurl
+```
+Et enfin :  
+```R
+BiocManager::install("GenomicRanges")
+BiocManager::install("GenomeInfoDB")
+```
+- Suppression des gènes TNNI3 et DNAAF3 de LGR 432 dans le fichier ”principal txs.csv”
+- Dans Tx_EnsDB103_layeredV6.R, remplacer les '\n\t+' et les '\n +' par des '\n'
+- Exécuter Tx_EnsDB103_layeredV6.R directement dans le terminal (20 lignes par 20 lignes)
+
+
+
+
 ```bash
 bash pgp-a.sh 1 selected_events.csv > pgp-a-1.txt 2> pgp-a-1.error.txt
 ```
