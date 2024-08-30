@@ -1,4 +1,4 @@
-### Pour exécuter le pipeline original
+# Pour exécuter le pipeline original
 ## Partie A
 Les fichiers nécessaires à l'exécution de cette partie sont les suivant (à avoir dans le dossier 'pgp-a') :
 abundant_tx.R
@@ -14,4 +14,4 @@ run_sashimiV1.sh
 selected_events.csv
 TxEnsDB103_layeredV6.R
 
-# Option 0
+### Option 0
