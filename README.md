@@ -135,5 +135,8 @@ python3 pgp-a.py
 ```
 
 Puis la ligne suivante va apparaître :  
-'Option :'  
+```python
+Option :
+```
+ 
 Il faudra alors indiquer l'entier correspondant à l'option que l'on souhaite exécuter (de 0 à 5).  
