@@ -54,3 +54,16 @@ Pour finir, on peut exécuter la commande suivante :
 bash pgp-a.sh 1 selected_events.csv > pgp-a-1.txt 2> pgp-a-1.error.txt
 ```
 
+### Option 2
+On peut exécuter la commande suivante :  
+```bash
+bash pgp-a.sh 2 selected_events.csv > pgp-a-2.txt 2> pgp-a-2.error.txt
+```
+
+### Option 3
+On peut exécuter la commande suivante :  
+```bash
+bash pgp-a.sh 3 > pgp-a-3.txt 2> pgp-a-3.error.txt
+```
+
+### Option 4
