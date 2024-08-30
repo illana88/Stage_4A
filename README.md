@@ -141,7 +141,7 @@ Puis la ligne suivante va apparaître :
  <br>
 Il faudra alors indiquer l'entier correspondant à l'option que l'on souhaite exécuter (de 0 à 5).  
 <br>
-De plus, si on exécute les options 1, 2, 3, 4, ou 5, il apparaîtra la ligne suivante :  
+De plus, si on exécute les options 0, 2, 3, 4, ou 5, il apparaîtra la ligne suivante :  
 'protein : '  
 <br>
 Il faudra ici indiquer le nom de la protéine que l'on souhaite étudier (par exemple : 'TDP43').  
