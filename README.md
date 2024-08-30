@@ -1,6 +1,6 @@
 # Pour exécuter le pipeline original
 ## Partie A
-Les fichiers nécessaires à l'exécution de cette partie sont les suivant (à avoir dans le dossier 'pgp-a') :\n
+Les fichiers nécessaires à l'exécution de cette partie sont les suivant (à avoir dans le dossier 'pgp-a') : \n
 abundant_tx.R
 all_bams.tsv
 Auto_CoverV4_layered_intronV3.R
