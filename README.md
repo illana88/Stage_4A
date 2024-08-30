@@ -149,10 +149,41 @@ De plus, si on exécute les options 0, 2, 3, 4, ou 5, il apparaîtra la ligne su
 Il faudra ici indiquer le nom de la protéine que l'on souhaite étudier (par exemple : 'TDP43').  
 
 ### Vérifications
-La partie A a entièrement été retranscrite en python (tous les fichiers de code), et a été testée en grande partie (toutes les options sauf la fin de l'option 4 ainsi que la fin du fichier TxEnsDB103_layeredV6.py - chercher en ctrl+F "##### Teste jusqu'ici et tout fonctionne #####").  
+La partie A a entièrement été retranscrite en Python (tous les fichiers de code), et a été testée en grande partie (toutes les options sauf la fin de l'option 4 ainsi que la fin du fichier TxEnsDB103_layeredV6.py - chercher en ctrl+F "##### Teste jusqu'ici et tout fonctionne #####").  
 <br>
 Il y a dans la fin de l'option 4 des appels à des variables nommées "usd_abs" ainsi que "dsd_abs" qui ne sont pas définies (j'ai simplement suivi le code du pipeline original, donc c'est peut-être une erreur ou pas le bon nom des variables).  
 
 <br><br>
 
 ## Partie B
+Les fichiers nécessaires à l'exécution de cette partie sont les suivant (à avoir dans le dossier 'pgp-b') :  
+- all_bams.tsv  
+- Auto_CoverV4_layered_intronV3.py
+- CE_inclusion.csv (à récupérer dans la partie A après exécution)  
+- check_aaV4_allFrames.R  
+- clean_selected_events.csv (à récupérer dans la partie A après exécution)  
+- esV5_layered_CDSV3.py  
+- gencode.v38.annotation.gtf  
+- get_orf_cds.R  
+- ggsashimi_txV3.py
+- GRCh38_appris_data.principal.txt
+- GRCh38.p13.genome.fa
+- Homo_sapiens.GRCh38.103.gtf
+- merge_sashimis.py
+- palette.txt
+- pgp_b_ce_ir.sh
+- pgp_b.sh
+- pgp_b.py (seulement pour le début)
+- principal_txs.csv (à récupérer dans la partie A après exécution)
+- run_sashimiV1.py
+- selected_events.csv
+- TxEnsDB103_layeredV6.py  
+
+### Première exécution
+On peut exécuter la commande suivante :  
+```python
+python3 pgp_b.py
+```
+
+### Vérifications  
+Pour cette partie, je n'ai eu le temps de retranscrire que le début de pgp_b.sh ainsi que tout le fichier esV5_layered_CDSV3.sh en Python, et je n'ai eu le temps que de tester le début de pgp_b.py.  
