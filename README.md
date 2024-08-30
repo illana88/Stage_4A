@@ -19,6 +19,7 @@ Les fichiers nécessaires à l'exécution de cette partie sont les suivant (à a
 - TxEnsDB103_layeredV6.R  
 
 ### Option 0  
+On peut exécuter la commande suivante :  
 ```bash
 bash pgp-a.sh 0 > pgp-a-0.txt 2> pgp-a-0.error.txt
 ```
@@ -113,3 +114,26 @@ bash pgp_b.sh sorted_selected_events.csv > pgp_b_es.txt 2>pgp_b_es.error.txt
 On commence de la même manière que précédemment en installant l'environnement conda et en s'assurant que la version de R sur cet environnement est bien '4.3.3'.  
 
 ## Partie A
+Les fichiers nécessaires à l'exécution de cette partie sont les suivant (à avoir dans le dossier 'pgp-a') :  
+- abundant_tx.py  
+- all_bams.tsv  
+- Auto_CoverV4_layered_intronV3.py  
+- gencode.v38.annotation.gtf  
+- ggsashimi_txV3.py  
+- GRCh38_appris_data.principal.txt  
+- Homo_sapiens.GRCh38.103.chr.sorted_new.gtf  
+- palette.txt  
+- pgp-a.py  
+- run_sashimiV1.py  
+- selected_events.csv  
+- TxEnsDB103_layeredV6.py
+
+### Options
+On peut exécuter la commande suivante :  
+```python
+python3 pgp-a.py
+```
+
+Puis la ligne suivante va apparaître :  
+'Option :'  
+Il faudra alors indiquer l'entier correspondant à l'option que l'on souhaite exécuter (de 0 à 5).  
