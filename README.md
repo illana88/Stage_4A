@@ -1,5 +1,5 @@
 # Pour exécuter le pipeline original
-Lien du pipeline original : https://github.com/NIH-CARD/proteogenomic-pipeline
+Lien du pipeline original : https://github.com/NIH-CARD/proteogenomic-pipeline  
 <br>
 Pour commencer, il faut installer conda (par exemple via ce lien : https://docs.anaconda.com/free/miniconda/miniconda-other-installer-links/), puis créer l'environnement comme indiqué sur le pipeline original. Enfin, exéctuer les commandes suivantes :  
 conda config --add channels bioconda  
