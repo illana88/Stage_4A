@@ -15,7 +15,8 @@ Les fichiers nécessaires à l'exécution de cette partie sont les suivant (à a
 - gencode.v38.annotation.gtf  
 - ggsashimi_txV3.py  
 - GRCh38_appris_data.principal.txt  
-- Homo_sapiens.GRCh38.103.chr.sorted_new.gtf  
+- Homo_sapiens.GRCh38.103.chr.sorted_new.gtf
+- merge_sashimis.py
 - palette.txt  
 - pgp-a.sh  
 - run_sashimiV1.sh  
