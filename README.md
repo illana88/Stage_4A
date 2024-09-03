@@ -102,6 +102,11 @@ Les fichiers nécessaires à l'exécution de cette partie sont les suivant (à a
 - run_sashimiV1.sh
 - selected_events.csv
 - TxEnsDB103_layeredV6.R
+<br>
+Ainsi que le dossier ce_ext/ contenant les fichiers suivants :
+- ce_inclusion.csv (à récupérer dans la partie A après exécution)  
+- ce_extension.csv (à récupérer dans la partie A après exécution)  
+- IR.csv (à récupérer dans la partie A après exécution)  
   
 ### Première exécution
 On peut exécuter la commande suivante :  
