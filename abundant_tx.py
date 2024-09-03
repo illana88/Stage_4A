@@ -1,5 +1,3 @@
-########## abundant_tx.R codé en Pyhton ##########
-
 import os
 import pandas as pd
 
@@ -71,5 +69,3 @@ Tx_ddf['GeneID'] = Tx_ddf['GeneID'].str.split('.', n=1, expand=True)[0]
 Tx_ddf['TxID'] = Tx_ddf['TxID'].str.split('.', n=1, expand=True)[0]
 Tx_ddf.to_csv("principal_txs.csv", index=False, sep=',', header=False)
 print('Done With Txs Table: principal_txs.csv')
-
-########## FIN abundant_tx.R cod√© en Pyhton ##########

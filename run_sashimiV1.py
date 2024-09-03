@@ -1,5 +1,3 @@
-########## run_sashimiV1.sh codé en Pyhton ##########
-
 import os
 import glob
 import subprocess
@@ -1540,5 +1538,3 @@ if len(args)==3 :
 
 #                         result = subprocess.run(command)
 #                         print(result.stdout)
-                        
-#             ########## FIN run_sashimiV1.sh codé en Pyhton ##########

@@ -1,5 +1,3 @@
-########## Auto_CoverV4_layered_intronV3.R codé en Pyhton ##########
-
 import pandas as pd
 import numpy as np
 import os
@@ -423,5 +421,3 @@ with open(f"{folder}/Summary_stats.txt", "a") as f :
     f.write(f"            ce_inclusion events are: {cnt_ce}\n")
     f.write(f"            ce_extension events are: {cnt_ext}\n")
     f.write(f"            IR events are: {cnt_ir}\n")
-
-########## FIN Auto_CoverV4_layered_intronV3.R codé en Pyhton ##########
